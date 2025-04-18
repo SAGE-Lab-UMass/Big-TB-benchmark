@@ -68,7 +68,7 @@ def select_subset_alignment(alignment, start, end, reference_numbers):
             print(f"Error: Invalid range (start_index={start_index}, end_index={end_index}). Returning None.")
             return None
 
-        selection = np.arange(start_index, end_index)
+        selection = np.arange(start_index, end_index+1)
         # print("Selected columns:", selection)
 
         return alignment.select(columns=selection)

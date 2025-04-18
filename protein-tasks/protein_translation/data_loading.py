@@ -34,7 +34,7 @@ def load_alignment(file_path, alphabet='-actg'):
 
             
 def load_feature_matrix_and_labels(gene_name):
-    file_dir ="/work/pi_annagreen_umass_edu/mahbuba/phenotype_prediction/fused_lasso/latest_codes/feature_matrix_labels"
+    file_dir ="/work/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/feature_matrix_labels"
     feature_matrix_file = f'{file_dir}/{gene_name}_feature_matrix.npy'
     print(feature_matrix_file)
     labels_file = f'{file_dir}/{gene_name}_labels.npy'
