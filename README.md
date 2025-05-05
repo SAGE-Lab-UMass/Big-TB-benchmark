@@ -30,14 +30,22 @@ Each gene-specific CSV file includes:
 
 ## Pipeline Overview
 
-### 1.  Protein Translation from Variant FASTA
+### 1. Generate Variant FASTA from Raw VCF
+Scripts to create variant FASTA files per gene region from raw VCF files.
+
+- The alignments are provided as:
+   -  Aligned: Variant FASTA sequences having gaps representing insertions/deletions in the H37Rv sequence. 
+   - Unaligned: Variant FASTA sequences without any gaps.
+
+### 2.  Protein Translation from Variant FASTA
 Scripts to extract and translate gene/operon regions from aligned variant FASTA files.
 
 - Handles CDS slicing, operon-aware boundaries
 - Gap-aware coordinate mapping with validation against MycoBrowser
 
+### 3. Annotate VCFs
 
-### 2. Model Training
+### 4. Model Training
 
 ####  Classical ML
 - Logistic Regression, Ridge, Lasso (variant encodings)
@@ -50,7 +58,7 @@ Each model is evaluated:
 - Per antibiotic
 - Across different sequence representations
 
-### 3.  Interpretability
+### 4.  Interpretability
 
 #### Leave-One-Residue-Out Occlusion
 - Compute per-residue importance by re-evaluating model performance after masking each amino acid
