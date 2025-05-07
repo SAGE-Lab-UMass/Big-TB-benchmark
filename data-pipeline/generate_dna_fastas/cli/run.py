@@ -15,10 +15,11 @@ def main():
                         help="Output file type (default: combined)")
     parser.add_argument("--msa-type", choices=["aligned", "unaligned"], required=True,
                         help="Whether to generate aligned or unaligned FASTAs")
+    
+    
+    # Data paths
     parser.add_argument("--genbank", default="data/genbank_reference_data/genome.gbff",
                         help="Path to the GenBank reference file")
-    
-    # data paths
     parser.add_argument("--input-vcf-paths", default="raw_vcf_paths/raw_vcf_normal_paths.txt",
                         help="Path to the input VCF paths file")
     parser.add_argument("--secondary-vcf-paths", default="raw_vcf_paths/raw_vcf_cryptic_paths.txt",
