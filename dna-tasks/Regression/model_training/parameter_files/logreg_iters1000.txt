@@ -1,0 +1,13 @@
+## Parameter file for run_logreg_l2.py
+
+drug: STREPTOMYCIN
+max_iterations: 1000
+regularization: l2
+output_dir: training_output/results_logreg_1000
+
+
+# File containing phenotypes of each strain, tab-separated values
+
+genotype_sites_file: data/reduced_input/site_indices.csv
+input_data_file: data/reduced_input/combined_geno_pheno_df.csv
+
