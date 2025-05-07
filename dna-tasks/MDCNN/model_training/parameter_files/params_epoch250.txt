@@ -1,0 +1,28 @@
+## Parameter file for run_cnn.py
+
+filter_size: 12
+N_epochs: 250
+output_path: training_output/results_ccp_filter12_epoch250_sbatch
+
+
+# File containing phenotypes of each strain, tab-separated values
+
+phenotype_file: input_data/phenotype/master_table_resistance.csv
+
+genotype_input_directory: input_data/fasta_files/combined_fastas
+
+pkl_file: model_training/pickle_files/mtb_cnn_geno_pheno_train_test.pkl
+
+# model_training/pickle_files/mtb_cnn_geno_pheno_train_test.parquet
+
+pkl_file_sparse_train:  model_training/pickle_files/mtb_cnn_X_sparse_train.npy.npz
+
+pkl_file_sparse_test:  model_training/pickle_files/mtb_cnn_X_sparse_test.npy.npz
+
+alpha_file:  model_training/pickle_files/alpha_mtb_cnn_train.csv
+
+saved_model_path: training_output/saved_models/mtb_cnn_filter12_epoch250_sbatch
+
+metadata_path: model_training/pickle_files/geno_pheno_metadata.parquet
+h5_path: model_training/pickle_files/geno_onehot.h5
+
