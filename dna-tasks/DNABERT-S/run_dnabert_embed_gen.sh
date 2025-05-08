@@ -12,11 +12,6 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 # Load Hugging Face token securely from a hidden env file
 source ~/.hf_token.env
 
-
-# Optional: Set shared cache directory (recommended on clusters with shared storage)
-# mkdir -p /project/pi_annagreen_umass_edu/saishradha/project_data_curation/huggingface_cache
-# mkdir -p $HF_HOME  # Ensure it exists
-
 # ====================================
 # Python environment setup
 # ====================================
