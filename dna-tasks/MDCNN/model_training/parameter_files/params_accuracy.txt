@@ -2,25 +2,22 @@
 
 filter_size: 12
 N_epochs: 150
-output_path: results_20210107_ccp_accuracy
+output_path: training_output/results_ccp_accuracy150
 
 # File containing phenotypes of each strain, tab-separated values
 
-phenotype_file: input_data/phenotype/master_table_resistance_filtered.csv
+phenotype_file: ../../data/phenotype/master_table_resistance.csv
+genotype_input_directory: ../../data/genotype/fastas
 
-genotype_input_directory: input_data/fasta_files/original
+geno_pheno_pkl_file: model_training/pickle_files/mtb_cnn_geno_pheno_train_test.pkl
 
-pkl_file: model_training/pickle_files
-multitask_geno_pheno_train_test.pkl
+pkl_file_sparse_train:  model_training/pickle_files/mtb_cnn_X_sparse_train.npy.npz
+pkl_file_sparse_test:  model_training/pickle_files/mtb_cnn_X_sparse_test.npy.npz
 
-pkl_file_sparse_train:  multitask_X_sparse_train.npy.npz
-
-pkl_file_sparse_test:  multitask_X_sparse_test.npy.npz
-
-alpha_file:  alpha_multitask_train_test.csv
-
-saved_model_path: saved_models/multitask_model_conv_conv_pool_filter12
+alpha_file:  model_training/pickle_files/alpha_mtb_cnn_train.csv
+saved_model_path: training_output/saved_models/mtb_cnn_filter12_epoch250
 
 threshold_file: threshold_file.csv
 
-
+metadata_path: model_training/pickle_files/geno_pheno_metadata.parquet
+h5_path: model_training/pickle_files/geno_onehot.h5
