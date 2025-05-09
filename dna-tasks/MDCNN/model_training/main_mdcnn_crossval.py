@@ -45,9 +45,7 @@ def run():
         kernel_size = len(BASE_TO_COLUMN)
         num_drugs = len(drugs)
         
-		#TODO: replace X.shape with passed argument
         model = models.Sequential()
-		#TODO: add filter size argument
         model.add(layers.Conv2D(
             64, (kernel_size, filter_size),
             data_format='channels_last',
@@ -63,7 +61,7 @@ def run():
         model.add(layers.Flatten())
         model.add(layers.Dense(256, activation='relu', name='d1'))
         model.add(layers.Dense(256, activation='relu', name='d2'))
-        model.add(layers.Dense(13, activation='sigmoid', name='d4'))
+        model.add(layers.Dense(num_drugs, activation='sigmoid', name='d4'))
 
         opt = Adam(learning_rate=np.exp(-1.0 * 9))
 
@@ -112,13 +110,9 @@ def run():
                     batch_size=128,
                     callbacks=[self.tensorboard_callback]
                 )
-
-                # TODO: Write history to a log file   
-                # print('\nhistory dict:', history.history)
                 return pd.DataFrame.from_dict(data=history.history)
             else:
                 history = self.model.fit(X_train, y_train, epochs=self.epochs, batch_size=128, callbacks=[tensorboard_callbacks])
-                # print('\nhistory dict:', history.history)
                 return pd.DataFrame.from_dict(data=history.history)
 
         def predict(self, X_val):
@@ -149,11 +143,7 @@ def run():
     # parquet_file = kwargs["metadata_path"]
     # h5_file = kwargs["h5_path"]
 
-    # train_indices_file = "train_indices.npy"
-    # test_indices_file = "test_indices.npy"
     num_drugs = len(drugs)
-
-    start = time.time()
 
     # Determine whether pickle already exists
     if os.path.isfile(pkl_file):
@@ -168,8 +158,7 @@ def run():
     df_geno_pheno = pd.read_pickle(pkl_file)
     print("done!\n")
 
-
-    
+    # If want to use parquet/h5 files instead of pkl
     # if os.path.isfile(parquet_file) and os.path.isfile(h5_file):
     #     print("genotype-phenotype df files already exist, proceeding with modeling")
     # else:
@@ -224,7 +213,6 @@ def run():
 
     print("creating y from geno_pheno df...")
     y_all_train, y_array = rs_encoding_to_numeric(df_geno_pheno.query("category=='set1_original_10202'"), drugs)
-    # y_all_train, y_array = rs_encoding_to_numeric(train_df, drugs)
     del train_df
     del train_indices
     del test_indices
@@ -236,8 +224,8 @@ def run():
     y_all_train = y_all_train[drugs].values.astype(int)
     print("done!\n")
 
-    print("considering isolates with at least 1 resistance status across all drugs...")
     # obtain isolates with at least 1 resistance status to length of drugs
+    print("considering isolates with at least 1 resistance status across all drugs...")
     indices_with_R_phenotype = np.where(y_all_train.sum(axis=1) != -num_drugs)
 
     X = X_sparse_train[indices_with_R_phenotype]

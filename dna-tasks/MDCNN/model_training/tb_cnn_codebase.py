@@ -29,39 +29,6 @@ from Bio import SeqIO
 
 from parameters.locus_order import drugs, locus_order, BASE_TO_COLUMN
 
-# Mapping to use for one-hot encoding
-# BASE_TO_COLUMN = {'A': 0, 'C': 1, 'T': 2, 'G': 3, '-': 4}
-
-
-# Get one hot vector
-# def get_one_hot(sequence):
-#     """
-# 	Creates a one-hot encoding of a sequence
-# 	Parameters
-# 	----------
-# 	sequence: iterable of str
-# 		Sequence containing only ACTG- characters
-
-# 	Returns
-# 	-------
-# 	np.ndarray of int
-# 		L (seq len) x len(one-hot encoded sequence)
-# 	"""
-
-#     seq_len = len(sequence)
-#     seq_in_index = [BASE_TO_COLUMN.get(b, b) for b in sequence]
-#     one_hot = np.zeros((seq_len, len(BASE_TO_COLUMN)), dtype=int)
-
-#     # Check if any element in seq_in_index is not an integer
-#     for i, val in enumerate(seq_in_index):
-#         if not isinstance(val, int):
-#             raise ValueError(f"Non-integer value found at position {i}: {val}")
-
-#     # Assign the found positions to 1
-#     one_hot[np.arange(seq_len), np.array(seq_in_index)] = 1
-
-#     return one_hot
-
 def get_one_hot(sequence):
     """
     Creates a one-hot encoding of a sequence
@@ -152,14 +119,6 @@ def make_genotype_df(genotype_input_directory):
         dfs_list.append(_df)
     df_genos = dfs_list[0].join(dfs_list[1:], how='outer')
     
-    # # Check if both ethA and ethR columns are present
-    # if 'ethA' in df_genos.columns and 'ethR' in df_genos.columns:
-    #     # Concatenate the two columns row-wise into a new ethAR column
-    #     df_genos['ethAR'] = df_genos['ethA'].astype(str) + df_genos['ethR'].astype(str)
-
-    #     # Drop the original columns
-    #     df_genos.drop(['ethA', 'ethR'], axis=1, inplace=True)
-    
     print(f"\nnumber of isolates in each fasta file {len(df_genos)}")
     return df_genos
 
@@ -233,11 +192,6 @@ def alpha_mat(subset_y, df_geno_pheno, weight=1.):
     num_drugs = len(drugs)
     y_cnn = subset_y
 
-    # export y_cnn to csv with only LEVOFLOXACIN column
-    # y_cnn_l = y_cnn[:, 5]
-    # y_cnn_df = pd.DataFrame(y_cnn_l, columns=['LEVOFLOXACIN'])
-    # y_cnn_df.to_csv("y_cnn.csv")    
-
     # generate alpha matrix
     alphas = np.zeros(num_drugs, dtype=float)
     alpha_matrix = np.zeros_like(y_cnn, dtype=float)
@@ -258,6 +212,12 @@ def alpha_mat(subset_y, df_geno_pheno, weight=1.):
 def make_geno_pheno_dataset(**kwargs):
     """
     Creates and saves phenotype info as Parquet and one-hot genotypes as HDF5.
+
+    Required kwargs:
+        phenotype_file: path to input phenotype file with columns "Isolate" and drug names
+        genotype_input_directory: path to directory with input fasta files
+        metadata_path: path to save the combined phenotype and genotype data as Parquet
+        h5_path: path to save the one-hot encoded genotypes as HDF5
     """
     metadata_path = kwargs["metadata_path"]
     h5_path = kwargs["h5_path"]
