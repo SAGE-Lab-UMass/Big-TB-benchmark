@@ -3,3 +3,6 @@ __pycache__
 
 # checkpoint files
 *.ipynb_checkpoints
+
+# remove data files
+dna-tasks/Regression/data/*

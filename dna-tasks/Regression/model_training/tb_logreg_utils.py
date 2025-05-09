@@ -2,15 +2,23 @@ import os
 import numpy as np
 
 def set_parameters():
+    """
+    Set the hyperparameters for the Logistic Regression model.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the hyperparameters for the model.
+        Currently, only the regularization parameter 'C' is set.
+        The values are chosen based on a logarithmic scale.
+    """
     parameters = {"C": [0.0001, 0.001, 0.01, 0.1, 1.]}
     return parameters
 
 def get_threshold_val(y_true, y_pred):
     """
     Compute the optimal threshold for prediction  based on the max sum of specificity and Sensitivity
-
     NB that we encoded R as 0, S as 1, so smaller predictions indicate higher chance of resistance
-
     We count falsely predicted resistance as a false positive, falsely predicted sensitivity as a false negative
 
     Parameters

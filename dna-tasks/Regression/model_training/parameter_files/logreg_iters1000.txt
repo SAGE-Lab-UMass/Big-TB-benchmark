@@ -4,6 +4,7 @@ drug: STREPTOMYCIN
 max_iterations: 1000
 regularization: l2
 output_dir: training_output/results_logreg_1000
+test_size: 0.2
 
 
 # File containing phenotypes of each strain, tab-separated values

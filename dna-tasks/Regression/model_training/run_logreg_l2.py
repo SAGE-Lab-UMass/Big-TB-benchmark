@@ -30,7 +30,9 @@ max_iters = kwargs["max_iterations"]
 penalty = kwargs["regularization"]
 genotype_sites_file = kwargs["genotype_sites_file"]
 input_data_file = kwargs["input_data_file"]
+test_size = kwargs["test_size"]
 
+print(f"Running logistic regression for drug {drug} with penalty {penalty} and max iterations {max_iters}\n")
 
 # Read in the genotypes of interest
 print("reading in genotypes of interest")
@@ -43,7 +45,7 @@ input_data_df = pd.read_csv(f"{input_data_file}", index_col=0, low_memory=False)
 
 # Perform a 70/30 train-test split
 all_indices = input_data_df.index
-train_indices, test_indices = train_test_split(all_indices, test_size=0.3, random_state=42)
+train_indices, test_indices = train_test_split(all_indices, test_size=test_size, random_state=42)
 train_df = input_data_df.loc[train_indices]
 test_df = input_data_df.loc[test_indices]
 print("Total train samples", train_df.shape)
