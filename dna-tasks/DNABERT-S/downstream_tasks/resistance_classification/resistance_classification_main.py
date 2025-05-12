@@ -76,7 +76,6 @@ def main(args):
     model = model.cuda()
 
     # Loss and Optimizer
-    # criterion = nn.BCEWithLogitsLoss()
     criterion = MaskedMultiWeightedBCE()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -89,34 +88,6 @@ def main(args):
     # trained_model, _ = train_kfold(model, dataset, optimizer, criterion, acc_metric, k_folds=5, epochs=epochs, train_batch_size=args.train_batch_size, val_batch_size=args.val_batch_size, device=device)
     trained_model = train_kfold_mod(model, dataset, drugs, optimizer, criterion, acc_metric, auc_threshold, output_path=args.output_path, saved_model_path=args.saved_model_path, k_folds=5, epochs=epochs, train_batch_size=args.train_batch_size, val_batch_size=args.val_batch_size, device=device)
 
-    # # Training Loop
-    # model.train()
-    # for epoch in range(epochs):
-    #     running_loss = 0.0
-    #     for batch_emb, batch_labels in dataloader:
-    #         inputs = batch_emb.to(device)
-    #         targets = batch_labels.to(device)
-    #         alphas = calculate_alphas(targets).to(device)
-
-    #         optimizer.zero_grad()
-    #         outputs = model(inputs)
-
-    #         # loss = criterion(outputs, targets.float())  
-    #         per_sample_loss = criterion(alphas, outputs)
-    #         loss = torch.mean(per_sample_loss)
-    #         accuracy = acc_metric(alphas, outputs)
-
-    #         loss.backward()
-    #         optimizer.step()
-
-    #         running_loss += loss.item()
-    #         # print("Item loss:", loss.item())
-    #         # print("Item accuracy:", accuracy.item())
-
-    #     print(f"Epoch [{epoch+1}/{epochs}] Loss: {running_loss/len(dataloader):.4f} Accuracy: {accuracy.item():.4f}")
-
-    # Save model
-    torch.save(trained_model.state_dict(), 'downstream_cnn_cv.pt')
 
 
 if __name__ == "__main__":

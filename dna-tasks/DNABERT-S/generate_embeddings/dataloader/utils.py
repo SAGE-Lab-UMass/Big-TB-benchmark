@@ -135,27 +135,6 @@ def make_genotype_df(genotype_input_directory):
     # Make a df that combines all genotype data
     dfs_list = []
 
-    # locus_order = [
-    #     "acpM-kasA",
-    #     "gid",
-    #     "rpsA",
-    #     "clpC",
-    #     "embCAB",
-    #     "aftB-ubiA",
-    #     "rrs-rrl",
-    #     "ethAR",
-    #     "oxyR-ahpC",
-    #     "tlyA",
-    #     "KatG",
-    #     "rpsL",
-    #     "rpoBC",
-    #     "FabG1-inhA",
-    #     "eis",
-    #     "gyrBA",
-    #     "panD",
-    #     "pncA"
-    # ]
-
     for l in locus_order:
         print("reading locus", l)
         print("looking for fasta files", f"{genotype_input_directory}/{l}*.fasta")
@@ -171,6 +150,7 @@ def make_genotype_df(genotype_input_directory):
     df_genos = dfs_list[0].join(dfs_list[1:], how='outer')
     print(f"size of df geno {len(df_genos)}\n")
     return df_genos
+    
 
 def alpha_mat(res_phenotypes_label, weight=1.0):
     """

@@ -10,10 +10,9 @@ import tqdm
 import ipdb
 
 from dataloader.dataloader import multi_gene_multi_drug_loader_csv
-from multigene_model import DNABERTClassifier
+from models.multigene_model import DNABERTClassifier
 from utils.model_utils import * 
 from utils.classification_metric_utils import *
-# from multigene_train import train_dnabert_classifier
 from multigene_acc_grad_train import train_dnabert_classifier
 from peft import get_peft_model
 
