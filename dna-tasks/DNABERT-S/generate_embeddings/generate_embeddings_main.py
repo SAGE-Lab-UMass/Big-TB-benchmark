@@ -36,7 +36,7 @@ def main(args):
 
     # get tokenizer and model
     print("Loading tokenizer and model...")
-    tokenizer, model = get_tokenizer_model(args.model_name, args.max_length)
+    tokenizer, model = get_tokenizer_model(args.model_name_or_path, args.embed_type, args.ft_model_path, args.max_length)
     print("done!\n")
 
     # parallelize model
@@ -53,10 +53,12 @@ def main(args):
 
     # get dnabertS embeddings for our data
     print("Getting dnabertS embeddings for our training data...")
-    calculate_dnaberts_embedding(train_loader, tokenizer, model, device, args.max_length, args.embed_dir, data="train")
+    # # train_embeddings, train_res_phenotypes = calculate_dnaberts_embedding_old(train_loader, tokenizer, model, device, args.max_length, args.embed_dir)
+    calculate_dnaberts_embedding(train_loader, tokenizer, model, device, args.max_length, args.embed_dir, data_partition="train")
     print("done!\n")
 
     del train_loader
+
     torch.cuda.empty_cache()
     print("Freeing up GPU memory...\n")
 
@@ -66,18 +68,29 @@ def main(args):
     print("done!\n")
 
     print("Getting dnabertS embeddings for our validation data...")
-    calculate_dnaberts_embedding(val_loader, tokenizer, model, device, args.max_length, args.embed_dir, data="val")
+    # val_embeddings, val_res_phenotypes = calculate_dnaberts_embedding_old(val_loader, tokenizer, model, args.max_length, args.embed_dir)
+    calculate_dnaberts_embedding(val_loader, tokenizer, model, device, args.max_length, args.embed_dir, data_partition="val")
     print("done!\n")
 
-    del val_loader
+    # # del val_loader
     torch.cuda.empty_cache()
     print("Freeing up GPU memory...\n")
+
+    print("Stacking compressing final embeddings into .npz...\n")
+    stack_final_embeddings(args.embed_dir, data_partition="train")
+    stack_final_embeddings(args.embed_dir, data_partition="val")
 
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Evaluate clustering')
-    parser.add_argument('--model_name', type=str, default="zhihan1996/DNABERT-S", help='Model name')
+    parser = argparse.ArgumentParser(description='Generate embedings for the model')
+    # parser.add_argument('--test_model_dir', type=str, default="/root/trained_model", help='Directory to save trained models to test')
+    # parser.add_argument('--model_list', type=str, default="tnf, test", help='List of models to evaluate, separated by comma. Currently support [tnf, tnf-k, dnabert2, hyenadna, nt, test]')
+    # parser.add_argument('--data_dir', type=str, default="/root/data", help='Data directory')
+    parser.add_argument('--model_name_or_path', type=str, default="zhihan1996/DNABERT-S", help='Model name')
+    parser.add_argument('--ft_model_path', type=str, default="/project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/DNABERT_S/training_output/finetune/saved_models/dnabert_only_finetuned_epoch_4.pth", help='Path to the fine-tuned model')
+    parser.add_argument('--embed_type', type=str, default="zs", help='The kind of embedding to use. Currently support [zs, ft]')
+
     parser.add_argument('--max_length', type=int, default=3000, help="Max length of tokens")
     parser.add_argument('--train_batch_size', type=int, default=9, help="Batch size used for training dataset") # with 80GB VRAM - 9 batch size 
     parser.add_argument('--val_batch_size', type=int, default=9, help="Batch size used for validating dataset")

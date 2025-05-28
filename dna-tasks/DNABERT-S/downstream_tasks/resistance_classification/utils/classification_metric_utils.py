@@ -1,12 +1,15 @@
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import ipdb
+
 class MaskedMultiWeightedBCE(nn.Module):
     def __init__(self):
         super(MaskedMultiWeightedBCE, self).__init__()
-        self.eps = 1e-08
+        self.eps = 1e-06 # float32 has precision of 1e-07, so use 1e-06 to avoid NaN in BCE calculation
 
     def forward(self, alpha, y_pred):
         """
@@ -26,7 +29,6 @@ class MaskedMultiWeightedBCE(nn.Module):
         """
 
         batch_size = alpha.size(0)
-    
         # Ensure predictions are within the range (0, 1)
         y_pred = torch.clamp(y_pred, min=self.eps, max=1.0 - self.eps)
         
@@ -51,9 +53,6 @@ class MaskedMultiWeightedBCE(nn.Module):
 
         # Return the mean masked BCE across the batch
         mean_bce_loss = torch.sum(masked_bce, dim=-1) / (num_not_missing + self.eps)
-
-        print("Alpha min/max:", alpha.min().item(), alpha.max().item())
-        print("y_pred min/max:", y_pred.min().item(), y_pred.max().item())
 
         return mean_bce_loss
 
