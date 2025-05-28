@@ -4,6 +4,7 @@ from torch.amp import autocast
 import tqdm
 import os
 
+
 class DNABERTClassifier(nn.Module):
     def __init__(self, base_model, hidden_dim=768, num_drugs=11, num_genes=12):
         super(DNABERTClassifier, self).__init__()
