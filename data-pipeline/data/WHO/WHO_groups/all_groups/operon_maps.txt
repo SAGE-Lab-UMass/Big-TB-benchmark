@@ -1,0 +1,38 @@
+Rv0167-Rv0174: yrbE1A-yrbE1B-mce1A-mce1B-mce1C-mce1D-lprK 
+Rv490-Rv491: senX3-regX3
+Rv933-Rv0936: pstB-pstS1-pstC1-pstA2 
+Rv0986-Rv0988: Rv0986-Rv0988
+Rv1161-Rv1164: narG-narH-narJ-narL
+Rv1411c-Rv1410c: lprG-Rv1410c	(downstream)
+Rv1477-Rv1478: fabG1-inhA
+
+**DOUBT**
+Rv1964-Rv1966: yrbE3A-yrbE3B-mce3A (mce3A is common in the next operon too in mycobrowser), how to consider the upstream downstream bps then
+Rv1966-Rv1971: mce3A-mce3B-mce3C-mce3D-mce3E-mce3F 
+****
+
+Rv2358-Rv2359: smtB-zur
+Rv2431c-Rv2430c: PE25-PPE41
+Rv2594c-Rv2592c: ruvC-ruvA-ruvB	  (downstream)
+Rv2688c-Rv2686c: Rv2688c-Rv2687c-Rv2686c	(downstream)
+Rv3083-Rv3089: Rv3083-lipR-Rv3085-adhD-Rv3087-tgs4-fadD13
+Rv3134c-Rv3132c: Rv3134c-devR-devS	(downstream)
+Rv3874-Rv3875: esxB-esxA
+Rv3793-Rv3795: embC-embA-embB
+Rv0047c-Rv0046c: Rv0047c-ino1
+Rv0287-Rv0288: esxG-esxH
+Rv1304-Rv1305: atpB-atpE
+Rv1334-Rv1335: mec-cysO
+Rv1465-Rv1466: Rv1465-Rv1466
+Rv1826-Rv1827: gcvH-garA
+Rv2745c-Rv2744c: clgR-35kd_ag	(downstream)
+Rv2934-Rv2937: ppsD-ppsE-drrA-drrB
+Rv3152-Rv3153: nuoH-nuoI
+Rv3516-Rv3517: echA19-Rv3517
+
+
+
+
+
+
+
