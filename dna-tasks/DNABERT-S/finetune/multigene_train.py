@@ -20,7 +20,7 @@ def train_dnabert_classifier(model, train_loader, val_loader, tokenizer, optimiz
         start_epoch = checkpoint['epoch'] + 1
         print(f"Resuming training from epoch {start_epoch}")
 
-    for epoch in range(args.num_epochs):
+    for epoch in range(start_epoch, args.num_epochs):
         model.train()
         running_loss = 0.0
 
@@ -57,7 +57,7 @@ def train_dnabert_classifier(model, train_loader, val_loader, tokenizer, optimiz
         if (epoch + 1) % args.val_every == 0:
             validate(model, val_loader, tokenizer, criterion, device, args)
 
-        save_dnabert_weights_only(model, args.output_dir)
+        save_dnabert_weights_only(model, epoch, args.output_dir)
 
 
 def save_checkpoint(model, optimizer, scheduler, epoch, output_dir):
@@ -73,14 +73,15 @@ def save_checkpoint(model, optimizer, scheduler, epoch, output_dir):
     print(f"Checkpoint saved at {checkpoint_path}")
 
 
-def save_dnabert_weights_only(model, output_dir):
+def save_dnabert_weights_only(model, epoch, output_dir):
     # Ensure the saved_models directory exists
     save_dir = os.path.join(output_dir, "saved_models")
     os.makedirs(save_dir, exist_ok=True)
     
     # Save the model state dict
-    dnabert_weights = model.base_model.state_dict()
-    save_path = os.path.join(save_dir, "dnabert_only_finetuned.pth")
+    dnabert_model = model.module.base_model if hasattr(model, 'module') else model.base_model
+    dnabert_weights = dnabert_model.state_dict()
+    save_path = os.path.join(save_dir, f"dnabert_only_finetuned_epoch_{epoch}.pth")
     torch.save(dnabert_weights, save_path)
     print(f"Model saved at {save_path}")
 

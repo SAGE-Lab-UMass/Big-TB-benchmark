@@ -29,7 +29,7 @@ class DNABERTClassifier(nn.Module):
                 )
                 sequence_output = outputs[0]  # (batch_size, seq_len, hidden_dim)
 
-                # Mean-pooling (directly in GPU for memory efficiency)
+                # Mean-pooling directly in GPU for memory efficiency
                 attention_mask_expanded = attention_mask[:, i, :].unsqueeze(-1)
                 masked_output = sequence_output * attention_mask_expanded
                 mean_pooled = masked_output.sum(1) / attention_mask_expanded.sum(1)
