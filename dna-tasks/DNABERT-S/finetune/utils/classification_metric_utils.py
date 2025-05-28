@@ -6,7 +6,7 @@ import torch.nn.functional as F
 class MaskedMultiWeightedBCE(nn.Module):
     def __init__(self):
         super(MaskedMultiWeightedBCE, self).__init__()
-        self.eps = 1e-08
+        self.eps = 1e-06
 
     def forward(self, alpha, y_pred):
         """

@@ -2,6 +2,13 @@ import torch
 from concurrent.futures import ThreadPoolExecutor
 
 def get_metadata(batch):
+    """
+    Extracts metadata from the batch dictionary.
+    Args:
+        batch (dict): The batch dictionary containing metadata.
+        Returns:
+        tuple: A tuple containing gene_order and drug_order.
+    """
     gene_order = None
     drug_order = None
 

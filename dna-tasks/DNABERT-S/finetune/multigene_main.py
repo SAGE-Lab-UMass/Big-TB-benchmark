@@ -10,11 +10,11 @@ import tqdm
 import ipdb
 
 from dataloader.dataloader import multi_gene_multi_drug_loader_csv
-from multigene_model import DNABERTClassifier
+from models.dnabert_classifier import DNABERTClassifier
 from utils.model_utils import * 
 from utils.classification_metric_utils import *
 # from multigene_train import train_dnabert_classifier
-from multigene_acc_grad_train import train_dnabert_classifier
+from multigene_train import train_dnabert_classifier
 from peft import get_peft_model
 
 import warnings
@@ -40,8 +40,8 @@ def train(args):
     val_loader = multi_gene_multi_drug_loader_csv(args, load_train=False, n_gpu=n_gpu)
     print("done!\n")
 
-    print("Loading tokenizer and model...")
-    tokenizer, base_model = get_tokenizer_model(args.model_name, args.max_length)
+    print(f"Loading tokenizer and model {args.model_name_or_path}...")
+    tokenizer, base_model = get_tokenizer_model(args.model_name_or_path, args.max_length)
     model = DNABERTClassifier(base_model, hidden_dim=768, num_drugs=args.num_drugs)
 
     # print("Apply LoRA!\n")
@@ -62,18 +62,18 @@ def train(args):
     scheduler = get_scheduler(optimizer, args, train_loader)
 
     print("Training...")
-    train_dnabert_classifier(model, train_loader, val_loader, tokenizer, optimizer, criterion, scheduler, device, args, resume_checkpoint=None)
+    train_dnabert_classifier(model, train_loader, val_loader, tokenizer, optimizer, criterion, scheduler, device, args, args.resume_checkpoint_path)
     print("done!\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', type=str, default="zhihan1996/DNABERT-S")
+    parser.add_argument('--model_name_or_path', type=str, default="zhihan1996/DNABERT-S")
     parser.add_argument('--max_length', type=int, default=2000, help="Max length of tokens") # works with 1 A100
     parser.add_argument('--train_batch_size', type=int, default=2)
     parser.add_argument('--val_batch_size', type=int, default=2)
     parser.add_argument('--datapath', type=str, default='/project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/DNABERT_S/finetune_data/multidrug_classification/eval', help="The dict of data")
     parser.add_argument('--pkl_file', type=str, default='geno_pheno_full_combined.csv', help="Pickle file containing geno-pheno mapping of isolate strains per drug")
-    parser.add_argument('--model_checkpoint_path', type=str, default='/project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/DNABERT_S/training_output/finetune/saved_checkpoints/checkpoint_epoch_0.pth', help="Path to the model checkpoint")
+    parser.add_argument('--resume_checkpoint_path', type=str, default=None, help="Path to the model checkpoint")
     parser.add_argument('--output_dir', type=str, default="/project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/DNABERT_S/training_output/finetune")
     parser.add_argument('--num_drugs', type=int, required=False, default=11, help="Number of drugs to train on")
     parser.add_argument('--num_epochs', type=int, default=5, help="Number of epochs to train")

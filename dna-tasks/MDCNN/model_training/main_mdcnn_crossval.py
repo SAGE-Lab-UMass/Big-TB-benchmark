@@ -33,6 +33,8 @@ from tensorflow.keras.callbacks import TensorBoard
 from tb_cnn_codebase import *
 from parameters.locus_order import drugs, BASE_TO_COLUMN
 
+import ipdb
+
 def run():
 
     def get_conv_nn():
@@ -45,7 +47,9 @@ def run():
         kernel_size = len(BASE_TO_COLUMN)
         num_drugs = len(drugs)
         
+		#TODO: replace X.shape with passed argument
         model = models.Sequential()
+		#TODO: add filter size argument
         model.add(layers.Conv2D(
             64, (kernel_size, filter_size),
             data_format='channels_last',
@@ -61,7 +65,7 @@ def run():
         model.add(layers.Flatten())
         model.add(layers.Dense(256, activation='relu', name='d1'))
         model.add(layers.Dense(256, activation='relu', name='d2'))
-        model.add(layers.Dense(num_drugs, activation='sigmoid', name='d4'))
+        model.add(layers.Dense(13, activation='sigmoid', name='d4'))
 
         opt = Adam(learning_rate=np.exp(-1.0 * 9))
 
@@ -110,9 +114,13 @@ def run():
                     batch_size=128,
                     callbacks=[self.tensorboard_callback]
                 )
+
+                # TODO: Write history to a log file   
+                # print('\nhistory dict:', history.history)
                 return pd.DataFrame.from_dict(data=history.history)
             else:
                 history = self.model.fit(X_train, y_train, epochs=self.epochs, batch_size=128, callbacks=[tensorboard_callbacks])
+                # print('\nhistory dict:', history.history)
                 return pd.DataFrame.from_dict(data=history.history)
 
         def predict(self, X_val):
@@ -136,48 +144,58 @@ def run():
     output_path = kwargs["output_path"]
     N_epochs = kwargs["N_epochs"]
     filter_size = kwargs["filter_size"]
-    pkl_file = kwargs["geno_pheno_pkl_file"]
+    pkl_file = kwargs["pkl_file"]
     pkl_file_sparse_train = kwargs['pkl_file_sparse_train']
     pkl_file_sparse_test = kwargs['pkl_file_sparse_test']
     saved_model_path = kwargs['saved_model_path']
-    # parquet_file = kwargs["metadata_path"]
-    # h5_file = kwargs["h5_path"]
+    random_seed = kwargs['random_seed']
+    test_size = kwargs['test_size']
 
+    train_indices_file = "train_indices.npy"
+    test_indices_file = "test_indices.npy"
     num_drugs = len(drugs)
 
     # Determine whether pickle already exists
-    if os.path.isfile(pkl_file):
-        print("genotype-phenotype df pickle file already exists, proceeding with modeling")
-    else:
-        print("creating genotype-phenotype df pickle")
-        make_geno_pheno_pkl(**kwargs)
-        print("done!\n")
-
-    # Get data from pickle
-    print("\nreading in the geno_pheno df pkl...")
-    df_geno_pheno = pd.read_pickle(pkl_file)
-    print("done!\n")
-
-    # If want to use parquet/h5 files instead of pkl
-    # if os.path.isfile(parquet_file) and os.path.isfile(h5_file):
-    #     print("genotype-phenotype df files already exist, proceeding with modeling")
+    # if os.path.isfile(pkl_file):
+    #     print("genotype-phenotype df pickle file already exists, proceeding with modeling")
     # else:
-    #     print("creating genotype-phenotype df dataset")
-    #     make_geno_pheno_dataset(**kwargs)
+    #     print("creating genotype-phenotype df pickle")
+    #     make_geno_pheno_pkl(**kwargs)
     #     print("done!\n")
 
-    # print("loading combined genotype-phenotype data")
-    # df_geno_pheno = load_combined_geno_pheno(**kwargs)
+    # # Get data from pickle
+    # print("\nreading in the geno_pheno df pkl...")
+    # df_geno_pheno = pd.read_pickle(pkl_file)
+    # print("done!\n")
 
-    # R/S stratified split
-    train_indices = df_geno_pheno.query("category=='set1_original_10202'").index
-    test_indices = df_geno_pheno.query("category!='set1_original_10202'").index
+
+    parquet_file = kwargs["metadata_path"]
+    h5_file = kwargs["h5_path"]
+    if os.path.isfile(parquet_file) and os.path.isfile(h5_file):
+        print("genotype-phenotype df files already exist, proceeding with modeling")
+    else:
+        print("creating genotype-phenotype df dataset")
+        make_geno_pheno_dataset(**kwargs)
+        print("done!\n")
+
+    print("loading combined genotype-phenotype data")
+    df_geno_pheno = load_combined_geno_pheno(**kwargs)
+
+    # Extract the directory to save the indices
+    # directory = os.path.dirname(pkl_file)
+
+    # # Create the full path for the .npy file
+    # train_indices_file_path = os.path.join(directory, train_indices_file)
+    # test_indices_file_path = os.path.join(directory, test_indices_file)
+
+    # original split
+    # train_indices = df_geno_pheno.query("category=='set1_original_10202'").index
+    # test_indices = df_geno_pheno.query("category!='set1_original_10202'").index
 
     # Perform a 80/20 train-test split
-    # df_geno_pheno = df_geno_pheno.reset_index(drop=True)
-    # all_indices = df_geno_pheno.index
-    # train_indices, test_indices = train_test_split(all_indices, test_size=0.2, random_state=42)
-
+    df_geno_pheno = df_geno_pheno.reset_index(drop=True)
+    all_indices = df_geno_pheno.index
+    train_indices, test_indices = train_test_split(all_indices, test_size=test_size, random_state=42)
     train_df = df_geno_pheno.loc[train_indices]
     print(f"Number of training samples: {len(train_indices)}")
     print(f"Number of testing samples: {len(test_indices)}\n")
@@ -185,6 +203,15 @@ def run():
     if os.path.isfile(pkl_file_sparse_train) and os.path.isfile(pkl_file_sparse_test):
         print("X input already exists, loading X...")
         X_sparse_train = sparse.load_npz(pkl_file_sparse_train)
+
+        # Load train and test indices if they are stored in files or regenerate them if possible
+        # Assuming you may store indices as npz or in other format if they exist
+        # if os.path.isfile(train_indices_file_path) and os.path.isfile(test_indices_file_path):
+        #     print("loading train and test indices...")
+        #     train_indices = np.load(train_indices_file_path)
+        #     test_indices = np.load(test_indices_file_path)
+        # Perform a 70/30 train-test split
+        
     else:
         print("creating X from geno_pheno df...")
         X_all = create_X(df_geno_pheno)
@@ -195,7 +222,7 @@ def run():
         X_all = X_sparse.todense()
         assert (X_all.shape[0] == len(df_geno_pheno))
         
-        print("\nsplitting the geno_pheno df into training and testing sets...")
+        print("\nsplitting the X data into training and testing sets...")
         X_sparse_train = X_sparse[train_indices, :]
         X_sparse_test = X_sparse[test_indices, :]
         del X_sparse
@@ -211,21 +238,31 @@ def run():
 
         del X_sparse_test
 
+        # Save train and test indices for future use
+        # np.save(train_indices_file_path, train_indices)
+        # np.save(test_indices_file_path, test_indices)
+
     print("creating y from geno_pheno df...")
-    y_all_train, y_array = rs_encoding_to_numeric(df_geno_pheno.query("category=='set1_original_10202'"), drugs)
+    # y_all_train, y_array = rs_encoding_to_numeric(df_geno_pheno.query("category=='set1_original_10202'"), drugs)
+    y_all_train, y_array = rs_encoding_to_numeric(train_df, drugs)
     del train_df
     del train_indices
     del test_indices
     print("done!\n")
     
 
+    # get the CIPROFLOXACIN column from they_all_train
+    # y_cnn_df = pd.DataFrame(df_geno_pheno, columns=['CIPROFLOXACIN'])
+    # y_cnn_df.to_csv("y_cnn_all.csv")
+    # del y_cnn_df
+
     # obtain phenotype data for CNN
     print("obtaining phenotype data for CNN...")
     y_all_train = y_all_train[drugs].values.astype(int)
     print("done!\n")
 
-    # obtain isolates with at least 1 resistance status to length of drugs
     print("considering isolates with at least 1 resistance status across all drugs...")
+    # obtain isolates with at least 1 resistance status to length of drugs
     indices_with_R_phenotype = np.where(y_all_train.sum(axis=1) != -num_drugs)
 
     X = X_sparse_train[indices_with_R_phenotype]
@@ -251,7 +288,7 @@ def run():
     cv_splits = 5
     print(f"performing {cv_splits}-fold cross validation...")
 
-    cv = KFold(n_splits=cv_splits, shuffle=True, random_state=1)
+    cv = KFold(n_splits=cv_splits, shuffle=True, random_state=random_seed)
 
     column_names = ['Validation Split #', 'Algorithm', 'Drug', "num_sensitive", "num_resistant", 'AUC', 'AUC_PR', "Threshold", "Spec", "Sens"]
     results = pd.DataFrame(columns=column_names)
@@ -307,6 +344,8 @@ def run():
             data = np.hstack((auc_y, auc_preds))
             df = pd.DataFrame(data, columns=['auc_y', 'auc_preds'])
 
+            # Export to CSV
+            # df.to_csv('auc_data.csv', index=False)
 
             val_auc = roc_auc_score(auc_y, auc_preds)
             val_auc_pr = average_precision_score(1 - y_val[non_missing_val, idx], 1 - y_pred[non_missing_val, idx])
@@ -319,9 +358,9 @@ def run():
 
             i += 1
 
-        # print(f"\nwriting per cv split {train_idx} results to {output_path}/cv_split_{train_idx}_auc.csv")
-        # cv_split_auc_file_path = os.path.join(output_path, f"cv_split_{train_idx}_auc.csv")
-        # results.to_csv(cv_split_auc_file_path)
+        print(f"\nwriting per cv split {train_idx} results to {output_path}/cv_split_{train_idx}_auc.csv")
+        cv_split_auc_file_path = os.path.join(output_path, f"cv_split_{train_idx}_auc.csv")
+        results.to_csv(cv_split_auc_file_path)
 
     K.clear_session()
 
