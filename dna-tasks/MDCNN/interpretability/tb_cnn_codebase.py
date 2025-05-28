@@ -1,0 +1,638 @@
+"""
+Functions for running CNN on MTB data to predict ABR phenotypes
+Authors:
+	Michael Chen (original version)
+	Anna G. Green
+	Chang Ho Yoon
+"""
+
+
+import sys
+import glob
+import pickle
+import os
+import yaml
+import sparse
+import ipdb
+import h5py
+
+import numpy as np
+import pandas as pd
+import keras.backend as K
+import tensorflow as tf
+
+from sklearn.model_selection import KFold, StratifiedKFold
+from keras.layers import *
+from keras.optimizers import Adam
+from keras.models import Model
+from Bio import SeqIO
+
+from parameters.locus_order import drugs, locus_order, BASE_TO_COLUMN
+
+# Mapping to use for one-hot encoding
+# BASE_TO_COLUMN = {'A': 0, 'C': 1, 'T': 2, 'G': 3, '-': 4}
+
+
+# Get one hot vector
+# def get_one_hot(sequence):
+#     """
+# 	Creates a one-hot encoding of a sequence
+# 	Parameters
+# 	----------
+# 	sequence: iterable of str
+# 		Sequence containing only ACTG- characters
+
+# 	Returns
+# 	-------
+# 	np.ndarray of int
+# 		L (seq len) x len(one-hot encoded sequence)
+# 	"""
+
+#     seq_len = len(sequence)
+#     seq_in_index = [BASE_TO_COLUMN.get(b, b) for b in sequence]
+#     one_hot = np.zeros((seq_len, len(BASE_TO_COLUMN)), dtype=int)
+
+#     # Check if any element in seq_in_index is not an integer
+#     for i, val in enumerate(seq_in_index):
+#         if not isinstance(val, int):
+#             raise ValueError(f"Non-integer value found at position {i}: {val}")
+
+#     # Assign the found positions to 1
+#     one_hot[np.arange(seq_len), np.array(seq_in_index)] = 1
+
+#     return one_hot
+
+def get_one_hot(sequence):
+    """
+    Creates a one-hot encoding of a sequence
+    Parameters
+    ----------
+    sequence: iterable of str
+        Sequence containing characters like ACTG- and potentially others
+
+    Returns
+    -------
+    np.ndarray of int
+        L (seq len) x len(one-hot encoded sequence)
+    """
+
+    # Define sequence length and initialize the one-hot matrix
+    seq_len = len(sequence)
+    one_hot = np.zeros((seq_len, len(BASE_TO_COLUMN)), dtype=int)
+    
+    # Use a list comprehension to get indices, and filter out invalid characters
+    valid_indices = [(i, BASE_TO_COLUMN[b]) for i, b in enumerate(sequence) if b in BASE_TO_COLUMN]
+    
+    # Assign 1s to the appropriate positions
+    if valid_indices:
+        rows, cols = zip(*valid_indices)
+        one_hot[rows, cols] = 1
+
+    return one_hot
+
+
+def sequence_dictionary(filename):
+    """
+	Creates a dataframe that contains the sequence of each locus for each isolate
+	Note that this function splits the identifier names in the fasta file on '/'
+	and takes the last entry
+
+	Parameters
+	----------
+	filename: str
+		path to directory containing genotype data (one fasta file containing
+		sequences for all isolates at a particular locus)
+
+	Returns
+	-------
+	pd.DataFrame with one column, indexed by strain name
+		column name will be the beginning string of the file name
+	"""
+    seq_dict = SeqIO.to_dict(
+        SeqIO.parse(filename, "fasta"),
+        key_function=lambda x: x.id.split("/")[-1].split(".cut")[0])
+
+    # create a dictionary of identifier: sequence
+    for identifier, sequence in seq_dict.items():
+        seq_dict[str(identifier)] = str(sequence.seq)
+
+    df = pd.DataFrame.from_dict(seq_dict, orient='index')
+    gene_name = filename.split("/")[-1].split("_")[0]
+    df.columns = [gene_name]
+
+    return df
+
+
+def make_genotype_df(genotype_input_directory):
+    """
+    Create a dataframe with the genotypes for each isolate at each locus
+    Hard-codes the ordering of the loci so that they are in same order upon re-runs
+
+	Parameters
+	----------
+	genotype_input_directory: str
+		path to directory containing fasta files of genotype inputs
+
+	Returns
+	-------
+	pd.DataFrame:
+		indexed by isolate name, one column per locus
+	"""
+    # Make a df that combines all genotype data
+    dfs_list = []
+
+    for l in locus_order:
+        print("looking for fasta files", f"{genotype_input_directory}/{l}*.fasta")
+        df_files = glob.glob(f"{genotype_input_directory}/{l}*.fasta")
+        if len(df_files)==1:
+            df_file = df_files[0]
+        else:
+            print("multiple fastas for this gene, should have a single file for a gene!")
+            raise ValueError
+        _df = sequence_dictionary(df_file)
+        dfs_list.append(_df)
+    df_genos = dfs_list[0].join(dfs_list[1:], how='outer')
+    
+    # # Check if both ethA and ethR columns are present
+    # if 'ethA' in df_genos.columns and 'ethR' in df_genos.columns:
+    #     # Concatenate the two columns row-wise into a new ethAR column
+    #     df_genos['ethAR'] = df_genos['ethA'].astype(str) + df_genos['ethR'].astype(str)
+
+    #     # Drop the original columns
+    #     df_genos.drop(['ethA', 'ethR'], axis=1, inplace=True)
+    
+    print(f"\nnumber of isolates in each fasta file {len(df_genos)}")
+    return df_genos
+
+
+# Change phenotype data to 0s and 1s
+def rs_encoding_to_numeric(df_geno_pheno, drugs_list):
+    """
+	Creates a matrix of y values (resistance/sensitivity)
+	to each drug, encoded as 0's and 1's
+
+    Note: encodes sensitivity as 1, resistance as 0, missing as -1
+
+	Parameters
+	----------
+	df_geno_pheno: pd.DataFrame
+        Dataframe containing resistance values to be converted from "R" and "S" to 0 and 1
+
+    drugs_list: list of str
+        list of columns in df_geno_pheno containing the drug resistance info to be encoded
+
+	Returns
+	-------
+	pd.Dataframe
+        has same index as df_geno_pheno, columns corresponding to drugs_list
+        contains numeric encoding of resistance values
+
+    np.ndarray
+        corresponds to above pd.DataFrame.values
+	"""
+
+    y_all_rs = df_geno_pheno[drugs_list]
+    y_all_rs = y_all_rs.fillna('-1')
+    y_all_rs = y_all_rs.astype(str)
+    resistance_categories = {'R': 0, 'S': 1, '-1.0': -1, '-1': -1}
+
+    y_all = y_all_rs.copy()
+    for key, val in resistance_categories.items():
+        y_all[y_all_rs == key] = val
+
+    y_all.index = list(range(0, y_all.shape[0]))
+
+    y_all_array = y_all.values
+
+    return y_all, y_all_array
+
+
+
+def alpha_mat(subset_y, df_geno_pheno, weight=1.):
+    """
+	creates alpha matrix (reflects proportion of strains resistant
+	(-ve)/sensitive (+ve)).
+
+	Parameters
+	----------
+	df_geno_pheno: pd.DataFrame
+		Dataframe where last 23 columns contain R/S encoding
+		of resistance vs sensitivity to antibiotics
+
+	subset_y: np.ndarray
+		Dataframe generated by the function rs_encoding_to_numeric
+		containing matrix of resistance values (0 or 1) for each drug,
+		then subset for indexes (strains) with phenotype data available
+    weight: float
+        Weight by which to multiply the sensitive class (to up or downweight
+        sensitive relative to resistant strains)
+
+	Returns
+	-------
+	np.ndarray of weighted resistance/sensitivity values proportionate to no.
+		of strains with phenotypic data.
+	"""
+    num_drugs = len(drugs)
+    y_cnn = subset_y
+
+    # export y_cnn to csv with only LEVOFLOXACIN column
+    # y_cnn_l = y_cnn[:, 5]
+    # y_cnn_df = pd.DataFrame(y_cnn_l, columns=['LEVOFLOXACIN'])
+    # y_cnn_df.to_csv("y_cnn.csv")    
+
+    # generate alpha matrix
+    alphas = np.zeros(num_drugs, dtype=float)
+    alpha_matrix = np.zeros_like(y_cnn, dtype=float)
+
+    for drug_index, drug in enumerate(drugs):
+
+        resistant_num = len(np.squeeze(np.where(y_cnn[:, drug_index] == 0.)))
+        sensitive_num = len(np.squeeze(np.where(y_cnn[:, drug_index] == 1.)))
+        print(f"drug {drug} has {resistant_num} resistant and {sensitive_num} sensitive strains")
+
+        alphas[drug_index] = resistant_num / float(resistant_num + sensitive_num) if resistant_num + sensitive_num > 0 else 0
+        alpha_matrix[:, drug_index][np.where(y_cnn[:, drug_index] == 1.0)] = weight * alphas[drug_index]
+        alpha_matrix[:, drug_index][np.where(y_cnn[:, drug_index] == 0.0)] = - alphas[drug_index]
+
+    return alpha_matrix
+
+
+def make_geno_pheno_pkl(**kwargs):
+    """
+    Creates and saves a pd.DataFrame as a pkl that contains the numeric encoded
+    phenotype information and the one-hot encoded sequence information for each isolate
+
+    Required kwargs:
+        phenotype_file: path to input phenotype file with columns "Isolate" and drug names
+        genotype_input_directory: path to directory with input fasta files
+        pkl_file: path to save the complete genotype/phenotype file
+	"""
+
+    output_path = kwargs['output_path']
+
+    # get table for phenotypes
+    df_phenos = pd.read_csv(kwargs['phenotype_file'], index_col="Isolate", sep=",", dtype=str).fillna(-1)
+
+    # make table of all genotypes
+    df_genos = make_genotype_df(kwargs['genotype_input_directory'])
+
+    # to save on RAM, only save genotypes for isolates for which we have phenotypes
+    isolate_ids = list(df_phenos.index)
+    n_strains = len(isolate_ids)
+    df_genos.index = df_genos.index.astype(str)
+    df_genos = df_genos.loc[df_genos.index.intersection(isolate_ids)]
+
+    # Drop rows where we're missing the sequence for a locus
+    df_genos = df_genos.dropna(axis="index")
+    print(f"number of isolates in master phenotype file: {n_strains}")
+    print(f"shape of isolates in geno df having common isolates in master phenotype file: {df_genos.shape}\n")
+
+    # Apply one-hot encoding function to get each isolate sequence
+    print('making one hot encoding for...')
+    for column in df_genos.columns:
+        print("...", column)
+        df_genos[column + "_one_hot"] = df_genos[column].apply(np.vectorize(get_one_hot))
+
+    print("\ncombinining genotypes and phenotypes into a dataframe...")
+    # combined dataframe of all genotypes and phenotypes
+    df_geno_pheno_full = df_genos.join(df_phenos, how='inner')
+
+    print("dumping the geno_pheno df to pkl...")
+    pkl_file = kwargs["pkl_file"]
+    df_geno_pheno_full.to_pickle(pkl_file)
+
+
+def create_X(df_geno_pheno):
+    """
+	Create an input X matrix, with output dimensions:
+		n_strains x len(one-hot)=5 here x longest locus length x no. of loci
+
+    Parameters
+    ----------
+    df_geno_pheno: pd.DataFrame
+        generated by make_geno_pheno_pkl, contains the numeric encoded
+        phenotype information and the one-hot encoded sequence information for each isolate
+
+    Returns
+    -------
+    np.ndarray
+        with shape N_strains, len(one_hot), L_longest_locus, N_loci
+        contains the one-hot encoded sequence information for each locus for each strain
+	"""
+
+    def _get_shapes(df_geno_pheno):
+        """
+		Finds the length of each gene in the input dataframe
+		Parameters
+		----------
+		df_geno_pheno: pd.Dataframe
+
+		Returns
+		-------
+		dict of str: int
+			length of coordinates in each column
+		"""
+        shapes = {}
+        for column in df_geno_pheno.columns:
+            if "one_hot" in column:
+                shapes[column] = df_geno_pheno.loc[df_geno_pheno.index[0], column].shape[0]
+
+        return shapes
+
+    shapes = _get_shapes(df_geno_pheno)
+
+    # Length of longest gene locus
+    n_genes = len(shapes)
+    longest_gene_name = max(shapes, key=shapes.get)
+    L_longest = max(list(shapes.values()))
+    L_one_hot_encoding = len(BASE_TO_COLUMN)
+    print(f"\tfound {n_genes} genes and longest gene is {longest_gene_name} with length {L_longest}")
+
+    # Number of strains in model
+    n_strains = df_geno_pheno.shape[0]
+
+    # define shape of matrix - fill with zeros (effectively accomplishes padding)
+    X = np.zeros((n_strains, L_one_hot_encoding, L_longest, n_genes))
+
+    # for each strain and gene locus
+    for idx, strain in enumerate(df_geno_pheno.index):
+        for gene_index, gene in enumerate(shapes.keys()):
+            one_hot_gene = df_geno_pheno.loc[strain, gene]
+            X[idx, :, range(0, one_hot_gene.shape[0]), gene_index] = one_hot_gene
+
+    return X
+
+
+def masked_multi_weighted_bce(alpha, y_pred):
+    """
+	Calculates the masked weighted binary cross-entropy in multi-classification
+
+	Parameters
+	----------
+	alpha: an element from the alpha matrix, a matrix of target y values weighted
+		by proportion of strains with resistance data for any given drug
+	y_pred: model-predicted y values
+    weights: list of float (optional, default=[1., 1.])
+        A list of two weights to be applied to the sensitive and resistant n_strains,
+        respectively
+
+	Returns
+	-------
+	scalar value of the masked weighted BCE.
+	"""
+    y_pred = K.clip(y_pred, K.epsilon(), 1.0 - K.epsilon())
+    y_true_ = K.cast(K.greater(alpha, 0.), K.floatx())
+
+    mask = K.cast(K.not_equal(alpha, 0.), K.floatx())
+    num_not_missing = K.sum(mask, axis=-1)
+    alpha = K.abs(alpha)
+    bce = - alpha * y_true_ * K.log(y_pred) - (1.0 - alpha) * (1.0 - y_true_) * K.log(1.0 - y_pred)
+    masked_bce = bce * mask
+    final_bce = K.sum(masked_bce, axis=-1) / num_not_missing
+
+    return final_bce
+
+
+def masked_weighted_accuracy(alpha, y_pred):
+    """
+	Calculates the mased weighted accuracy of a model's predictions
+	Parameters
+	----------
+	alpha: an element from the alpha matrix, a matrix of target y values weighted
+		by proportion of strains with resistance data for any given drug
+	y_pred: model-predicted y values
+
+	Returns
+	-------
+	scalar value of the masked weighted accuracy.
+	"""
+
+    total = K.sum(K.cast(K.not_equal(alpha, 0.), K.floatx()))
+    y_true_ = K.cast(K.greater(alpha, 0.), K.floatx())
+    mask = K.cast(K.not_equal(alpha, 0.), K.floatx())
+    correct = K.sum(K.cast(K.equal(y_true_, K.round(y_pred)), K.floatx()) * mask)
+    return correct / total
+
+def load_alpha_matrix(alpha_matrix_path, y_array, df_geno_pheno, **kwargs):
+    """
+    Loads in the alpha matrix, if file exists, otherwise creates alpha matrix
+
+    Parameters
+    ----------
+    alpha_matrix_path: str
+        path to alpha matrix. Will be used to save matrix if matrix does not exist
+
+    Returns
+    -------
+    np.ndarray
+        The alpha matrix
+    """
+
+    if os.path.isfile(alpha_matrix_path):
+        print("alpha matrix already exists, loading alpha matrix...")
+        alpha_matrix = alpha_matrix = np.loadtxt(alpha_matrix_path, delimiter=',')
+    else:
+        if "weight_of_sensitive_class" in kwargs:
+            print('creating alpha matrix with weight', kwargs["weight_of_sensitive_class"])
+            alpha_matrix = alpha_mat(y_array, df_geno_pheno, kwargs["weight_of_sensitive_class"])
+        else:
+            print("creating alpha matrix with equal weights to sensitive and resistant classes...")
+            alpha_matrix = alpha_mat(y_array, df_geno_pheno)
+        np.savetxt(alpha_matrix_path, alpha_matrix, delimiter=',')
+
+    print("\nthe shape of the alpha_matrix: {}".format(alpha_matrix.shape))
+    return alpha_matrix
+
+def split_into_traintest(X_sparse, df_geno_pheno, category):
+    """
+    Splits the X dataframe into training and test set based on annotation in df_geno_pheno
+
+    Parameters
+    ----------
+    X_sparse: sparse.COO
+        a sparse-encoded np.ndarray containing genetic information for all isolates
+    df_geno_pheno: pd.DataFrame
+        Dataframe of genetic and phenotypic information. Contains the exact isolates in the exact order used to create X_sparse.
+        Contains a column called "category" that will be used to split isolates into training and test
+    category: str
+        Name of the training set category
+
+    Returns:
+    -------
+    sparse.COO
+        a sparse-encoded np.ndarray containing genetic information for all TRAINING SET isolates
+    sparse.COO
+        a sparse-encoded np.ndarray containing genetic information for all TEST SET isolates
+    """
+    X_all = X_sparse.todense()
+
+    df_geno_pheno = df_geno_pheno.reset_index(drop=True)
+
+    train_indices = df_geno_pheno.query("category==@category").index
+    test_indices = df_geno_pheno.query("category!=@category").index
+
+    print("splitting X pkl")
+    X_train = X_all[train_indices, :]
+    X_test = X_all[test_indices, :]
+    del X_all
+
+    X_sparse_train = sparse.COO(X_train)
+    sparse.save_npz(pkl_file_sparse_train, X_sparse_train, compressed=False)
+
+    X_sparse_test = sparse.COO(X_test)
+    sparse.save_npz(pkl_file_sparse_test, X_sparse_test, compressed=False)
+
+    return X_sparse_train, X_sparse_test
+
+
+def get_threshold_val(y_true, y_pred):
+    """
+    Compute the optimal threshold for prediction  based on the max sum of specificity and Sensitivity
+
+    NB that we encoded R as 0, S as 1, so smaller predictions indicate higher chance of resistance
+
+    We count falsely predicted resistance as a false positive, falsely predicted sensitivity as a false negative
+
+    Parameters
+    ----------
+    y_true: np.array
+        Actual labels for isolates
+    y_pred: np.array
+        Predicted labels for isolates
+
+    Returns
+    -------
+    dict of str -> float with entries:
+        sens: sensitivity at chosen threshold
+        spec: specificity at chosen threshold
+        threshold: chosen threshold value
+    """
+
+    num_samples = y_pred.shape[0]
+    fpr_ = []
+    tpr_ = []
+    thresholds = np.linspace(0, 1, 101)
+    num_sensitive = np.sum(y_true==1)
+    num_resistant = np.sum(y_true==0)
+    for threshold in thresholds:
+
+        fp_ = 0 # number of false positives
+        tp_ = 0 # number of true positives
+
+        for i in range(num_samples):
+            # If y is predicted resistant
+            if (y_pred[i] < threshold):
+                if (y_true[i] == 1): fp_ += 1
+                if (y_true[i] == 0): tp_ += 1
+
+        fpr_.append(fp_ / float(num_sensitive))
+        tpr_.append(tp_ / float(num_resistant))
+
+    fpr_ = np.array(fpr_)
+    tpr_ = np.array(tpr_)
+
+    # valid_inds = np.where(fpr_ <= 0.1)
+    valid_inds = np.arange(101)
+    sens_spec_sum = (1 - fpr_) + tpr_
+    best_sens_spec_sum = np.max(sens_spec_sum[valid_inds])
+    best_inds = np.where(best_sens_spec_sum == sens_spec_sum[valid_inds])
+
+    if best_inds[0].shape[0] == 1:
+        best_sens_spec_ind = np.array(np.squeeze(best_inds))
+    else:
+        best_sens_spec_ind = np.array(np.squeeze(best_inds))[-1]
+
+    return {'threshold': np.squeeze(thresholds[valid_inds][best_sens_spec_ind]),
+            'spec': 1 - fpr_[valid_inds][best_sens_spec_ind],
+            'sens': tpr_[valid_inds][best_sens_spec_ind]}
+
+
+
+
+def make_geno_pheno_dataset(config):
+    """
+    Creates and saves phenotype info as Parquet and one-hot genotypes as HDF5.
+    """
+    metadata_path = config["metadata_path"]
+    h5_path = config["h5_path"]
+
+    # Load phenotype table
+    df_phenos = pd.read_csv(config['phenotype_file'], index_col="Isolate", sep=",", dtype=str).fillna("-1")
+
+    # Load genotypes
+    df_genos = make_genotype_df(config['genotype_input_directory'])
+    df_genos.index = df_genos.index.astype(str)
+
+    # Keep only isolates with phenotype info
+    isolate_ids = df_phenos.index.intersection(df_genos.index)
+    df_genos = df_genos.loc[isolate_ids].dropna()
+
+    print(f"number of isolates in master phenotype file: {len(df_phenos)}")
+    print(f"shape of genos intersected with phenos: {df_genos.shape}\n")
+
+    # Save phenotypes + raw sequences as Parquet
+    print("Saving phenotypes and genotypes as Parquet...")
+    df_raw = df_genos.join(df_phenos, how="inner")
+    df_raw.to_parquet(metadata_path, index=True)
+
+    # Save one-hot arrays as HDF5
+    print("Saving one-hot encoded genotypes as HDF5...")
+    with h5py.File(h5_path, 'w') as h5f:
+        for isolate_id, row in df_genos.iterrows():
+            for locus in df_genos.columns:
+                try:
+                    onehot = np.vectorize(get_one_hot)(row[locus])
+                    h5f.create_dataset(f"{isolate_id}/{locus}", data=onehot, compression='gzip')
+                except Exception as e:
+                    print(f"Error encoding {isolate_id}/{locus}: {e}")
+                    continue
+            break
+
+    print(f"\nDone. Saved:\n  - Parquet: {metadata_path}\n  - HDF5: {h5_path}")
+
+def load_combined_geno_pheno(config):
+    """
+    Reconstructs the original combined DataFrame (phenotypes + one-hot genotypes)
+    by loading metadata from Parquet and one-hot arrays from HDF5.
+
+    Args:
+        metadata_path: path to geno_pheno_metadata.parquet
+        h5_path: path to geno_onehot.h5
+        one_hot_columns: list of locus names to load (optional, load all if None)
+
+    Returns:
+        pd.DataFrame with one-hot encoded features as new columns
+    """
+    metadata_path = config["metadata_path"]
+    h5_path = config["h5_path"]
+
+    df_meta = pd.read_parquet(metadata_path)
+    # Infer one-hot columns from HDF5 file if not provided
+    with h5py.File(h5_path, 'r') as h5f:
+        try:
+            first_isolate = next(iter(h5f.keys()))
+            one_hot_columns = list(h5f[first_isolate].keys())
+        except StopIteration:
+            raise ValueError("HDF5 file appears to be empty.")
+
+    # Prepare the one-hot DataFrame
+    df_onehot = pd.DataFrame(index=df_meta.index, columns=[f"{locus}_one_hot" for locus in one_hot_columns])
+    df_onehot = df_onehot.astype("object")
+
+    with h5py.File(h5_path, 'r') as h5f:
+        for isolate_id in df_meta.index:
+            if isolate_id in h5f:
+                for locus in one_hot_columns:
+                    dataset_name = f"{isolate_id}/{locus}"
+                    try:
+                        df_onehot.at[isolate_id, f"{locus}_one_hot"] = h5f[dataset_name][:]
+                    except KeyError:
+                        df_onehot.at[isolate_id, f"{locus}_one_hot"] = None
+            else:
+                # Entire isolate missing from HDF5
+                for locus in one_hot_columns:
+                    df_onehot.at[isolate_id, f"{locus}_one_hot"] = None
+
+    # Merge metadata with one-hot data
+    df_combined = pd.concat([df_meta, df_onehot], axis=1)
+    return df_combined
