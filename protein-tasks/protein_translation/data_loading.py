@@ -5,6 +5,13 @@ import os
 from evcouplings.align import Alignment
 import numpy as np
 
+# ------------------------------------------------------------------
+# load phenotype tables and keep only rows with a phenotype call
+# for the requested drug(s)
+# ------------------------------------------------------------------
+
+
+
 def load_phenotype_data(paths, drug):
     dfs = []
     for path in paths:
@@ -17,6 +24,7 @@ def load_phenotype_data(paths, drug):
     phenotype_data = pd.concat(dfs, ignore_index=True)
     print(f"Number of records in phenotype data: {len(phenotype_data)}")
     return phenotype_data
+
 
 def load_who_catalog(who_catalog_path):
     who_catalog = pd.read_excel(who_catalog_path, sheet_name='Catalogue_master_file', header=2)
@@ -34,10 +42,11 @@ def load_alignment(file_path, alphabet='-actg'):
 
             
 def load_feature_matrix_and_labels(gene_name):
-    file_dir ="/work/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/feature_matrix_labels"
-    feature_matrix_file = f'{file_dir}/{gene_name}_feature_matrix.npy'
+    file_dir ="../data/latest/feature_matrix_labels"
+    
+    feature_matrix_file = f'{file_dir}/{gene_name}_{drug_name}_feature_matrix.npy'
     print(feature_matrix_file)
-    labels_file = f'{file_dir}/{gene_name}_labels.npy'
+    labels_file = f'{file_dir}/{gene_name}_{drug_name}_labels.npy'
     
     if os.path.exists(feature_matrix_file) and os.path.exists(labels_file):
         print(f"Loading feature matrix and labels for {gene_name} from disk.")
