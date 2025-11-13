@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import ipdb
 from collections import defaultdict
-from parameters.locus_order import GENE_OPERONIC_PAIR_MAPS
+from utils import GENE_OPERONIC_PAIR_MAPS
 
 def find_drug_column(df, drug):
     for col in df.columns:
@@ -11,6 +11,9 @@ def find_drug_column(df, drug):
     raise ValueError(f"Drug column '{drug}' not found in DataFrame.")
 
 def export_relevant_set(relevant_set, output_path):
+    # Ensure output directory exists
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
     pd.DataFrame(sorted(relevant_set), columns=["WHO_R_features"]).to_csv(output_path, index=False)
     print(f"Exported relevant WHO-R features to {output_path}")
 
@@ -45,6 +48,9 @@ def create_mutations_column(mapped_df, has_neg_strand):
         gene_operon[mask] + "_" + adjusted_position.loc[mask].astype(int).astype(str)
         #mapped_df.loc[mask, "gene"] + "_" + adjusted_position.loc[mask].astype(int).astype(str)
     )
+
+    # export mapped df to csv
+    # mapped_df.to_csv("/project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/Regression_l2/interpretability/interpretability_output/debug.csv", index=False)
 
     return mapped_df
 
@@ -92,115 +98,77 @@ def compute_p_at_k(predicted, relevant, k):
 
 def compute_r_at_k(predicted, relevant, k):
     hits = find_hits_at_k(predicted, relevant, k)
+    # return hits / len(relevant) if relevant else 0.0
     return hits / len(relevant) if relevant else 0.0
 
-def compute_map_mar(true_causal_variants_df, directory, important_features_ranked, drug, has_neg_strand=False, embed_type='one_hot'):
-    # Build relevant set (all features marked "R" across all files)
-    relevant_set = set(true_causal_variants_df["gapped_mutation_feature"].dropna())
-    print(f"Relevant set size for drug {drug}: {len(relevant_set)}")
+def compute_map_mar_for_directory(directory, important_features_ranked, drug, has_neg_strand=False):
+    # Step 1: Build relevant set (all features marked "R" across all files)
+    relevant_set = set()
 
-    # Compute MAP@k and MAR@k using the final relevant_set
+    for file in os.listdir(directory):
+        if not file.endswith(".csv"):
+            continue
+
+        file_path = os.path.join(directory, file)
+        df = read_csv_file(file_path, has_neg_strand)
+        print(f"Processing file: {file}")
+
+        if df is None or "WHO_mutation_feature" not in df.columns:
+            continue
+
+        try:
+            drug_col = find_drug_column(df, drug)
+            relevant_set.update(
+                df.loc[df[drug_col] == "R", "WHO_mutation_feature"].dropna()
+            )
+        except Exception as e:
+            print(f"Error in file {file}: {e}")
+            continue
+
+    export_relevant_set(relevant_set, f"/project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/Regression_l2/interpretability/interpretability_output/map_mar/relevant_features_{drug}.csv")
+
+    # Step 2: Compute MAP@k and MAR@k using the final relevant_set
+    p_k_scores = {}
+    r_k_scores = {}
     map_k_scores = {}
     mar_k_scores = {}
     hits_k_num = {}
 
     for k in [1, 5, 10]:
+        p_k_scores[k] = compute_p_at_k(predicted=important_features_ranked, relevant=relevant_set, k=k)
+        r_k_scores[k] = compute_r_at_k(predicted=important_features_ranked, relevant=relevant_set, k=k)
         map_k_scores[k] = compute_ap_at_k(predicted=important_features_ranked, relevant=relevant_set, k=k)
-        mar_k_scores[k] = compute_ar_at_k(predicted=important_features_ranked, relevant=relevant_set, k=k)
+        # mar_k_scores[k] = compute_ar_at_k(predicted=important_features_ranked, relevant=relevant_set, k=k)
         hits_k_num[k] = find_hits_at_k(predicted=important_features_ranked, relevant=relevant_set, k=k)
 
-    return map_k_scores, mar_k_scores, hits_k_num
+    return p_k_scores, r_k_scores, map_k_scores, hits_k_num
 
 
-def create_combined_variants_csv(vcf_who_map_directory, combined_variants_csv="combined_variants.csv"):
-    # Initialize an empty list to store DataFrames
-    all_dataframes = []
-
-    # Loop through all CSV files in the directory
-    for filename in os.listdir(vcf_who_map_directory):
-        if filename.endswith(".csv"):
-            print(f"Processing file: {filename}")
-            file_path = os.path.join(combined_variants_csv, filename)
-            df = pd.read_csv(file_path, na_values=[''], keep_default_na=False)
-            all_dataframes.append(df)
-
-    # Concatenate all DataFrames into one big DataFrame
-    combined_df = pd.concat(all_dataframes, ignore_index=True)
-
-    # Save the combined DataFrame to a CSV file
-    combined_df.to_csv(combined_variants_csv, index=False)
-    print(f"All genotype variants combined into: {combined_variants_csv}")
-
-    return combined_df
-
-
-def compute_true_causal_variant_set(vcf_who_map_directory, drug, output_path, has_neg_strand=False, combined_variants_csv="combined_variants.csv"):
-    if os.path.exists(combined_variants_csv):
-        print(f"Combined variants CSV already exists: {combined_variants_csv}, loading it.")
-        combined_variants_df = pd.read_csv(combined_variants_csv)
-    else:
-        # Create the combined variants CSV
-        print(f"Creating combined variants CSV: {combined_variants_csv}")
-        combined_variants_df = create_combined_variants_csv(vcf_who_map_directory, combined_variants_csv)
-
-    # Create the relevant set CSV
-    updated_combined_variants_df = create_mutations_column(combined_variants_df, has_neg_strand)
-    drug_col = find_drug_column(updated_combined_variants_df, drug)
-    confidence_column = f"{drug_col}_confidence"
-
-    # Filtering the dataframe to include only variants with confidence values indicating resistance (R)
-    causal_variants_df = updated_combined_variants_df[updated_combined_variants_df[confidence_column].str.startswith(("1)", "2)"))][['variant', 'WHO_mutation_feature']].drop_duplicates()
-
-    causal_variants_df.columns = ["variants", "gapped_mutation_feature"]
-
-    # Save the relevant set to a CSV file
-    causal_variants_path = os.path.join(output_path, f"true_causal_variants_{drug}.csv")
-
-    # create the directory if it doesn't exist
-    os.makedirs(os.path.dirname(causal_variants_path), exist_ok=True)
-    causal_variants_df.to_csv(causal_variants_path, index=False)
-    print(f"Resistant variants saved to: {causal_variants_path}")
-
-    return causal_variants_df
-
-
-def save_map_mar_results(map, mar, hits, output_csv):
-    rows = [{"k": k, "MAP@k": map[k], "MAR@k": mar[k], "Hits@k": hits[k]} for k in sorted(map)]
+def save_map_mar_results(p, r, map, hits, output_csv):
+    rows = [{"k": k, "P@k": p[k], "R@k": r[k], "MAP@k": map[k], "Hits@k": hits[k]} for k in sorted(map)]
     pd.DataFrame(rows).to_csv(output_csv, index=False)
     print(f"Saved MAP/MAR results to {output_csv}")
 
 
 def get_confident_mutation_hits(
     vcf_who_map_directory, 
-    important_model_features, 
+    important_features, 
+    two_most_important_below_threshold, 
     drug,
-    output_path,
-    output_file_name,
-    embed_type='one_hot',
+    model_type="log-reg",
     has_neg_strand=False,
+    output_csv="confident_mutation_hits.csv"
     ):
+    # important_model_features = list(set(important_features).union(two_most_important_below_threshold))
+    important_model_features = important_features + two_most_important_below_threshold
 
-    causal_variants_path = os.path.join(output_path, f"true_causal_variants_{drug}.csv")
-    if os.path.exists(causal_variants_path):
-        print(f"True causal variants CSV already exists: {causal_variants_path}, loading it.")
-        true_causal_variants_df = pd.read_csv(causal_variants_path)
-    else:
-        # Create the true causal variants CSV
-        print(f"Creating true causal variants CSV: {causal_variants_path}")
-        true_causal_variants_df = compute_true_causal_variant_set(
-            vcf_who_map_directory,
-            drug,
-            output_path,
-            has_neg_strand
-        )
+    output_csv = f"/project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/Regression_l2/interpretability/interpretability_output/map_mar/map_mar_{drug}.csv"
 
-    map, mar, hits = compute_map_mar(
-        true_causal_variants_df,
+    p, r, map, hits = compute_map_mar_for_directory(
         vcf_who_map_directory,
         important_model_features,
         drug,
-        has_neg_strand, 
-        embed_type
+        has_neg_strand
     )
     
-    save_map_mar_results(map, mar, hits, output_file_name)
+    save_map_mar_results(p, r, map, hits, output_csv)

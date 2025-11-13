@@ -1,42 +1,20 @@
 import os
 
 WHO_DRUGS_AVAILABLE  = [
-    'Isoniazid',    # INH
-    'Rifampicin',   # RIF
-    'Ethambutol',   # EMB
-    'Pyrazinamide', # PZA
-    'Streptomycin', # (SM) less commonly used now as very toxic
+    'Isoniazid',    
+    'Rifampicin',   
+    'Ethambutol',   
+    'Pyrazinamide', 
+    'Streptomycin', 
     'Kanamycin', 
     'Amikacin', 
     'Capreomycin', 
-    # 'OFLOXACIN',    # FQ
-    'Levofloxacin', # FQ 
-    'Moxifloxacin', # FQ 
-    # 'CIPROFLOXACIN', # FQ
+    'Levofloxacin', 
+    'Moxifloxacin', 
     'Ethionamide',
-    # 'BEDAQUILINE',
-    # 'CLOFAZIMINE',
-    # 'DELAMANID',
-    # 'LINEZOLID',
 ]
 
-DRUGS_UNAVAILABLE = ["Ciprofloxacin", "Ofloxacin"]
-
-GENE_OPERONIC_PAIR_MAPS = {
-    "rrs": "rrs-rrl",
-    "rrl": "rrs-rrl",
-    "embC": "embCAB",
-    "embA": "embCAB",
-    "embB": "embCAB",
-    # "ethA": "ethAR",
-    # "ethR": "ethAR",
-    "fabG1": "fabG1-inhA",
-    "inhA": "fabG1-inhA",
-    "gyrB": "gyrBA",
-    "gyrA": "gyrBA",
-    "rpoB": "rpoBC",
-    "rpoC": "rpoBC",
-}
+GENE_OPERONIC_PAIR_MAPS = {}
 
 def create_output_dir(output_dir, drug):
     """

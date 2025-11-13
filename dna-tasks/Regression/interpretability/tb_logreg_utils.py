@@ -30,8 +30,8 @@ def get_threshold_val(y_true, y_pred):
 
     # Compute number resistant and sensitive
     num_samples = y_pred.shape[0]
-    num_sensitive = np.sum(y_true==1)
-    num_resistant = np.sum(y_true==0)
+    num_sensitive = np.sum(y_true==0)
+    num_resistant = np.sum(y_true==1)
 
     # Test thresholds from 0.01 to 0.99
     thresholds = np.linspace(0, 1, 101)
@@ -48,9 +48,9 @@ def get_threshold_val(y_true, y_pred):
             # If y is predicted resistant
             if (y_pred[i] < threshold):
                 # If actually sensitive, false positive
-                if (y_true[i] == 1): fp_ += 1
+                if (y_true[i] == 0): fp_ += 1
                 # If actually resistant, true positive
-                if (y_true[i] == 0): tp_ += 1
+                if (y_true[i] == 1): tp_ += 1
 
         # Compute FPR and TPR
         fpr_.append(fp_ / float(num_sensitive))
