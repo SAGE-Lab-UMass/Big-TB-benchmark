@@ -51,7 +51,7 @@ def get_tokenizer_model(model_name_or_path, embed_type='zs', ft_model_path=None,
     
     return tokenizer, pretrained_model
 
-def get_tokens(batch, tokenizer, model_max_length=400):
+def get_tokens(batch, tokenizer, model_max_length=400, padding='max_length'):
     """
     Tokenize the input batch of DNA sequences.
 
@@ -64,7 +64,7 @@ def get_tokens(batch, tokenizer, model_max_length=400):
                     batch, 
                     max_length=model_max_length, 
                     return_tensors='pt', 
-                    padding='max_length', 
+                    padding=padding, 
                     truncation=True
                 )
     
@@ -115,7 +115,51 @@ def calculate_phenotypes(data_loader, tokenizer, model_max_length=400, embed_dir
     return res_phenotypes_all_drugs
 
 
-def calculate_dnaberts_embedding(data_loader, tokenizer, model, device, model_max_length=400, embed_dir=None, data_partition="train"):
+def calculate_dnaberts_token_embedding(data_loader, tokenizer, model, device, model_max_length=400, embed_dir=None, data_partition="train"):
+    model.eval()
+
+    # Ensure directory exists
+    os.makedirs(embed_dir, exist_ok=True)
+
+    for j, batch in enumerate(tqdm.tqdm(data_loader)):
+        with torch.no_grad():
+            input_ids, attention_mask, res_phenotypes = prepare_multigene_input_fast(batch, tokenizer, model_max_length)
+
+            batch_embeddings = []
+            for i in range(len(input_ids)):
+                with autocast(device_type="cuda"):
+                    dnaberts_output = model(
+                        input_ids=input_ids[i].to(device), 
+                        attention_mask=attention_mask[i].to(device)
+                    )[0]
+
+                # Directly calculate mean on GPU without stacking
+                dnaberts_output = dnaberts_output * attention_mask[i].unsqueeze(-1).to(device)
+                # dnaberts_output = dnaberts_output.sum(dim=1) / attention_mask[i].sum(dim=1, keepdim=True).to(device)
+                
+                # Move to CPU immediately
+                batch_embeddings.append(dnaberts_output.cpu().numpy())
+
+                del dnaberts_output
+                torch.cuda.empty_cache()
+
+            # Convert batch embeddings to a numpy array
+            batch_embeddings = np.stack(batch_embeddings, axis=1)  # (batch_size, num_genes, hidden_dim)
+            res_phenotypes = res_phenotypes.cpu().numpy()
+
+            # Save each batch immediately
+            np.save(os.path.join(embed_dir, f"zs_{data_partition}_embeddings_batch_{j}.npy"), batch_embeddings)
+            np.save(os.path.join(embed_dir, f"zs_{data_partition}_res_phenotypes_batch_{j}.npy"), res_phenotypes)
+
+            del input_ids, attention_mask, res_phenotypes
+            torch.cuda.empty_cache()
+
+    print("All batches processed and saved.")
+
+    return None  # No longer return embeddings in memory
+
+
+def calculate_dnaberts_mean_embedding(data_loader, tokenizer, model, device, model_max_length=400, embed_dir=None, data_partition="train"):
     model.eval()
 
     # Ensure directory exists

@@ -54,7 +54,7 @@ def main(args):
     # get dnabertS embeddings for our data
     print("Getting dnabertS embeddings for our training data...")
     # # train_embeddings, train_res_phenotypes = calculate_dnaberts_embedding_old(train_loader, tokenizer, model, device, args.max_length, args.embed_dir)
-    calculate_dnaberts_embedding(train_loader, tokenizer, model, device, args.max_length, args.embed_dir, data_partition="train")
+    calculate_dnaberts_token_embedding(train_loader, tokenizer, model, device, args.max_length, args.embed_dir, data_partition="train")
     print("done!\n")
 
     del train_loader
@@ -69,7 +69,7 @@ def main(args):
 
     print("Getting dnabertS embeddings for our validation data...")
     # val_embeddings, val_res_phenotypes = calculate_dnaberts_embedding_old(val_loader, tokenizer, model, args.max_length, args.embed_dir)
-    calculate_dnaberts_embedding(val_loader, tokenizer, model, device, args.max_length, args.embed_dir, data_partition="val")
+    calculate_dnaberts_token_embedding(val_loader, tokenizer, model, device, args.max_length, args.embed_dir, data_partition="val")
     print("done!\n")
 
     # # del val_loader

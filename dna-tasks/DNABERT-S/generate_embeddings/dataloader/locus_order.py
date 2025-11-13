@@ -1,54 +1,46 @@
 # locus_order = [
-#         "gyrB",  
-#         "gyrA", 
-#         "rpsL", 
-#         "rpoB",
-#         "rplC",  
-#         "inhA",     # upstream downstream promoter regions considered for inhA
-#         "katG",
-#         "pncA",
-#         "eis",     # upstream downstream promoter regions considered for eis
-#         "tlyA", 
-#         "rrs", 
-#         "embB",
-#         "ethA",
-#         "gid"
-# ]
-
-# locus_order = [
 #     "gyrBA",
 #     "rpoBC",
 #     # "Rv0678",
 #     "rpsL",
-#     "rplC",
-#     "FabG1-inhA",
+#     # "rplC",
+#     "fabG1-inhA",
 #     "rrs-rrl",
 #     "tlyA",
 #     "katG",
 #     "pncA",
-#     "eis",
+#     # "eis",
 #     "embCAB",
-#     "ethAR",
+#     "ethA",
+#     "ethR",
 #     "gid"
 # ]
 
+
 locus_order = [
-    "gyrBA",
-    "rpoBC",
+    "gyrB",
+    "gyrA"
+    "rpoB",
+    "rpoC"
     # "Rv0678",
     "rpsL",
     # "rplC",
-    "fabG1-inhA",
-    "rrs-rrl",
+    "fabG1",
+    "inhA"
+    "rrs",
+    "rrl"
     "tlyA",
     "katG",
     "pncA",
     # "eis",
-    "embCAB",
+    "embC",
+    "embA",
+    "embB",
     "ethA",
     "ethR",
     "gid"
 ]
+
 
 DRUGS = [
     'ISONIAZID',
