@@ -20,6 +20,7 @@ dna-tasks/Regression/data/*
 *.txt
 *.tex
 *.json
+*.xlsx
 
 *.mmap
 *.pkl
