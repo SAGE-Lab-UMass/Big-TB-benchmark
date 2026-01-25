@@ -49,10 +49,11 @@ Scripts to extract and translate gene/operon regions from aligned variant FASTA 
 
 ####  Classical ML
 - Logistic Regression, Ridge, Lasso (variant encodings)
-- KNN, SVR, Random Forest (on ESM embeddings)
+
 
 ####  Deep Learning
 - 1D CNNs and Transformers (trained on one-hot encoded sequences)
+- CNN(on ESM/DNABertembeddings)
 
 Each model is evaluated:
 - Per antibiotic
@@ -61,7 +62,7 @@ Each model is evaluated:
 ### 4.  Interpretability
 
 #### SHAP Residue Attribution
-- Compute per-residue importance with SHAP explanations on protein models
+- Compute per-residue importance with SHAP explanations on trained models
 - Precision, recall, and F1@k measured against WHO causal variant sets
 
 #### Outputs
