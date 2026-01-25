@@ -1,11 +1,11 @@
 
-# GeRM: a benchmark dataset for Genomic Resistance prediction and interpretability in *Mycobacterium tuberculosis*
+# BIG-TB: A Benchmark Dataset for Genomic Resistance Prediction and Interpretability in *Mycobacterium tuberculosis*
 
 This repository provides a reproducible benchmark for genotype-to-phenotype prediction of drug resistance in *M. tuberculosis*, combining classical and deep learning models on DNA and protein sequences. It includes end-to-end code for:
 - DNA to protein translation,
 - Sequence Data preparation for ML pipeline,
 - Model training and evaluation,
-- Per-residue interpretability using occlusion.
+- Per-residue interpretability using SHAP explainers.
 
 ---
 
@@ -60,8 +60,8 @@ Each model is evaluated:
 
 ### 4.  Interpretability
 
-#### Leave-One-Residue-Out Occlusion
-- Compute per-residue importance by re-evaluating model performance after masking each amino acid
+#### SHAP Residue Attribution
+- Compute per-residue importance with SHAP explanations on protein models
 - Precision, recall, and F1@k measured against WHO causal variant sets
 
 #### Outputs
@@ -143,6 +143,5 @@ If you use this benchmark in your work, please cite:
 * Research support from SAGE Lab @ UMass Amherst
 
 ---
-
 
 
