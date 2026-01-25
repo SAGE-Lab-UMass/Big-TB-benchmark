@@ -1,0 +1,44 @@
+## Parameter file for run_cnn.py  (Updated for parquet + HDF5 + random split)
+
+# ----------------------------
+# Run parameters
+# ----------------------------
+filter_size: 12
+N_epochs: 120
+weight_of_sensitive_class: 1
+
+# Target antibiotic (single-drug mode)
+drug: LEVOFLOXACIN
+
+# Train/validation split settings
+test_size: 0.2           # fraction of isolates used for test set
+random_seed: 42           # reproducible random split
+
+# ----------------------------
+# Output paths specific to antibiotic
+# ----------------------------
+output_path: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/interpretability/output/LEVO_ccp_120/LEVO
+deduplicated_data_output_path: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/interpretability/output/LEVO_ccp_120/LEVO/dedup_geno_data
+
+threshold_file: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/LEVO_ccp_120/LEVO_thresholds.csv
+
+X_sparse_path: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/LEVO_ccp_120/LEVO_X_sparse.npz
+X_sparse_path_train: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/LEVO_ccp_120/LEVO_X_sparse_train.npz
+X_sparse_path_test: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/LEVO_ccp_120/LEVO_X_sparse_test.npz
+
+alpha_file: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/LEVO_ccp_120/LEVO_alpha_sensitive_weight_1.0.csv
+
+saved_model_path: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/training_output/LEVO_ccp_120/saved_models/sd-cnn_model_best.h5
+
+# parquet + HDF5 dataset paths (new unified data format)
+metadata_path: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/LEVO_ccp_120/geno_pheno_metadata.parquet
+h5_path: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/LEVO_ccp_120/geno_pheno_onehot.h5
+
+has_neg_strand: True
+model_type: sd-cnn
+# ----------------------------
+# Invariant to antibiotic
+# ----------------------------
+phenotype_file: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/phenotype_data/master_resistance_table.csv
+genotype_input_directory: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/genomic_data/aligned/
+WHO_VCF_mapped_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/vcf_who_mapped_data

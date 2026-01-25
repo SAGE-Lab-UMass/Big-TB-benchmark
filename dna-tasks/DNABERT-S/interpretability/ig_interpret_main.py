@@ -34,7 +34,7 @@ def main(args):
     test_subset_dataloader = select_data_subset_for_ig(test_dataloader, drug_index, max_samples=200, ratio_sensitive=0.2)
 
 
-    # Ff token attributions already exist, load them
+    # If token attributions already exist, load them
     global_token_attributions_path = os.path.join(args.output_path, f"global_token_attributions_{args.drug}.pt")
     if os.path.exists(global_token_attributions_path):
         print(f"Loading global token attributions from {global_token_attributions_path}")

@@ -3,6 +3,7 @@ import os
 import joblib
 import pandas as pd
 import yaml
+import ipdb
 
 from scipy import stats
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
@@ -12,6 +13,7 @@ from sklearn.model_selection import GridSearchCV, KFold, train_test_split
 from sklearn.metrics import roc_auc_score
 
 from tb_logreg_utils import get_threshold_val, set_parameters, create_output_dir
+from parameters.locus_order import DRUG_TO_LOCI
 
 
 # Input argument is parameter file
@@ -30,22 +32,37 @@ max_iters = kwargs["max_iterations"]
 penalty = kwargs["regularization"]
 genotype_sites_file = kwargs["genotype_sites_file"]
 input_data_file = kwargs["input_data_file"]
-test_size = kwargs["test_size"]
 
-print(f"Running logistic regression for drug {drug} with penalty {penalty} and max iterations {max_iters}\n")
 
 # Read in the genotypes of interest
 print("reading in genotypes of interest")
 genotypes = pd.read_csv(f"{genotype_sites_file}", index_col=0)
-genotype_columns = [f"{x}_{y}" for x,y in zip(genotypes.locus, genotypes.sites)]
+
+selected_loci = [f"/{gene}" for gene in DRUG_TO_LOCI[drug]]
+drug_genotypes = genotypes[genotypes["locus"].isin(selected_loci)]
+
+
+genotype_columns = [f"{x}_{y}" for x,y in zip(drug_genotypes.locus, drug_genotypes.sites)]
 print("done!\n")
 
-### Prepare the input data
-input_data_df = pd.read_csv(f"{input_data_file}", index_col=0, low_memory=False)
+print(f"length of genotype columns for drug {drug}: {len(genotype_columns)}")
 
-# Perform a 70/30 train-test split
+
+
+### Prepare the input data
+input_data_df_old = pd.read_csv(f"{input_data_file}", index_col=0, low_memory=False)
+# test_df = input_data_df.query("category!='set1_original_10202'")
+# train_df = input_data_df.query("category=='set1_original_10202'")
+
+# Retain only samples with non-missing values for the specified drug
+input_data_df = input_data_df_old[input_data_df_old[drug].notna()].copy()
+
+# number of columns in input data
+print(f"total input samples with non-missing phenotypes for drug {drug}: {input_data_df.shape}")
+
+# Perform a 80/20 train-test split
 all_indices = input_data_df.index
-train_indices, test_indices = train_test_split(all_indices, test_size=test_size, random_state=42)
+train_indices, test_indices = train_test_split(all_indices, test_size=0.2, random_state=42, stratify=input_data_df[drug])
 train_df = input_data_df.loc[train_indices]
 test_df = input_data_df.loc[test_indices]
 print("Total train samples", train_df.shape)
@@ -106,7 +123,7 @@ df.to_csv(f"{drug_output_dir}/XVal_accuracy.csv")
 
 ### Fit LogisticRegression on best C, then assess on held-out set
 print("chosen parameters", clf.best_params_)
-classifer = LogisticRegression(penalty=penalty, class_weight="balanced", max_iter=1000, **clf.best_params_)
+classifer = LogisticRegression(penalty=penalty, class_weight="balanced", max_iter=max_iters, **clf.best_params_)
 classifier.fit(X,Y)
 
 print(f"saving best C model to {saved_model_path}/LogisticRegression_bestC.model...")
@@ -118,6 +135,9 @@ print("total X_test samples with no missing data", test_df.shape)
 
 X = test_df[genotype_columns]
 Y = test_df[drug]
+
+print("X_test_df shape after dropping NaN:", X.shape)
+print("y_test_df shape after dropping NaN:", Y.shape)
 
 print(f"\nrunning model on test set for drug {drug}...")
 y_pred = classifier.predict_proba(X.values)[:,1]

@@ -6,3 +6,4 @@ __pycache__
 
 # remove data files
 dna-tasks/Regression/data/*
+dna-tasks/notebooks/*

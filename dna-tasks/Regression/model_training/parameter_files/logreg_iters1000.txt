@@ -1,14 +1,12 @@
 ## Parameter file for run_logreg_l2.py
 
-drug: STREPTOMYCIN
+drug: ETHAMBUTOL
 max_iterations: 1000
 regularization: l2
-output_dir: training_output/results_logreg_1000
-test_size: 0.2
+output_dir: training_output/updated_results_logreg_1000
 
 
 # File containing phenotypes of each strain, tab-separated values
-
-genotype_sites_file: data/reduced_input/site_indices.csv
-input_data_file: data/reduced_input/combined_geno_pheno_df.csv
+genotype_sites_file: input_data/reduced_prepared_data/site_indices.csv
+input_data_file: input_data/reduced_prepared_data/combined_geno_pheno_df.csv
 

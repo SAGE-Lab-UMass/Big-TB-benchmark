@@ -1,0 +1,25 @@
+## Parameter file for run_logreg_l2.py
+
+drug: LEVOFLOXACIN # capital is necessary since the master pheno table has it in capitals
+model_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/Regression_l2/training_output/updated_results_logreg_1000
+output_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/Regression_l2/interpretability/interpretability_output/confident_mutations
+# WHO_label_file: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/make_vcf-who_map/vcf_who_mapping/outputs/isolate_level_mapping.csv
+WHO_label_file: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/make_vcf-who_map/outputs/isolate_level_mapping.csv
+WHO_VCF_mapped_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/vcf_who_mapped_data
+plot_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/Regression_l2/interpretability/interpretability_output/shap_plots
+dedup_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/Regression_l2/interpretability/interpretability_output/dedup_geno_data
+shap_values_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/Regression_l2/interpretability/interpretability_output/shap_values
+
+# File containing phenotypes of each strain, tab-separated values
+
+genotype_sites_file: input_data/reduced_prepared_data/site_indices.csv
+input_data_file: input_data/reduced_prepared_data/combined_geno_pheno_df.csv
+
+# input_data_file: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/phenotype_data/master_resistance_table.csv
+
+# Direction of DNA strands available in fastas
+has_neg_strand: True
+
+# Type of model
+model_type: log-reg
+

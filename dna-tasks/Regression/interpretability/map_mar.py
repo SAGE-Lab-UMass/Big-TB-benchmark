@@ -11,6 +11,9 @@ def find_drug_column(df, drug):
     raise ValueError(f"Drug column '{drug}' not found in DataFrame.")
 
 def export_relevant_set(relevant_set, output_path):
+    # Ensure output directory exists
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
     pd.DataFrame(sorted(relevant_set), columns=["WHO_R_features"]).to_csv(output_path, index=False)
     print(f"Exported relevant WHO-R features to {output_path}")
 
