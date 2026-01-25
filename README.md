@@ -69,70 +69,12 @@ Each model is evaluated:
 - Top-k residue lists
 - Precision-recall-F1 plots stratified by gene, drug, and model
 
----
-
-## Directory Structure
-
-```
 
 
-````
-
----
-
-## Getting Started
-
-### Dependencies
-Install via pip:
-```bash
-pip install -r requirements.txt
-````
-
-Includes:
-
-* `biopython`, `pandas`, `numpy`
-* `scikit-learn`, `torch`, `transformers`, `fair-esm`
-* `matplotlib`, `seaborn`
-
-### ESM Setup (optional)
-
-To generate ESM2 embeddings:
-
-```bash
-git clone https://github.com/facebookresearch/esm
-cd esm
-pip install -e .
-```
-
----
-
-## Reproducing Results
-
-1. **Prepare data:**
-
-   * Extract variant-aligned CDS regions (see `translation/`)
-   * Generate protein sequences and label files
-
-2. **Generate features:**
-
-
-3. **Train models:**
-
-
-
-4. **Compute interpretability:**
-
-
-
----
 
 ## Citation
 
 If you use this benchmark in your work, please cite:
-
-```
-[placeholder]. GeRM: a benchmark dataset for Genomic Resistance prediction and interpretability in Mycobacterium tuberculosis.
-```
 
 ---
 
