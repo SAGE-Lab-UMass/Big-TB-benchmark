@@ -1,0 +1,25 @@
+# extra folders
+__pycache__
+
+# checkpoint files
+*.ipynb_checkpoints
+
+# remove data files
+dna-tasks/Regression/data/*
+
+*.csv
+*.npy
+*.fasta
+*.pt
+*.png
+*.joblib
+*.pdb
+*.npz
+*.dup1
+*.pdf
+*.txt
+*.tex
+*.json
+
+*.mmap
+*.pkl
