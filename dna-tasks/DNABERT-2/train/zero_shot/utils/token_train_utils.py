@@ -844,27 +844,6 @@ def cross_val_train_on_token_embeddings(
         freeze_bias_frac: Fraction of epochs before unfreezing bias.
         random_seed: Random seed.
         device: Device to use.
-
-    Args:
-        dataset: Dataset to train on.
-        drug: Drug name.
-        num_sensitive: Number of sensitive samples.
-        num_resistant: Number of resistant samples.
-        criterion: Loss function.
-        learning_rate: Learning rate.
-        weight_decay: Weight decay.
-        output_path: Path to save outputs.
-        saved_model_path: Path to save models.
-        model_name: Model class name.
-        model_dim: Model embedding dimension.
-        model_seq_len: Model sequence length.
-        k_folds: Number of folds.
-        epochs: Number of epochs per fold.
-        train_batch_size: Training batch size.
-        val_batch_size: Validation batch size.
-        freeze_bias_frac: Fraction of epochs before unfreezing bias.
-        random_seed: Random seed.
-        device: Device to use.
     """
     kfold = KFold(n_splits=k_folds, shuffle=True, random_state=random_seed)
 
