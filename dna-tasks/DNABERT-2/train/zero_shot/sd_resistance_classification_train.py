@@ -38,18 +38,32 @@ from utils.token_train_utils import cross_val_train_on_token_embeddings
 
 # Mapping of drug names to their index in the phenotype matrix (fallback only)
 # WARNING: This is a hardcoded mapping and may not reflect the actual order in the NPZ files. Double check the order in your data and update if necessary.
+# DRUG_INDEX = {
+#     "AMIKACIN": 0,
+#     "CAPREOMYCIN": 1,
+#     "ETHAMBUTOL": 2,
+#     "ETHIONAMIDE": 3,
+#     "ISONIAZID": 4,
+#     "KANAMYCIN": 5,
+#     "LEVOFLOXACIN": 6,
+#     "MOXIFLOXACIN": 7,
+#     "PYRAZINAMIDE": 8,
+#     "RIFAMPICIN": 9,
+#     "STREPTOMYCIN": 10,
+# }
+
 DRUG_INDEX = {
-    "AMIKACIN": 0,
-    "CAPREOMYCIN": 1,
-    "ETHAMBUTOL": 2,
-    "ETHIONAMIDE": 3,
-    "ISONIAZID": 4,
-    "KANAMYCIN": 5,
-    "LEVOFLOXACIN": 6,
-    "MOXIFLOXACIN": 7,
-    "PYRAZINAMIDE": 8,
-    "RIFAMPICIN": 9,
-    "STREPTOMYCIN": 10,
+    'ISONIAZID': 0,
+    'RIFAMPICIN': 1,
+    'ETHAMBUTOL': 2,
+    'PYRAZINAMIDE': 3,
+    'STREPTOMYCIN': 4,
+    'KANAMYCIN': 5,
+    'AMIKACIN': 6,
+    'CAPREOMYCIN': 7,
+    'LEVOFLOXACIN': 8,
+    'MOXIFLOXACIN': 9,
+    'ETHIONAMIDE': 10
 }
 
 

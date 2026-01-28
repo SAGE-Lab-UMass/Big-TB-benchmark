@@ -45,7 +45,8 @@ from dataloader.dataloader import multi_gene_multi_drug_loader_csv
 from utils.embed_gen_utils import (
     get_tokenizer_model, 
     calculate_dnaberts_embedding,
-    stack_final_phenotypes
+    stack_final_phenotypes,
+    stack_final_embeddings
 )
 
 # Increase CSV field size limit for large sequence data
@@ -228,10 +229,10 @@ def main(args):
     # Stack final embeddings and phenotypes into efficient storage format
     stack_final_phenotypes(args.embed_dir, data_partition="full", gene=genes)
 
-    # Uncomment below lines if stacking for train/val needed separatelyå
-    # stack_final_embeddings(args.embed_dir, data_partition="train", drug=args.drug)
-    # stack_final_embeddings(args.embed_dir, data_partition="val", drug=args.drug)
-    å
+    # Uncomment below lines if stacking for train/val needed separately
+    stack_final_embeddings(args.embed_dir, data_partition="train", drug=args.drug)
+    stack_final_embeddings(args.embed_dir, data_partition="val", drug=args.drug)
+    
     print("Phenotype stacking and compression complete\n")
 
     print("=" * 60)

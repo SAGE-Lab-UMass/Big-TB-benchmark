@@ -1,54 +1,23 @@
-# locus_order = [
-#         "gyrB",  
-#         "gyrA", 
-#         "rpsL", 
-#         "rpoB",
-#         "rplC",  
-#         "inhA",     # upstream downstream promoter regions considered for inhA
-#         "katG",
-#         "pncA",
-#         "eis",     # upstream downstream promoter regions considered for eis
-#         "tlyA", 
-#         "rrs", 
-#         "embB",
-#         "ethA",
-#         "gid"
-# ]
-
-# locus_order = [
-#     "gyrBA",
-#     "rpoBC",
-#     # "Rv0678",
-#     "rpsL",
-#     "rplC",
-#     "FabG1-inhA",
-#     "rrs-rrl",
-#     "tlyA",
-#     "katG",
-#     "pncA",
-#     "eis",
-#     "embCAB",
-#     "ethAR",
-#     "gid"
-# ]
-
 locus_order = [
-    "gyrBA",
-    "rpoBC",
-    # "Rv0678",
-    "rpsL",
-    # "rplC",
-    "fabG1-inhA",
-    "rrs-rrl",
-    "tlyA",
-    "katG",
-    "pncA",
-    # "eis",
-    "embCAB",
-    "ethA",
-    "ethR",
-    "gid"
+        "gyrB",  
+        "gyrA", 
+        "rpsL", 
+        "rpoB",
+        "rpoC",  
+        "inhA",     # upstream downstream promoter regions considered for inhA
+        "katG",
+        "pncA",
+        "eis",     # upstream downstream promoter regions considered for eis
+        "tlyA", 
+        "rrs", 
+        "embB",
+        "embA",
+        "embC",
+        "ethA",
+        "ethR",
+        "gid"
 ]
+
 
 DRUGS = [
     'ISONIAZID',
@@ -77,27 +46,23 @@ DRUG_TO_LOCI = {
     'MOXIFLOXACIN': ['gyrB', 'gyrA'], # ran1
     'ETHIONAMIDE': ['inhA', 'ethA', 'ethR'], # ip
     # Add more drugs and their corresponding loci as needed
-} 
+}
 
-# DRUGS = [
-#     'Isoniazid',    # INH
-#     'Rifampicin',   # RIF
-#     'Ethambutol',   # EMB
-#     'Pyrazinamide', # PZA
-#     'Streptomycin', # (SM) less commonly used now as very toxic
-#     'Kanamycin', 
-#     'Amikacin', 
-#     'Capreomycin', 
-#     # 'OFLOXACIN',    # FQ
-#     'Levofloxacin', # FQ 
-#     'Moxifloxacin', # FQ 
-#     # 'CIPROFLOXACIN', # FQ
-#     'Ethionamide',
-#     # 'BEDAQUILINE',
-#     # 'CLOFAZIMINE',
-#     # 'DELAMANID',
-#     # 'LINEZOLID',
-# ]
+
+# Mapping drug names to indices for label extraction from phenotype data
+DRUG_INDEX = {
+    'ISONIAZID': 0,
+    'RIFAMPICIN': 1,
+    'ETHAMBUTOL': 2,
+    'PYRAZINAMIDE': 3,
+    'STREPTOMYCIN': 4,
+    'KANAMYCIN': 5,
+    'AMIKACIN': 6,
+    'CAPREOMYCIN': 7,
+    'LEVOFLOXACIN': 8,
+    'MOXIFLOXACIN': 9,
+    'ETHIONAMIDE': 10
+}
 
 BASE_TO_COLUMN = {
     'A': 0, 
@@ -106,21 +71,5 @@ BASE_TO_COLUMN = {
     'G': 3, 
     '-': 4,
 }
-    
-# GENE_OPERONIC_PAIR_MAPS = {
-#     "rrs": "rrs-rrl",
-#     "rrl": "rrs-rrl",
-#     "embC": "embCAB",
-#     "embA": "embCAB",
-#     "embB": "embCAB",
-#     # "ethA": "ethAR",
-#     # "ethR": "ethAR",
-#     "fabG1": "fabG1-inhA",
-#     "inhA": "fabG1-inhA",
-#     "gyrB": "gyrBA",
-#     "gyrA": "gyrBA",
-#     "rpoB": "rpoBC",
-#     "rpoC": "rpoBC",
-# }
 
 GENE_OPERONIC_PAIR_MAPS = {}
