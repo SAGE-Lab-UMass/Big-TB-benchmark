@@ -6,14 +6,17 @@ import sys, argparse, os, numpy as np, pandas as pd
 from pathlib import Path
 from typing import Tuple, Dict
 
+THIS_DIR = Path(__file__).resolve().parent
+PROTEIN_TASKS_DIR = THIS_DIR.parent
+
 # ────────────────────────────────────────────────────────────
 # 1)  COMMON HELPERS
 # ────────────────────────────────────────────────────────────
 CONFIG = {
-    "FEATURE_DIR" : Path("../data/latest/feature_matrix_labels"),
-    "WHO_CATALOG" : Path("../data/filtered_variants_output.csv"),
-    "SEQ_META"    : Path("../data/catalog/protein_sequences.csv"),
-    "PR_OUT_DIR"  : Path("../data/latest/results/interpretability/regression"),
+    "FEATURE_DIR" : PROTEIN_TASKS_DIR / "data/latest/feature_matrix_labels",
+    "WHO_CATALOG" : PROTEIN_TASKS_DIR / "data/filtered_variants_output.csv",
+    "SEQ_META"    : PROTEIN_TASKS_DIR / "data/catalog/protein_sequences.csv",
+    "PR_OUT_DIR"  : PROTEIN_TASKS_DIR / "data/latest/results/interpretability/regression",
 }
 DRUG2GENES: Dict[str, list] = {
     # ── single-gene drugs ───────────────────────────────────

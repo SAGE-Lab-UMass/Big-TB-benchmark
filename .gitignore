@@ -11,3 +11,4 @@ dna-tasks/notebooks/*
 # remove DNABERT-S files
 DNABERT-S/
 **/DNABERT-S/
+protein-tasks/slurm/logs/

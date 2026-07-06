@@ -77,15 +77,18 @@ torch.backends.cudnn.deterministic = True   # pick a deterministic kernel
 # from tqdm.auto import tqdm  
 import tqdm
 
+ESM_MODELS_DIR = Path(__file__).resolve().parent
+PROTEIN_TASKS_DIR = ESM_MODELS_DIR.parent
+
 # -------------------------------------------------------------------
 SPECIAL_DIRS = {
-    ("gyrA", "levofloxacin") : "data/latest/embeddings/gyrA_LEV",
-    ("gyrB", "levofloxacin") : "data/latest/embeddings/gyrB_LEV",
-    ("gyrA", "moxifloxacin") : "data/latest/embeddings/gyrA_MOX",
-    ("gyrB", "moxifloxacin") : "data/latest/embeddings/gyrB_MOX",
-    ("ethA", "ethionamide")  : "data/latest/embeddings/ethA_ETH",
-    ("ethR", "ethionamide")  : "data/latest/embeddings/ethR_ETH",
-    ("inhA", "ethionamide")  : "data/latest/embeddings/inhA_ETH",
+    ("gyrA", "levofloxacin") : PROTEIN_TASKS_DIR / "data/latest/embeddings/gyrA_LEV",
+    ("gyrB", "levofloxacin") : PROTEIN_TASKS_DIR / "data/latest/embeddings/gyrB_LEV",
+    ("gyrA", "moxifloxacin") : PROTEIN_TASKS_DIR / "data/latest/embeddings/gyrA_MOX",
+    ("gyrB", "moxifloxacin") : PROTEIN_TASKS_DIR / "data/latest/embeddings/gyrB_MOX",
+    ("ethA", "ethionamide")  : PROTEIN_TASKS_DIR / "data/latest/embeddings/ethA_ETH",
+    ("ethR", "ethionamide")  : PROTEIN_TASKS_DIR / "data/latest/embeddings/ethR_ETH",
+    ("inhA", "ethionamide")  : PROTEIN_TASKS_DIR / "data/latest/embeddings/inhA_ETH",
     
 }
 
@@ -93,8 +96,12 @@ SPECIAL_DIRS = {
 # 2) one helper – return the directory that actually holds the .npz
 # -------------------------------------------------------------------
 def embeddings_root(gene: str, drug: str | None = None) -> Path:
-    return Path(SPECIAL_DIRS.get((gene, drug),
-                                 f"data/latest/embeddings/{gene}"))
+    return Path(
+        SPECIAL_DIRS.get(
+            (gene, drug),
+            PROTEIN_TASKS_DIR / f"data/latest/embeddings/{gene}",
+        )
+    )
 
 
  
@@ -134,8 +141,10 @@ def load_dataset_for_cv(gene, drug, mode, in_dim):
 
     else:
         gene = all_drugs[drug][0]
-        ph = pd.read_csv(f"data/latest/sequence_data_csv/{gene}_{drug.upper()}_combined_sequence_data.csv",
-                         usecols=["Filename", "Phenotype"])
+        ph = pd.read_csv(
+            sequence_csv_path(gene, drug),
+            usecols=["Filename", "Phenotype"],
+        )
         label_map = dict(zip(ph.Filename.astype(str), (ph.Phenotype == "R").astype(int)))
         del ph
         gc.collect()
@@ -407,7 +416,7 @@ def _collate_fixed(L_PAD: int):
 # --- evaluate a subset with a fixed L_PAD ---
 def _eval_subset(model, subset, batch_size, device, L_PAD):
     ld = DataLoader(subset, batch_size=batch_size, shuffle=False,
-                    num_workers=2, pin_memory=True,
+                    num_workers=0, pin_memory=False,
                     collate_fn=_collate_fixed(L_PAD))
     model.eval()
     probs, labels = [], []
@@ -457,19 +466,20 @@ def regenerate_esm_fold_preds(
 
         # checkpoint path for this fold
         fold_dir = Path(out_root) / drug / mode / f"fold_{fold}"
-        ckpt = fold_dir / f"{drug}_model.pt"
-        if not ckpt.exists():
-            raise FileNotFoundError(f"Missing checkpoint for fold {fold}: {ckpt}")
-
+        ckpt = resolve_checkpoint_path(fold_dir, drug, fold)
         model.load_state_dict(torch.load(ckpt, map_location=device))
 
         # inference on held-out val
         prob, y = _eval_subset(model, va_subset, batch_size, device, L_PAD)
 
         # save
+        preds_df = pd.DataFrame({"prob": prob, "label": y})
         out_csv = fold_dir / "val_preds.csv"
-        pd.DataFrame({"prob": prob, "label": y}).to_csv(out_csv, index=False)
+        named_out_csv = fold_dir / f"{drug}_fold{fold}_preds.csv"
+        preds_df.to_csv(out_csv, index=False)
+        preds_df.to_csv(named_out_csv, index=False)
         print(f"saved {out_csv}")
+        print(f"saved {named_out_csv}")
 
         # (optional) show fold AUC
         if len(np.unique(y)) == 2 and len(y) == len(prob) and len(y) > 0:
@@ -510,16 +520,22 @@ def regenerate_esm_fold_preds(
 DRUG_LIST = ['rifampicin','streptomycin','isoniazid','pyrazinamide',
              'ethionamide','amikacin','capreomycin','moxifloxacin', 'levofloxacin','ethambutol']
 
-for drug_name in DRUG_LIST:
-    if drug_name not in DRUG2GENES:
-        print(f"[skip] unknown drug: {drug_name}"); continue
-    regenerate_esm_fold_preds(
-        gene=None, drug=drug_name, mode="full", in_dim=320,
-        out_root="data/latest/cross_val/esm_cv_sig", n_folds=5, seed=42, batch_size=32
-    )
 
-    # PCA-10
-    regenerate_esm_fold_preds(
-        gene=None, drug=drug_name, mode="pca", in_dim=10,
-        out_root="data/latest/cross_val/esm_cv_sig", n_folds=5, seed=42, batch_size=32
-    )
+def main():
+    for drug_name in DRUG_LIST:
+        if drug_name not in DRUG2GENES:
+            print(f"[skip] unknown drug: {drug_name}")
+            continue
+        regenerate_esm_fold_preds(
+            gene=None, drug=drug_name, mode="full", in_dim=320,
+            out_root="data/latest/cross_val/esm_cv_sig", n_folds=5, seed=42, batch_size=32
+        )
+
+        regenerate_esm_fold_preds(
+            gene=None, drug=drug_name, mode="pca", in_dim=10,
+            out_root="data/latest/cross_val/esm_cv_sig", n_folds=5, seed=42, batch_size=32
+        )
+
+
+if __name__ == "__main__":
+    main()

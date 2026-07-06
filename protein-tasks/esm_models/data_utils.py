@@ -35,20 +35,63 @@ multi_drugs = {
 
 all_drugs = {**single_drugs, **multi_drugs}   # merge dicts
 
-# -------------------------------------------------------------------
-SPECIAL_DIRS = {
-    ("gyrA", "levofloxacin") : "/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/embeddings/gyrA_LEV",
-    ("gyrB", "levofloxacin") : "/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/embeddings/gyrB_LEV",
-    ("gyrA", "moxifloxacin") : "/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/embeddings/gyrA_MOX",
-    ("gyrB", "moxifloxacin") : "/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/embeddings/gyrB_MOX",
-    ("ethA", "ethionamide")  : "/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/embeddings/ethA_ETH",
-    ("ethR", "ethionamide")  : "/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/embeddings/ethR_ETH",
-    ("inhA", "ethionamide")  : "/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/embeddings/inhA_ETH",
+ESM_MODELS_DIR = Path(__file__).resolve().parent
+PROTEIN_TASKS_DIR = ESM_MODELS_DIR.parent
+LOCAL_DATA_ROOT = PROTEIN_TASKS_DIR / "data" / "latest"
+SOURCE_DATA_ROOT = Path(os.environ.get("BIGTB_SOURCE_DATA_ROOT", LOCAL_DATA_ROOT))
+
+SPECIAL_DIR_NAMES = {
+    ("gyrA", "levofloxacin") : "gyrA_LEV",
+    ("gyrB", "levofloxacin") : "gyrB_LEV",
+    ("gyrA", "moxifloxacin") : "gyrA_MOX",
+    ("gyrB", "moxifloxacin") : "gyrB_MOX",
+    ("ethA", "ethionamide")  : "ethA_ETH",
+    ("ethR", "ethionamide")  : "ethR_ETH",
+    ("inhA", "ethionamide")  : "inhA_ETH",
 }
 
+
+def _existing_dir(*candidates: Path) -> Path:
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
+def results_root() -> Path:
+    return LOCAL_DATA_ROOT / "results"
+
+
+def cross_val_root() -> Path:
+    return LOCAL_DATA_ROOT / "cross_val"
+
+
+def sequence_csv_path(gene: str, drug: str) -> Path:
+    name = f"{gene}_{drug.upper()}_combined_sequence_data.csv"
+    return _existing_dir(
+        LOCAL_DATA_ROOT / "sequence_data_csv" / name,
+        SOURCE_DATA_ROOT / "sequence_data_csv" / name,
+    )
+
+
 def embeddings_root(gene: str, drug: str | None = None) -> Path:
-    return Path(SPECIAL_DIRS.get((gene, drug),
-                                 f"/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/embeddings/{gene}"))
+    dirname = SPECIAL_DIR_NAMES.get((gene, drug), gene)
+    return _existing_dir(
+        LOCAL_DATA_ROOT / "embeddings" / dirname,
+        SOURCE_DATA_ROOT / "embeddings" / dirname,
+    )
+
+
+def resolve_checkpoint_path(fold_dir: Path, drug: str, fold: int | None = None) -> Path:
+    candidates = [fold_dir / f"{drug}_model.pt"]
+    if fold is not None:
+        candidates.append(fold_dir / f"{drug}_fold{fold}_model.pt")
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    raise FileNotFoundError(
+        "Missing checkpoint. Tried: " + ", ".join(str(path) for path in candidates)
+    )
 
 # ──────────────────────────────────────────────────────────────
 # helper ─ build a {isolate-id → label} dict for a *set* of genes
@@ -63,7 +106,7 @@ def build_label_map(genes,drug):
     label_map = {}
 
     for g in genes:
-        csv = Path(f"data/latest/sequence_data_csv/{g}_{drug.upper()}_combined_sequence_data.csv")
+        csv = sequence_csv_path(g, drug)
         df  = pd.read_csv(csv, usecols=["Filename", "Phenotype"])
         df["id"]    = df["Filename"].astype(str)
         df["label"] = (df["Phenotype"] == "R").astype(int)
@@ -94,10 +137,10 @@ def build_train_test_split(drug, test_size=0.2, seed=42):
 
     if drug in single_drugs:
         gene = single_drugs[drug][0]
-        paths = [f"/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/sequence_data_csv/{gene}_{drug.upper()}_combined_sequence_data.csv"]
+        paths = [sequence_csv_path(gene, drug)]
     else:
         genes = multi_drugs[drug]
-        paths = [f"/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/sequence_data_csv/{g}_{drug.upper()}_combined_sequence_data.csv"
+        paths = [sequence_csv_path(g, drug)
                  for g in genes]
 
     dfs = []
