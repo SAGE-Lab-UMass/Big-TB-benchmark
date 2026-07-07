@@ -6,6 +6,7 @@ import glob, os, math, sys,json,time,gc
 import numpy as np, pandas as pd
 from pathlib import Path
 
+from data_utils import embeddings_root
 
 import random, shap
 import torch.nn as nn
@@ -193,19 +194,20 @@ class TokenMemmapMap(torch.utils.data.Dataset):
         # ---- unpack every “chunk” meta and open its mem-map ----------
         self.blocks = []          # list of (ids, memmap) per chunk
         self.lookup = []          # flat list of (block_idx, row_idx)
+        self.ids = []
 
-        
         for bidx, meta_path in enumerate(meta_paths):
             meta = np.load(meta_path, allow_pickle=True)
-            ids  = meta["identifier"]             # list/array of isolate IDs
+            ids  = meta["identifier"].astype(str)             # list/array of isolate IDs
             shape = tuple(meta["shape"])          # (n_rows, L, 320)
             mmap_path = meta_path.replace("_meta.npz", ".mmap")
             mm = np.memmap(mmap_path, dtype="float16", mode="r", shape=shape) # memory-map (readonly)
 
-            
             self.blocks.append((ids, mm))
-            # extend lookup
-            self.lookup.extend([(bidx, r) for r in range(shape[0])])
+            for r, seq_id in enumerate(ids):
+                if seq_id in label_dict:
+                    self.lookup.append((bidx, r))
+                    self.ids.append(seq_id)
         self.label_dict = label_dict
 
     def __len__(self):
@@ -232,14 +234,19 @@ class PcaMemmapMap(torch.utils.data.Dataset):          # PCA‑K
     def __init__(self, meta_paths, label_dict, k):
         self.blocks = [] # [(ids, memmap_k), …]
         self.lookup = []
+        self.ids = []
         self.k = k
         for bidx, p in enumerate(meta_paths):
             m  = np.load(p, allow_pickle=True)
             # open the companion .mmap (same basename, different suffix)
             mm = np.memmap(p.replace("_meta.npz", ".mmap"),
                            dtype="float16", mode="r", shape=tuple(m["shape"])) # (n , L , k)
-            self.blocks.append((m["identifier"], mm))
-            self.lookup += [(bidx, r) for r in range(m["shape"][0])]
+            ids = m["identifier"].astype(str)
+            self.blocks.append((ids, mm))
+            for r, seq_id in enumerate(ids):
+                if seq_id in label_dict:
+                    self.lookup.append((bidx, r))
+                    self.ids.append(seq_id)
         self.label = label_dict
         
     def __len__(self):  return len(self.lookup)
@@ -257,14 +264,19 @@ class MeanMemmapMap(torch.utils.data.Dataset):
     """
     def __init__(self, meta_paths, label_dict):
         self.blocks, self.lookup = [], []
+        self.ids = []
         for bidx, p in enumerate(meta_paths):
             m  = np.load(p, allow_pickle=True)
             mmap_path = Path(str(p).replace("_pcmean_meta.npz", "_pcmean.mmap"))
             mm = np.memmap(mmap_path, dtype="float16", mode="r", shape=tuple(m["shape"]))
             # mm = np.memmap(p.replace("_pcmean_meta.npz", "_pcmean.mmap"), dtype="float16",
             #                mode="r", shape=tuple(m["shape"]))   # (N,L,1)
-            self.blocks.append((m["identifier"], mm))
-            self.lookup += [(bidx, r) for r in range(m["shape"][0])]
+            ids = m["identifier"].astype(str)
+            self.blocks.append((ids, mm))
+            for r, seq_id in enumerate(ids):
+                if seq_id in label_dict:
+                    self.lookup.append((bidx, r))
+                    self.ids.append(seq_id)
         self.label = label_dict
 
     def __len__(self):  return len(self.lookup)
