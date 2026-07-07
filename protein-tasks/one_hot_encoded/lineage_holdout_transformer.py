@@ -29,6 +29,18 @@ from significance_testing_transformer import _train_one_fold, DRUG2GENES, N_EPOC
 OUT_ROOT = PROTEIN_TASKS_DIR / 'data/latest/lineage_ood_all_train/transformer'
 
 
+def _write_aggregate_summary(drug: str) -> None:
+    """Rebuild the per-drug aggregate table from split-level summaries."""
+    out_dir = OUT_ROOT / drug
+    summary_files = sorted(out_dir.glob('heldout_lineage_*/summary.csv'))
+    if not summary_files:
+        return
+    df = pd.concat([pd.read_csv(path) for path in summary_files], ignore_index=True)
+    if 'heldout_lineage' in df.columns:
+        df = df.sort_values('heldout_lineage').reset_index(drop=True)
+    df.to_csv(out_dir / 'all_lineage_summary.csv', index=False)
+
+
 def run_lineage_holdout_for_drug(drug: str, heldout_lineage: str, min_class_count: int = DEFAULT_MIN_CLASS_COUNT, dry_run: bool = False) -> dict:
     # Recompute the canonical isolate-ID split from shared inputs. Because the
     # split is defined by isolate IDs, each model family receives the same train/test
@@ -104,13 +116,13 @@ def main() -> None:
     set_seed(SEED)
     _, splits = build_and_save_drug_splits(args.drug, DRUG2GENES, min_class_count=args.min_class_count)
     heldouts = [args.heldout_lineage] if args.heldout_lineage else list(splits.keys())
-    rows = []
     for heldout in heldouts:
-        rows.append(run_lineage_holdout_for_drug(args.drug, heldout, min_class_count=args.min_class_count, dry_run=args.dry_run))
+        run_lineage_holdout_for_drug(args.drug, heldout, min_class_count=args.min_class_count, dry_run=args.dry_run)
 
-    out_dir = OUT_ROOT / args.drug
-    out_dir.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(rows).to_csv(out_dir / 'all_lineage_summary.csv', index=False)
+    if not args.dry_run:
+        out_dir = OUT_ROOT / args.drug
+        out_dir.mkdir(parents=True, exist_ok=True)
+        _write_aggregate_summary(args.drug)
 
 
 if __name__ == '__main__':

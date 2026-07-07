@@ -37,6 +37,18 @@ MODE2DIM = {
 }
 
 
+def _write_aggregate_summary(drug: str, mode: str, in_dim: int) -> None:
+    """Rebuild the per-drug aggregate table from split-level summaries."""
+    out_dir = OUT_ROOT / drug / f'{mode}_{in_dim}'
+    summary_files = sorted(out_dir.glob('heldout_lineage_*/summary.csv'))
+    if not summary_files:
+        return
+    df = pd.concat([pd.read_csv(path) for path in summary_files], ignore_index=True)
+    if 'heldout_lineage' in df.columns:
+        df = df.sort_values('heldout_lineage').reset_index(drop=True)
+    df.to_csv(out_dir / 'all_lineage_summary.csv', index=False)
+
+
 def run_lineage_holdout_for_drug(
     drug: str,
     heldout_lineage: str,
@@ -145,20 +157,20 @@ def main() -> None:
     in_dim = args.in_dim if args.in_dim is not None else MODE2DIM[args.mode]
     _, splits = build_and_save_drug_splits(args.drug, DRUG2GENES, min_class_count=args.min_class_count)
     heldouts = [args.heldout_lineage] if args.heldout_lineage else list(splits.keys())
-    rows = []
     for heldout in heldouts:
-        rows.append(run_lineage_holdout_for_drug(
+        run_lineage_holdout_for_drug(
             args.drug,
             heldout,
             args.mode,
             in_dim,
             min_class_count=args.min_class_count,
             dry_run=args.dry_run,
-        ))
+        )
 
-    out_dir = OUT_ROOT / args.drug / f'{args.mode}_{in_dim}'
-    out_dir.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(rows).to_csv(out_dir / 'all_lineage_summary.csv', index=False)
+    if not args.dry_run:
+        out_dir = OUT_ROOT / args.drug / f'{args.mode}_{in_dim}'
+        out_dir.mkdir(parents=True, exist_ok=True)
+        _write_aggregate_summary(args.drug, args.mode, in_dim)
 
 
 if __name__ == '__main__':
