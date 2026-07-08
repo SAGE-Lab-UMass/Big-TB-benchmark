@@ -32,6 +32,21 @@ MANIFEST_DIR = PROTEIN_TASKS_DIR / 'data/latest/feature_matrix_labels/row_manife
 SUPPORTED_DRUGS = set(DRUG2GENES)
 
 
+def _write_aggregate_summary(drug: str) -> None:
+    """Rebuild the per-drug aggregate table from split-level summaries."""
+    out_dir = OUT_ROOT / drug
+    summary_files = sorted(out_dir.glob('heldout_lineage_*/summary.csv'))
+    if not summary_files:
+        return
+    df = pd.concat([pd.read_csv(path) for path in summary_files], ignore_index=True)
+    if 'heldout_lineage' in df.columns:
+        sort_cols = ['heldout_lineage']
+        if 'model' in df.columns:
+            sort_cols.append('model')
+        df = df.sort_values(sort_cols).reset_index(drop=True)
+    df.to_csv(out_dir / 'all_lineage_summary.csv', index=False)
+
+
 def _auc_safe(y_true, y_score):
     """Return NaN instead of crashing if a test split has one class."""
     y_true = np.asarray(y_true).astype(int)
@@ -217,19 +232,19 @@ def main() -> None:
     args = parser.parse_args()
 
     heldouts = [args.heldout_lineage] if args.heldout_lineage else list(MAJOR_LINEAGES)
-    all_rows = []
     for heldout in heldouts:
-        all_rows.extend(run_lineage_holdout_for_drug(
+        run_lineage_holdout_for_drug(
             args.drug,
             heldout,
             min_class_count=args.min_class_count,
             seed=args.seed,
             dry_run=args.dry_run,
-        ))
+        )
 
-    out_dir = OUT_ROOT / args.drug
-    out_dir.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(all_rows).to_csv(out_dir / 'all_lineage_summary.csv', index=False)
+    if not args.dry_run:
+        out_dir = OUT_ROOT / args.drug
+        out_dir.mkdir(parents=True, exist_ok=True)
+        _write_aggregate_summary(args.drug)
 
 
 if __name__ == '__main__':

@@ -36,7 +36,9 @@ class Wrapped(nn.Module):
     def forward(self, x):     return self.base(x).unsqueeze(1)
 
 # ─── deduplication with caching ─────────────────────────────────────
-def dedup_and_save_indices(ds, name, out_dir="/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/results/dedup"):
+def dedup_and_save_indices(ds, name, out_dir=None):
+    if out_dir is None:
+        out_dir = results_root() / "dedup"
     out_dir = Path(out_dir); out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{name}_dedup_indices.npy"
 
@@ -246,7 +248,9 @@ def shap_per_residue_single_pool(model, pool_ds,
 def compute_shap_for_drug(drug, mode="full", in_dim=320,
                           background_frac=0.10, explain_frac=None,   # explain_frac unused now
                           seed=42, max_bg=160,
-                          out_root="/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/results"):
+                          out_root=None):
+    if out_root is None:
+        out_root = results_root()
 
     gene = single_drugs.get(drug, [None])[0] if drug in single_drugs else None
     run_dir = f"{out_root}/prediction/esm/{drug}_dim{in_dim}"
@@ -371,7 +375,7 @@ def load_model(drug, gene, mode, in_dim, run_dir):
     stem_out = 64 if in_dim == 320 else 32
     model = ProteinCNN1x1(seq_len=L_PAD, in_dim=in_dim, stem_out=stem_out).to(device)
 
-    model_path = Path(run_dir) / f"{drug}_model.pt"
+    model_path = resolve_checkpoint_path(Path(run_dir), drug)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
@@ -380,7 +384,7 @@ def load_model(drug, gene, mode, in_dim, run_dir):
 # # ─── driver for SHAP only ───────────────────────────────────────────
 # def compute_shap_for_drug(drug, mode="full", in_dim=320,
 #                           background_frac=1.0, explain_frac=1.0,
-#                           out_root="/project/pi_annagreen_umass_edu/mahbuba/Data-Curation-for-MTB/protein-tasks/data/latest/results"):
+#                           out_root=None):
 
 #     gene = single_drugs.get(drug, [None])[0] if drug in single_drugs else None
 #     run_dir = f"{out_root}/prediction/esm/{drug}_dim{in_dim}"
