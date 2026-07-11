@@ -143,8 +143,11 @@ def load_dataset_for_cv(gene, drug, mode, in_dim):
         gene = all_drugs[drug][0]
         ph = pd.read_csv(
             sequence_csv_path(gene, drug),
-            usecols=["Filename", "Phenotype"],
+            usecols=["Filename", "Phenotype", "Frameshift_Mutation"],
         )
+        # Match the model-ready cohort used by all other protein runners.
+        ph = ph[(ph["Frameshift_Mutation"] == 0) &
+                (ph["Phenotype"].isin(["R", "S"]))].copy()
         label_map = dict(zip(ph.Filename.astype(str), (ph.Phenotype == "R").astype(int)))
         del ph
         gc.collect()

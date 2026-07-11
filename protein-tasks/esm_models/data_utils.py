@@ -107,7 +107,11 @@ def build_label_map(genes,drug):
 
     for g in genes:
         csv = sequence_csv_path(g, drug)
-        df  = pd.read_csv(csv, usecols=["Filename", "Phenotype"])
+        # Keep this cohort definition aligned with the one-hot and regression
+        # runners. Embeddings are generated from these same eligible rows.
+        df = pd.read_csv(csv, usecols=["Filename", "Phenotype", "Frameshift_Mutation"])
+        df = df[(df["Frameshift_Mutation"] == 0) &
+                (df["Phenotype"].isin(["R", "S"]))].copy()
         df["id"]    = df["Filename"].astype(str)
         df["label"] = (df["Phenotype"] == "R").astype(int)
         # if an isolate appears in both files, assert the labels agree
@@ -147,7 +151,10 @@ def build_train_test_split(drug, test_size=0.2, seed=42):
     for p in paths:
         if not os.path.exists(p):
             raise FileNotFoundError(f"Expected file not found: {p}")
-        dfs.append(pd.read_csv(p, usecols=["Filename", "Phenotype"]))
+        df = pd.read_csv(p, usecols=["Filename", "Phenotype", "Frameshift_Mutation"])
+        df = df[(df["Frameshift_Mutation"] == 0) &
+                (df["Phenotype"].isin(["R", "S"]))].copy()
+        dfs.append(df)
 
     ph = pd.concat(dfs, ignore_index=True)
 
