@@ -76,6 +76,8 @@ Task 2 evaluates whether model attributions recover known WHO resistance-conferr
   <img src="docs/figures/recall_heatmap_task2.png" alt="Task 2 canonical resistance variant recovery heatmap" width="900"/>
 </p>
 
+The accompanying [protein Task 2 variant-support table](supplementary_data/task2_protein_who_variant_support.csv) reports, for each WHO Group 1 or Group 2 protein substitution represented in the model inputs, its WHO confidence group, model-ready cohort size, carrier count, and resistant/susceptible carrier counts. These are BIG-TB cohort-specific counts.
+
 ## Repository Layout
 
 ```text
