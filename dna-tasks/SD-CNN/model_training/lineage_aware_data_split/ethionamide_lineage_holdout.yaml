@@ -6,20 +6,20 @@ drug: ETHIONAMIDE
 test_size: 0.2
 random_seed: 42
 
-output_path: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/ETHIONAMIDE
+output_path: training_output/lineage_aware_split/ETHIONAMIDE
 
-threshold_file: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/ETHIONAMIDE/threshold_unused.csv
+threshold_file: training_output/lineage_aware_split/ETHIONAMIDE/threshold_unused.csv
 
-X_sparse_path: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/ETA_X_sparse.npz
-X_sparse_path_train: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/ETA_X_sparse_train.npz
-X_sparse_path_test: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/ETA_X_sparse_test.npz
+X_sparse_path: ../../../../project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/ETA_X_sparse.npz
+X_sparse_path_train: ../../../../project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/ETA_X_sparse_train.npz
+X_sparse_path_test: ../../../../project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/ETA_X_sparse_test.npz
 
-alpha_file: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/ETA_alpha_sensitive_weight_1.0.csv
+alpha_file: ../../../../project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/ETA_alpha_sensitive_weight_1.0.csv
 
-saved_model_path: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/ETHIONAMIDE/saved_models
+saved_model_path: training_output/lineage_aware_split/ETHIONAMIDE/saved_models
 
-metadata_path: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/geno_pheno_metadata.parquet
-h5_path: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/geno_pheno_onehot.h5
+metadata_path: ../../../../project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/geno_pheno_metadata.parquet
+h5_path: ../../../../project_data_curation/benchmarking/SD-CNN/model_training/pickle_files/ETA_ccp_100/geno_pheno_onehot.h5
 
-phenotype_file: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/phenotype_data/master_resistance_table.csv
-genotype_input_directory: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/genomic_data/aligned/
+phenotype_file: ../../../../project_data_curation/phenotype_data/master_resistance_table.csv
+genotype_input_directory: ../../../../project_data_curation/genomic_data/aligned/

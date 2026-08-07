@@ -1,2 +1,0 @@
-Algorithm,Drug,num_sensitive,num_resistant,AUC,AUC_PR,threshold,spec,sens
-SD-CNN,CAPREOMYCIN,44,2,0.3125,0.05128205128205128,0.5,0.0,1.0

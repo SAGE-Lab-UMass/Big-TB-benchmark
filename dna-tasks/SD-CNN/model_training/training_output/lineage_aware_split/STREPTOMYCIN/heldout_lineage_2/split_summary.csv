@@ -1,2 +1,0 @@
-drug,heldout_lineage,train_n,test_n,train_sensitive,train_resistant,test_sensitive,test_resistant,nonzero_train_and_test
-STREPTOMYCIN,2,5155,1826,3969,1186,836,990,True
