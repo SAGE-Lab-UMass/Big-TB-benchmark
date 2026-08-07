@@ -6,6 +6,7 @@ __pycache__
 
 # remove data files
 dna-tasks/Regression/data/*
+dna-tasks/data/regression_data/input_data/
 dna-tasks/notebooks/*
 
 # remove DNABERT files
