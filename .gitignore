@@ -12,3 +12,20 @@ dna-tasks/notebooks/*
 DNABERT-S/
 **/DNABERT-S/
 protein-tasks/slurm/logs/
+dna-tasks/Evo2/
+
+
+# for this push just keep sd-cnn updates
+
+# SD-CNN lineage-aware split runtime artifacts
+dna-tasks/SD-CNN/model_training/lineage_aware_data_split/logs/
+dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/**/saved_model/
+
+# MD-CNN/MDCNN lineage-aware split runtime artifacts
+dna-tasks/MDCNN/model_training/lineage_aware_data_split/
+dna-tasks/MDCNN/model_training/training_output/
+dna-tasks/MD-CNN/
+
+# Regression lineage-aware split runtime artifacts
+dna-tasks/Regression/lineage_aware_data_split/
+dna-tasks/Regression/training_output/
