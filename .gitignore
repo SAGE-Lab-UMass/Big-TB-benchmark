@@ -20,7 +20,10 @@ dna-tasks/Evo2/
 
 # SD-CNN lineage-aware split runtime artifacts
 dna-tasks/SD-CNN/model_training/lineage_aware_data_split/logs/
-dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/**/saved_model/
+dna-tasks/SD-CNN/model_training/lineage_aware_data_split/run_sdcnn_lineage_holdout_sai.sh
+dna-tasks/SD-CNN/model_training/lineage_aware_data_split/submit_sdcnn_lineage_holdout_sai.sh
+dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/*
+!dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/test_set_metrics.csv
 
 # MD-CNN/MDCNN lineage-aware split runtime artifacts
 dna-tasks/MDCNN/model_training/lineage_aware_data_split/
@@ -29,4 +32,7 @@ dna-tasks/MD-CNN/
 
 # Regression lineage-aware split runtime artifacts
 dna-tasks/Regression/interpret_logreg.ipynb
+dna-tasks/Regression/run_lineage_holdout_all_drugs_sai.sh
+dna-tasks/Regression/training_output/lineage_aware_results_logreg_1000/*
+!dna-tasks/Regression/training_output/lineage_aware_results_logreg_1000/test_set_metrics.csv
 dna-tasks/Regression/training_output/**/saved_models/

@@ -4,9 +4,9 @@ set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-CONDA_SH="/work/pi_annagreen_umass_edu/saishradha/miniconda3/etc/profile.d/conda.sh"
-CNN_ENV="/work/pi_annagreen_umass_edu/saishradha/miniconda3/envs/cnn"
-PYTHON="$CNN_ENV/bin/python"
+CONDA_SH="${CONDA_SH:-/path/to/miniconda3/etc/profile.d/conda.sh}"
+CONDA_ENV="${CONDA_ENV:-/path/to/miniconda3/envs/cnn}"
+PYTHON="${PYTHON:-$CONDA_ENV/bin/python}"
 
 BASE_PARAM_FILE="model_training/parameter_files/logreg_iters1000.txt"
 TRAINER="lineage_aware_data_split/run_logreg_l2_lineage_holdout.py"
@@ -14,18 +14,18 @@ OVERRIDE_OUTPUT_DIR="training_output/lineage_aware_results_logreg_1000"
 MIN_CLASS_COUNT="${MIN_CLASS_COUNT:-50}"
 
 if [[ ! -f "$CONDA_SH" ]]; then
-  echo "Missing conda initialization script: $CONDA_SH" >&2
+  echo "Set CONDA_SH to your conda.sh path or edit this script: $CONDA_SH" >&2
   exit 1
 fi
 
 if [[ ! -x "$PYTHON" ]]; then
-  echo "Missing CNN environment Python: $PYTHON" >&2
+  echo "Set CONDA_ENV/PYTHON to your conda environment Python or edit this script: $PYTHON" >&2
   exit 1
 fi
 
 source "$CONDA_SH"
-if ! conda activate "$CNN_ENV"; then
-  echo "Failed to activate CNN conda environment: $CNN_ENV" >&2
+if ! conda activate "$CONDA_ENV"; then
+  echo "Set CONDA_ENV to your conda environment path or edit this script: $CONDA_ENV" >&2
   exit 1
 fi
 
