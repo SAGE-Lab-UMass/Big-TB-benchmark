@@ -5,9 +5,8 @@ import joblib
 import numpy as np
 import pandas as pd
 import yaml
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV, KFold
-from sklearn.metrics import roc_auc_score
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 THIS_DIR = Path(__file__).resolve().parent
 REGRESSION_DIR = THIS_DIR.parent
@@ -17,11 +16,11 @@ LINEAGE_CSV = DATA_ROOT / "BIG_TB_isolates_with_lineages.csv"
 
 sys.path.insert(0, str(MODEL_TRAINING_DIR))
 
-from tb_logreg_utils import get_threshold_val, set_parameters  # noqa: E402
 from parameters.locus_order import DRUG_TO_LOCI  # noqa: E402
 
 MAJOR_LINEAGES = ("1", "2", "3", "4")
 DEFAULT_MIN_CLASS_COUNT = 50
+LOGREG_CS = [1e-4, 1e-3, 1e-2, 0.1, 1, 10, 100]
 
 
 def _to_binary_labels(y: pd.Series) -> pd.Series:
@@ -43,7 +42,7 @@ def _to_binary_labels(y: pd.Series) -> pd.Series:
 
 
 def _normalize_lineage_series(lineage: pd.Series) -> pd.Series:
-    """Normalize lineage labels so major-lineage matching is stable."""
+    """Normalize lineage labels so exact held-out lineage matching is stable."""
     s = lineage.astype("string")
     s = s.str.strip()
     s = s.mask(s.str.lower().isin(["nan", "none", ""]))
@@ -66,38 +65,6 @@ def _normalize_lineage_series(lineage: pd.Series) -> pd.Series:
         return txt
 
     return s.apply(_normalize_one).astype("string")
-
-
-def _extract_major_lineage(lineage: pd.Series) -> pd.Series:
-    """Extract major lineage {1,2,3,4} from normalized lineage labels."""
-
-    def _major_one(x):
-        if pd.isna(x):
-            return pd.NA
-        txt = str(x).strip()
-        if txt == "":
-            return pd.NA
-
-        # Ambiguous multi-lineage calls (e.g. "1,4") are excluded.
-        if "," in txt:
-            return pd.NA
-
-        major = txt.split(".", 1)[0].strip()
-        if major in MAJOR_LINEAGES:
-            return major
-
-        try:
-            val = float(txt)
-            if float(val).is_integer():
-                major = str(int(val))
-                if major in MAJOR_LINEAGES:
-                    return major
-        except Exception:
-            pass
-
-        return pd.NA
-
-    return lineage.astype("string").apply(_major_one).astype("string")
 
 
 def _resolve_lineages(df: pd.DataFrame) -> pd.Series:
@@ -159,7 +126,10 @@ def _write_aggregate_summary(drug_output_dir: Path) -> None:
     if not rows:
         return
     all_df = pd.concat(rows, ignore_index=True)
-    all_df = all_df.sort_values(["heldout_lineage"]).reset_index(drop=True)
+    sort_cols = ["heldout_lineage"]
+    if "model" in all_df.columns:
+        sort_cols.append("model")
+    all_df = all_df.sort_values(sort_cols).reset_index(drop=True)
     all_df.to_csv(drug_output_dir / "all_lineage_summary.csv", index=False)
 
 
@@ -204,16 +174,14 @@ def run_for_lineage(
     min_class_count: int,
 ) -> None:
     lineage = input_data_df["_resolved_lineage"].astype("string")
-    major_lineage = _extract_major_lineage(lineage)
     phenotype = _to_binary_labels(input_data_df[drug])
 
-    annotated_mask = major_lineage.notna()
+    annotated_mask = lineage.notna()
     lineage_annotated_df = input_data_df.loc[annotated_mask].copy()
     lineage_annotated_df["_resolved_lineage"] = lineage.loc[annotated_mask].astype(str)
-    lineage_annotated_df["_major_lineage"] = major_lineage.loc[annotated_mask].astype(str)
     lineage_annotated_df["_binary_pheno"] = phenotype.loc[annotated_mask].astype(int)
 
-    test_mask = lineage_annotated_df["_major_lineage"] == str(heldout_lineage)
+    test_mask = lineage_annotated_df["_resolved_lineage"] == str(heldout_lineage)
     train_mask = ~test_mask
 
     train_df = lineage_annotated_df.loc[train_mask].copy()
@@ -226,12 +194,18 @@ def run_for_lineage(
     lineage_output_dir.mkdir(parents=True, exist_ok=True)
     saved_models_dir = lineage_output_dir / "saved_models"
     saved_models_dir.mkdir(parents=True, exist_ok=True)
+    legacy_xval_path = lineage_output_dir / "XVal_accuracy.csv"
+    if legacy_xval_path.exists():
+        legacy_xval_path.unlink()
+    for legacy_model in ["GridSearchCV.model", "LogisticRegression_bestC.model"]:
+        legacy_model_path = saved_models_dir / legacy_model
+        if legacy_model_path.exists():
+            legacy_model_path.unlink()
 
     split_manifest = pd.DataFrame(
         {
             "row_id": lineage_annotated_df.index.astype(str),
             "Lineage": lineage_annotated_df["_resolved_lineage"].astype(str),
-            "Major_Lineage": lineage_annotated_df["_major_lineage"].astype(str),
             "label": lineage_annotated_df["_binary_pheno"].astype(int),
             "split": np.where(test_mask.to_numpy(), "test", "train"),
         }
@@ -241,13 +215,13 @@ def run_for_lineage(
     base_summary = {
         "drug": drug,
         "heldout_lineage": str(heldout_lineage),
+        "model": "logreg",
         "N": int(test_df.shape[0]),
         "N_S": int(test_s),
         "N_R": int(test_r),
         "AUC": np.nan,
-        "spec": np.nan,
-        "sens": np.nan,
-        "threshold": np.nan,
+        "acc": np.nan,
+        "best_C": np.nan,
         "train_N": int(train_df.shape[0]),
         "train_N_S": int(train_s),
         "train_N_R": int(train_r),
@@ -276,69 +250,37 @@ def run_for_lineage(
     X_train = train_df[genotype_columns]
     y_train = train_df["_binary_pheno"]
 
-    parameters = set_parameters()
-    classifier = LogisticRegression(
+    clf = LogisticRegressionCV(
+        Cs=LOGREG_CS,
+        cv=5,
+        scoring="roc_auc",
         max_iter=int(kwargs["max_iterations"]),
         penalty=kwargs["regularization"],
         class_weight="balanced",
+        solver="liblinear",
+        refit=True,
     )
-
-    clf = GridSearchCV(classifier, parameters)
-    print(f"[fit] {drug} held-out lineage {heldout_lineage}: fitting GridSearchCV")
+    print(f"[fit] {drug} held-out lineage {heldout_lineage}: fitting LogisticRegressionCV")
     clf.fit(X_train, y_train)
 
-    joblib.dump(clf, saved_models_dir / "GridSearchCV.model")
-
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
-    xval_rows = []
-    for train_index, val_index in kf.split(X_train.values):
-        cv_clf = LogisticRegression(
-            penalty=kwargs["regularization"],
-            class_weight="balanced",
-            max_iter=int(kwargs["max_iterations"]),
-            **clf.best_params_,
-        )
-        cv_clf.fit(X_train.values[train_index, :], y_train.values[train_index])
-
-        y_pred = cv_clf.predict_proba(X_train.values[val_index])[:, 1]
-        y_true = y_train.values[val_index]
-        cutoffs = get_threshold_val(y_true, y_pred)
-
-        val_auc = np.nan
-        if len(np.unique(y_true)) > 1:
-            val_auc = roc_auc_score(y_true, y_pred)
-
-        xval_rows.append([drug, val_auc, cutoffs["spec"], cutoffs["sens"], cutoffs["threshold"]])
-
-    xval_df = pd.DataFrame(xval_rows, columns=["drug", "AUC", "spec", "sens", "threshold"])
-    xval_df.to_csv(lineage_output_dir / "XVal_accuracy.csv", index=False)
-
-    final_clf = LogisticRegression(
-        penalty=kwargs["regularization"],
-        class_weight="balanced",
-        max_iter=int(kwargs["max_iterations"]),
-        **clf.best_params_,
-    )
-    final_clf.fit(X_train, y_train)
-    joblib.dump(final_clf, saved_models_dir / "LogisticRegression_bestC.model")
+    joblib.dump(clf, saved_models_dir / "LogisticRegressionCV.model")
 
     X_test = test_df[genotype_columns]
     y_test = test_df["_binary_pheno"]
 
-    y_pred = final_clf.predict_proba(X_test.values)[:, 1]
-    cutoffs = get_threshold_val(y_test.values, y_pred)
+    y_pred = clf.predict_proba(X_test.values)[:, 1]
     test_auc = np.nan
     if len(np.unique(y_test.values)) > 1:
         test_auc = roc_auc_score(y_test.values, y_pred)
+    test_acc = accuracy_score(y_test.values, (y_pred >= 0.5).astype(int))
 
     test_summary = pd.DataFrame(
         [
             {
                 **base_summary,
                 "AUC": test_auc,
-                "spec": cutoffs["spec"],
-                "sens": cutoffs["sens"],
-                "threshold": cutoffs["threshold"],
+                "acc": test_acc,
+                "best_C": float(clf.C_[0]),
                 "feasible": True,
             }
         ]

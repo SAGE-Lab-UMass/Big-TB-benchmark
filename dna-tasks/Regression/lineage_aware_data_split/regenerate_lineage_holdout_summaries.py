@@ -49,13 +49,13 @@ def regenerate_lineage_holdout_summaries_for_drug(drug_output_dir: Path) -> None
         summary = {
             "drug": drug_name,
             "heldout_lineage": str(heldout),
+            "model": "logreg",
             "N": int(test_df.shape[0]),
             "N_S": int(test_s),
             "N_R": int(test_r),
             "AUC": np.nan,
-            "spec": np.nan,
-            "sens": np.nan,
-            "threshold": np.nan,
+            "acc": np.nan,
+            "best_C": np.nan,
             "train_N": int(train_df.shape[0]),
             "train_N_S": int(train_s),
             "train_N_R": int(train_r),
@@ -72,12 +72,10 @@ def regenerate_lineage_holdout_summaries_for_drug(drug_output_dir: Path) -> None
                 # Preserve model metrics if they exist
                 if pd.notna(existing_row.get("AUC")):
                     summary["AUC"] = existing_row["AUC"]
-                if pd.notna(existing_row.get("spec")):
-                    summary["spec"] = existing_row["spec"]
-                if pd.notna(existing_row.get("sens")):
-                    summary["sens"] = existing_row["sens"]
-                if pd.notna(existing_row.get("threshold")):
-                    summary["threshold"] = existing_row["threshold"]
+                if pd.notna(existing_row.get("acc")):
+                    summary["acc"] = existing_row["acc"]
+                if pd.notna(existing_row.get("best_C")):
+                    summary["best_C"] = existing_row["best_C"]
                 if pd.notna(existing_row.get("feasible")):
                     # Only override feasible if it was True (meaning training completed)
                     if existing_row["feasible"]:

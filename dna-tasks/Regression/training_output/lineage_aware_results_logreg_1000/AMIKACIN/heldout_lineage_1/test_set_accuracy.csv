@@ -1,2 +1,2 @@
-drug,heldout_lineage,N,N_S,N_R,AUC,spec,sens,threshold,train_N,train_N_S,train_N_R,feasible,min_class_count
-AMIKACIN,1,16,12,4,,,,,1641,1321,320,False,50
+drug,heldout_lineage,model,N,N_S,N_R,AUC,acc,best_C,train_N,train_N_S,train_N_R,feasible,min_class_count
+AMIKACIN,1,logreg,16,12,4,,,,1641,1321,320,False,50

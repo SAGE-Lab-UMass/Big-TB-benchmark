@@ -1,2 +1,2 @@
-drug,heldout_lineage,N,N_S,N_R,AUC,spec,sens,threshold,train_N,train_N_S,train_N_R,feasible,min_class_count
-RIFAMPICIN,1,1592,1292,300,0.9547549019607843,0.9907120743034056,0.9,0.55,15634,11238,4396,True,50
+drug,heldout_lineage,model,N,N_S,N_R,AUC,acc,best_C,train_N,train_N_S,train_N_R,feasible,min_class_count
+RIFAMPICIN,1,logreg,1592,1292,300,0.9547136222910216,0.9729899497487438,1.0,15634,11238,4396,True,50

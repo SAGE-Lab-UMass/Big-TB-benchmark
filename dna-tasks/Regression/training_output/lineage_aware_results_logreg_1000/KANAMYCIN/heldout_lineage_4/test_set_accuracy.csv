@@ -1,2 +1,2 @@
-drug,heldout_lineage,N,N_S,N_R,AUC,spec,sens,threshold,train_N,train_N_S,train_N_R,feasible,min_class_count
-KANAMYCIN,4,943,781,162,0.7811329254991226,0.9935979513444302,0.5679012345679012,0.5,387,300,87,True,50
+drug,heldout_lineage,model,N,N_S,N_R,AUC,acc,best_C,train_N,train_N_S,train_N_R,feasible,min_class_count
+KANAMYCIN,4,logreg,943,781,162,0.7794968463982549,0.9098621420996819,10.0,387,300,87,True,50

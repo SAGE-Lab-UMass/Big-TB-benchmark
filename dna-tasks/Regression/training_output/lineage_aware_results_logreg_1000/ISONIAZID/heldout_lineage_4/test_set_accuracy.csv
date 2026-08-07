@@ -1,2 +1,2 @@
-drug,heldout_lineage,N,N_S,N_R,AUC,spec,sens,threshold,train_N,train_N_S,train_N_R,feasible,min_class_count
-ISONIAZID,4,9087,5978,3109,0.913427474665604,0.9774171963867514,0.8269540045030557,0.8,7846,5402,2444,True,50
+drug,heldout_lineage,model,N,N_S,N_R,AUC,acc,best_C,train_N,train_N_S,train_N_R,feasible,min_class_count
+ISONIAZID,4,logreg,9087,5978,3109,0.9050523625761491,0.9154836579729284,0.1,7846,5402,2444,True,50
