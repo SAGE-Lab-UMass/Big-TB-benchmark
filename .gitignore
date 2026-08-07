@@ -15,7 +15,7 @@ protein-tasks/slurm/logs/
 dna-tasks/Evo2/
 
 
-# for this push just keep sd-cnn updates
+# for this push just keep regression updates
 
 # SD-CNN lineage-aware split runtime artifacts
 dna-tasks/SD-CNN/model_training/lineage_aware_data_split/logs/

@@ -1,0 +1,2 @@
+drug,heldout_lineage,N,N_S,N_R,AUC,spec,sens,threshold,train_N,train_N_S,train_N_R,feasible,min_class_count
+PYRAZINAMIDE,4,4851,3837,1014,0.8321546305848946,0.9596038571800886,0.7337278106508875,0.67,4082,3435,647,True,50

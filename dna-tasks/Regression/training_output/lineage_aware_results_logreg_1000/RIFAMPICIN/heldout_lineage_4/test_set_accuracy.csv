@@ -1,0 +1,2 @@
+drug,heldout_lineage,N,N_S,N_R,AUC,spec,sens,threshold,train_N,train_N_S,train_N_R,feasible,min_class_count
+RIFAMPICIN,4,9193,6495,2698,0.9615802427709974,0.9772132409545804,0.9206819866567828,0.77,8033,6035,1998,True,50

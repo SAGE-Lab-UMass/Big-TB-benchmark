@@ -1,0 +1,2 @@
+drug,heldout_lineage,N,N_S,N_R,AUC,spec,sens,threshold,train_N,train_N_S,train_N_R,feasible,min_class_count
+CAPREOMYCIN,4,810,692,118,0.7616647888703831,0.9754335260115607,0.559322033898305,0.5,793,611,182,True,50
