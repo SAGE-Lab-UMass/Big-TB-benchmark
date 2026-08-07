@@ -1,0 +1,2 @@
+Algorithm,Drug,num_sensitive,num_resistant,AUC,AUC_PR,threshold,spec,sens
+SD-CNN,AMIKACIN,31,6,0.7741935483870969,0.7254901960784313,0.8,1.0,0.5

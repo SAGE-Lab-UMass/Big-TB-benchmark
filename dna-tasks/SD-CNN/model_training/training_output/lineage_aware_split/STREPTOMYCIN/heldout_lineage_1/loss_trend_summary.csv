@@ -1,0 +1,2 @@
+first_loss,last_loss,loss_delta_last_minus_first,first_val_loss,last_val_loss,val_loss_delta_last_minus_first
+0.30787357687950134,0.1896979659795761,-0.11817561089992523,0.11062069982290268,0.10589418560266495,-0.004726514220237732

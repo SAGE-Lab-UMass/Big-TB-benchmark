@@ -1,0 +1,2 @@
+Algorithm,Drug,num_sensitive,num_resistant,AUC,AUC_PR,threshold,spec,sens
+SD-CNN,LEVOFLOXACIN,4,4,0.75,0.875,0.5,1.0,0.25

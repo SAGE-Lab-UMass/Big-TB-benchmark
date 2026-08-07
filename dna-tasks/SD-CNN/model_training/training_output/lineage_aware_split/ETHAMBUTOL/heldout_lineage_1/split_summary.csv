@@ -1,0 +1,2 @@
+drug,heldout_lineage,train_n,test_n,train_sensitive,train_resistant,test_sensitive,test_resistant,nonzero_train_and_test
+ETHAMBUTOL,1,13168,1292,10487,2681,1208,84,True

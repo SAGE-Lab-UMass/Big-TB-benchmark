@@ -1,0 +1,2 @@
+drug,heldout_lineage,train_n,test_n,train_sensitive,train_resistant,test_sensitive,test_resistant,nonzero_train_and_test
+ISONIAZID,4,7819,8920,4977,2842,6257,2663,True

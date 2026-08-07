@@ -1,0 +1,2 @@
+Algorithm,Drug,num_sensitive,num_resistant,AUC,AUC_PR,threshold,spec,sens
+SD-CNN,MOXIFLOXACIN,1797,181,0.5631808077919922,0.11538933104806362,0.0,1.0,0.0

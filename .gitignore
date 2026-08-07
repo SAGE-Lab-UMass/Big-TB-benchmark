@@ -8,7 +8,7 @@ __pycache__
 dna-tasks/Regression/data/*
 dna-tasks/notebooks/*
 
-# remove DNABERT-S files
+# remove DNABERT files
 DNABERT-S/
 **/DNABERT-S/
 protein-tasks/slurm/logs/

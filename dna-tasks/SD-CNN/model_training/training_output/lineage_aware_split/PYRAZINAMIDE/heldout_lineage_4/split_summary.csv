@@ -1,0 +1,2 @@
+drug,heldout_lineage,train_n,test_n,train_sensitive,train_resistant,test_sensitive,test_resistant,nonzero_train_and_test
+PYRAZINAMIDE,4,5794,6559,4755,1039,5561,998,True

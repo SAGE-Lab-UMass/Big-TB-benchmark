@@ -1,0 +1,2 @@
+drug,heldout_lineage,train_n,test_n,train_sensitive,train_resistant,test_sensitive,test_resistant,nonzero_train_and_test
+ETHIONAMIDE,3,1935,62,1333,602,56,6,True
