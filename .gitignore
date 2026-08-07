@@ -27,5 +27,5 @@ dna-tasks/MDCNN/model_training/training_output/
 dna-tasks/MD-CNN/
 
 # Regression lineage-aware split runtime artifacts
-dna-tasks/Regression/lineage_aware_data_split/
-dna-tasks/Regression/training_output/
+dna-tasks/Regression/interpret_logreg.ipynb
+dna-tasks/Regression/training_output/**/saved_models/
