@@ -62,9 +62,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--use_pca", action="store_true")
     
     # Early stopping parameters (matching SD-CNN defaults)
-    parser.add_argument("--early_stopping_min_epochs", type=int, default=20,
+    parser.add_argument("--early_stopping_min_epochs", type=int, default=5,
                         help="Minimum epochs before early stopping can trigger")
-    parser.add_argument("--early_stopping_patience", type=int, default=10,
+    parser.add_argument("--early_stopping_patience", type=int, default=5,
                         help="Number of epochs to wait without improvement before stopping")
     parser.add_argument("--early_stopping_min_relative_improvement", type=float, default=1e-3,
                         help="Minimum relative improvement threshold (default: 0.001 = 0.1%%)")

@@ -55,8 +55,8 @@ All defaults match SD-CNN implementation:
 
 | Parameter | Default Value | Description |
 |-----------|--------------|-------------|
-| `early_stopping_min_epochs` | 20 | Minimum epochs before early stopping can trigger |
-| `early_stopping_patience` | 10 | Number of epochs to wait without improvement |
+| `early_stopping_min_epochs` | 5 | Minimum epochs before early stopping can trigger |
+| `early_stopping_patience` | 5 | Number of epochs to wait without improvement |
 | `early_stopping_min_relative_improvement` | 1e-3 (0.1%) | Minimum relative improvement threshold |
 | `early_stopping_smoothing_window` | 3 | Window size for smoothing training loss |
 
@@ -167,9 +167,9 @@ The implementation is fully backward compatible:
 | Monitoring Metric | Validation AUC | Smoothed Training Loss |
 | Uses Test/Val Data? | Yes (validation set) | No (training only) |
 | Smoothing | None | 3-epoch moving average |
-| Min Epochs | None | 20 epochs minimum |
+| Min Epochs | None | 5 epochs minimum |
 | Improvement Metric | Absolute (min_delta=1e-4) | Relative (0.1%) |
-| Patience | 5 epochs | 10 epochs |
+| Patience | 5 epochs | 5 epochs |
 | Checkpoint Saving | Only on improvement | Only on improvement |
 
 ## Benefits
