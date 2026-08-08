@@ -1,2 +1,0 @@
-drug,heldout_lineage,model,N,N_S,N_R,AUC,acc,best_C,train_N,train_N_S,train_N_R,feasible,min_class_count
-RIFAMPICIN,4,logreg,9193,6495,2698,0.9628514207484687,0.9609485478081149,100.0,8033,6035,1998,True,50

@@ -1,2 +1,0 @@
-drug,heldout_lineage,model,N,N_S,N_R,AUC,acc,best_C,train_N,train_N_S,train_N_R,feasible,min_class_count
-STREPTOMYCIN,2,logreg,1411,837,574,0.891408464775892,0.8646350106307583,100.0,4226,2589,1637,True,50

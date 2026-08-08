@@ -1,2 +1,0 @@
-drug,heldout_lineage,model,N,N_S,N_R,AUC,acc,best_C,train_N,train_N_S,train_N_R,feasible,min_class_count
-AMIKACIN,2,logreg,654,516,138,0.756804010785305,0.8883792048929664,0.001,1003,817,186,True,50

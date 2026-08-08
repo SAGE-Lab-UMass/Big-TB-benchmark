@@ -1,2 +1,0 @@
-drug,heldout_lineage,model,N,N_S,N_R,AUC,acc,best_C,train_N,train_N_S,train_N_R,feasible,min_class_count
-ETHAMBUTOL,3,logreg,1948,1597,351,0.9312252139428095,0.9152977412731006,1.0,10632,8427,2205,True,50

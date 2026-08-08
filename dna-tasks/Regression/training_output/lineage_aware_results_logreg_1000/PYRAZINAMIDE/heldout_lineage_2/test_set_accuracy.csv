@@ -1,2 +1,0 @@
-drug,heldout_lineage,model,N,N_S,N_R,AUC,acc,best_C,train_N,train_N_S,train_N_R,feasible,min_class_count
-PYRAZINAMIDE,2,logreg,1640,1327,313,0.890244636464099,0.8786585365853659,0.0001,7293,5945,1348,True,50
