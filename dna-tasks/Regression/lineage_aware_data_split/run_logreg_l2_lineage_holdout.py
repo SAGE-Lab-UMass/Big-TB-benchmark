@@ -104,12 +104,22 @@ def _resolve_lineages(df: pd.DataFrame) -> pd.Series:
             right_on="ROLLINGDB_ID",
             how="left",
         )
-        return _normalize_lineage_series(merged["Lineage"])
+        # Preserve original index to prevent pandas index alignment issues
+        return pd.Series(
+            _normalize_lineage_series(merged["Lineage"]).to_numpy(),
+            index=df.index,
+            dtype="string"
+        )
 
     # Fallback: many prepared tables keep isolate IDs as the index.
     idx_df = pd.DataFrame({"ROW_ID": df.index.astype(str)})
     merged = idx_df.merge(lineage_df, left_on="ROW_ID", right_on="ROLLINGDB_ID", how="left")
-    return _normalize_lineage_series(merged["Lineage"])
+    # Preserve original index to prevent pandas index alignment issues
+    return pd.Series(
+        _normalize_lineage_series(merged["Lineage"]).to_numpy(),
+        index=df.index,
+        dtype="string"
+    )
 
 
 def _split_stats(y: pd.Series) -> tuple[int, int]:

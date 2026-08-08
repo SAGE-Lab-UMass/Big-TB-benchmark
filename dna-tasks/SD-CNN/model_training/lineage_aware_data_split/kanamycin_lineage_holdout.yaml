@@ -1,5 +1,10 @@
 filter_size: 12
 N_epochs: 100
+batch_size: 100
+early_stopping_min_epochs: 20
+early_stopping_patience: 10
+early_stopping_min_relative_improvement: 1.0e-3
+early_stopping_smoothing_window: 3
 weight_of_sensitive_class: 1
 
 drug: KANAMYCIN

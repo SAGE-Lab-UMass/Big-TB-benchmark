@@ -22,7 +22,7 @@ import tensorflow as tf
 import yaml
 from sklearn.metrics import average_precision_score, roc_auc_score
 from tensorflow.keras import layers, models
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import Callback
 from tensorflow.keras.optimizers import Adam
 import tensorflow.keras.backend as K
 
@@ -48,6 +48,12 @@ from tb_cnn_codebase import (  # noqa: E402
 
 
 MAJOR_LINEAGES = ("1", "2", "3", "4")
+DEFAULT_MIN_CLASS_COUNT = 50
+DEFAULT_BATCH_SIZE = 100
+DEFAULT_EARLY_STOPPING_MIN_EPOCHS = 20
+DEFAULT_EARLY_STOPPING_PATIENCE = 10
+DEFAULT_EARLY_STOPPING_MIN_RELATIVE_IMPROVEMENT = 1e-3
+DEFAULT_EARLY_STOPPING_SMOOTHING_WINDOW = 3
 
 
 def _normalize_lineage_series(lineage: pd.Series) -> pd.Series:
@@ -83,6 +89,20 @@ def _resolve_lineages(df: pd.DataFrame) -> pd.Series:
 
     lineage_df = pd.read_csv(LINEAGE_CSV, usecols=["ROLLINGDB_ID", "Lineage"])
     lineage_df["ROLLINGDB_ID"] = lineage_df["ROLLINGDB_ID"].astype(str)
+
+    # Prefer the canonical New_ID -> ROLLINGDB_ID join for SD-CNN tables.
+    if "New_ID" in df.columns:
+        merged = df[["New_ID"]].astype(str).merge(
+            lineage_df,
+            left_on="New_ID",
+            right_on="ROLLINGDB_ID",
+            how="left",
+        )
+        return pd.Series(
+            _normalize_lineage_series(merged["Lineage"]).to_numpy(),
+            index=df.index,
+            dtype="string",
+        )
 
     id_candidates = [
         "ROLLINGDB_ID",
@@ -184,7 +204,111 @@ def _compute_metrics(y_true: np.ndarray, y_pred: np.ndarray, threshold: float, d
     return pd.DataFrame([["SD-CNN", drug, num_sensitive, num_resistant, auc, auc_pr, threshold, spec, sens]], columns=col_names)
 
 
-def _run_one_lineage(kwargs: dict, heldout_lineage: str, dry_run: bool, epochs_override: int | None) -> None:
+class TrainingLossConvergenceCallback(Callback):
+    """Stop on smoothed epoch-mean training loss without using validation/test data."""
+
+    def __init__(
+        self,
+        checkpoint_path: Path,
+        min_epochs: int,
+        patience: int,
+        min_relative_improvement: float,
+        smoothing_window: int,
+    ) -> None:
+        super().__init__()
+        self.checkpoint_path = Path(checkpoint_path)
+        self.min_epochs = int(min_epochs)
+        self.patience = int(patience)
+        self.min_relative_improvement = float(min_relative_improvement)
+        self.smoothing_window = int(smoothing_window)
+        if self.min_epochs < 1:
+            raise ValueError("early_stopping_min_epochs must be >= 1")
+        if self.patience < 1:
+            raise ValueError("early_stopping_patience must be >= 1")
+        if self.smoothing_window < 1:
+            raise ValueError("early_stopping_smoothing_window must be >= 1")
+
+        self.losses: list[float] = []
+        self.records: list[dict[str, float | int]] = []
+        self.best_smoothed_loss = np.inf
+        self.best_epoch = 0
+        self.patience_counter = 0
+        self.stopped_epoch = 0
+
+    def on_epoch_end(self, epoch: int, logs: dict | None = None) -> None:
+        logs = logs or {}
+        if "loss" not in logs:
+            raise RuntimeError("Training loss is missing from Keras epoch logs")
+
+        epoch_num = epoch + 1
+        mean_train_loss = float(logs["loss"])
+        self.losses.append(mean_train_loss)
+
+        window_losses = self.losses[-self.smoothing_window :]
+        smoothed_train_loss = float(np.mean(window_losses))
+
+        if np.isfinite(self.best_smoothed_loss):
+            relative_improvement = (
+                self.best_smoothed_loss - smoothed_train_loss
+            ) / max(abs(self.best_smoothed_loss), 1e-12)
+            meaningful_improvement = relative_improvement >= self.min_relative_improvement
+        else:
+            relative_improvement = np.nan
+            meaningful_improvement = True
+
+        if meaningful_improvement:
+            self.best_smoothed_loss = smoothed_train_loss
+            self.best_epoch = epoch_num
+            self.patience_counter = 0
+            self.model.save_weights(str(self.checkpoint_path))
+        elif epoch_num >= self.min_epochs:
+            self.patience_counter += 1
+        else:
+            self.patience_counter = 0
+
+        self.records.append(
+            {
+                "epoch": epoch_num,
+                "mean_train_loss": mean_train_loss,
+                "smoothed_train_loss": smoothed_train_loss,
+                "best_smoothed_train_loss": self.best_smoothed_loss,
+                "relative_improvement": relative_improvement,
+                "patience_counter": self.patience_counter,
+            }
+        )
+        print(
+            "[early-stop] "
+            f"epoch={epoch_num} "
+            f"mean_train_loss={mean_train_loss:.8f} "
+            f"smoothed_train_loss={smoothed_train_loss:.8f} "
+            f"best_smoothed_train_loss={self.best_smoothed_loss:.8f} "
+            f"relative_improvement={relative_improvement:.8g} "
+            f"patience_counter={self.patience_counter}"
+        )
+
+        if epoch_num >= self.min_epochs and self.patience_counter >= self.patience:
+            self.stopped_epoch = epoch_num
+            self.model.stop_training = True
+            print(
+                f"Training converged at epoch {epoch_num}.\n"
+                f"Smoothed training loss did not improve by >= {self.min_relative_improvement * 100:.3g}%\n"
+                f"for {self.patience} consecutive epochs.\n"
+                f"Best checkpoint was from epoch {self.best_epoch}."
+            )
+
+
+def _run_one_lineage(
+    kwargs: dict,
+    heldout_lineage: str,
+    dry_run: bool,
+    epochs_override: int | None,
+    min_class_count: int,
+    batch_size_override: int | None,
+    early_stopping_min_epochs_override: int | None,
+    early_stopping_patience_override: int | None,
+    early_stopping_min_relative_improvement_override: float | None,
+    early_stopping_smoothing_window_override: int | None,
+) -> None:
     drug = kwargs["drug"]
     out_root = Path(kwargs["output_path"]) / f"heldout_lineage_{heldout_lineage}"
     out_root.mkdir(parents=True, exist_ok=True)
@@ -199,6 +323,8 @@ def _run_one_lineage(kwargs: dict, heldout_lineage: str, dry_run: bool, epochs_o
 
     print("Loading combined geno+pheno DataFrame ...")
     df = load_combined_geno_pheno(**kwargs).copy()
+    if "New_ID" not in df.columns:
+        df["New_ID"] = df.index.astype(str)
     df["_row_id"] = df.index.astype(str)
     df["_resolved_lineage"] = _resolve_lineages(df)
 
@@ -233,6 +359,8 @@ def _run_one_lineage(kwargs: dict, heldout_lineage: str, dry_run: bool, epochs_o
         "train_resistant": train_resistant,
         "test_sensitive": test_sensitive,
         "test_resistant": test_resistant,
+        "feasible": bool(min(train_sensitive, train_resistant, test_sensitive, test_resistant) >= min_class_count),
+        "min_class_count": int(min_class_count),
         "nonzero_train_and_test": bool(len(train_idx) > 0 and len(test_idx) > 0),
     }
 
@@ -253,8 +381,12 @@ def _run_one_lineage(kwargs: dict, heldout_lineage: str, dry_run: bool, epochs_o
         f"train(S/R)=({train_sensitive}/{train_resistant}) test(S/R)=({test_sensitive}/{test_resistant})"
     )
 
-    if len(train_idx) == 0 or len(test_idx) == 0:
-        print("[skip] split does not satisfy non-zero train/test requirement")
+    if min(train_sensitive, train_resistant, test_sensitive, test_resistant) < min_class_count:
+        print(
+            f"[skip] split does not satisfy min_class_count={min_class_count}: "
+            f"train(S/R)=({train_sensitive}/{train_resistant}) "
+            f"test(S/R)=({test_sensitive}/{test_resistant})"
+        )
         return
 
     if dry_run:
@@ -279,45 +411,74 @@ def _run_one_lineage(kwargs: dict, heldout_lineage: str, dry_run: bool, epochs_o
         del x_all
 
     x_train = x_sparse[train_idx, :].todense()
-    x_test = x_sparse[test_idx, :].todense()
-
     y_train_2d = y_train.reshape(-1, 1)
-    y_test_2d = y_test.reshape(-1, 1)
 
     alpha_train = alpha_mat(y_train_2d, df.iloc[train_idx], weight=kwargs.get("weight_of_sensitive_class", 1.0), drug_name=drug)
-    alpha_test = alpha_mat(y_test_2d, df.iloc[test_idx], weight=kwargs.get("weight_of_sensitive_class", 1.0), drug_name=drug)
 
     n_epochs = int(epochs_override if epochs_override is not None else kwargs["N_epochs"])
+    batch_size = int(batch_size_override if batch_size_override is not None else kwargs.get("batch_size", DEFAULT_BATCH_SIZE))
+    early_stopping_min_epochs = int(
+        early_stopping_min_epochs_override
+        if early_stopping_min_epochs_override is not None
+        else kwargs.get("early_stopping_min_epochs", DEFAULT_EARLY_STOPPING_MIN_EPOCHS)
+    )
+    early_stopping_patience = int(
+        early_stopping_patience_override
+        if early_stopping_patience_override is not None
+        else kwargs.get("early_stopping_patience", DEFAULT_EARLY_STOPPING_PATIENCE)
+    )
+    early_stopping_min_relative_improvement = float(
+        early_stopping_min_relative_improvement_override
+        if early_stopping_min_relative_improvement_override is not None
+        else kwargs.get(
+            "early_stopping_min_relative_improvement",
+            DEFAULT_EARLY_STOPPING_MIN_RELATIVE_IMPROVEMENT,
+        )
+    )
+    early_stopping_smoothing_window = int(
+        early_stopping_smoothing_window_override
+        if early_stopping_smoothing_window_override is not None
+        else kwargs.get(
+            "early_stopping_smoothing_window",
+            DEFAULT_EARLY_STOPPING_SMOOTHING_WINDOW,
+        )
+    )
     model = _get_model(x_train.shape[1:], int(kwargs["filter_size"]))
 
-    early_stop = EarlyStopping(
-        monitor="val_loss",
-        patience=5,
-        restore_best_weights=True,
-        min_delta=1e-4,
-        verbose=1,
+    model_dir = out_root / "saved_model"
+    model_dir.mkdir(parents=True, exist_ok=True)
+    best_checkpoint_path = model_dir / "best_training_loss.weights.h5"
+    early_stop = TrainingLossConvergenceCallback(
+        checkpoint_path=best_checkpoint_path,
+        min_epochs=early_stopping_min_epochs,
+        patience=early_stopping_patience,
+        min_relative_improvement=early_stopping_min_relative_improvement,
+        smoothing_window=early_stopping_smoothing_window,
     )
 
-    print(f"Training SD-CNN: epochs={n_epochs}")
+    print(
+        f"Training SD-CNN: epochs={n_epochs} batch_size={batch_size} "
+        f"early_stopping_min_epochs={early_stopping_min_epochs} "
+        f"early_stopping_patience={early_stopping_patience} "
+        f"early_stopping_min_relative_improvement={early_stopping_min_relative_improvement} "
+        f"early_stopping_smoothing_window={early_stopping_smoothing_window}"
+    )
     history = model.fit(
         x_train,
         alpha_train,
-        validation_data=(x_test, alpha_test),
         epochs=n_epochs,
-        batch_size=128,
+        batch_size=batch_size,
         callbacks=[early_stop],
         verbose=1,
     )
 
     hist_df = pd.DataFrame(history.history)
     hist_df.to_csv(out_root / "history.csv", index=False)
+    pd.DataFrame(early_stop.records).to_csv(out_root / "training_loss_early_stopping_log.csv", index=False)
 
     loss_delta = np.nan
-    val_loss_delta = np.nan
     if "loss" in hist_df.columns and len(hist_df) > 1:
         loss_delta = float(hist_df["loss"].iloc[-1] - hist_df["loss"].iloc[0])
-    if "val_loss" in hist_df.columns and len(hist_df) > 1:
-        val_loss_delta = float(hist_df["val_loss"].iloc[-1] - hist_df["val_loss"].iloc[0])
 
     pd.DataFrame(
         [
@@ -325,17 +486,23 @@ def _run_one_lineage(kwargs: dict, heldout_lineage: str, dry_run: bool, epochs_o
                 "first_loss": float(hist_df["loss"].iloc[0]) if "loss" in hist_df.columns else np.nan,
                 "last_loss": float(hist_df["loss"].iloc[-1]) if "loss" in hist_df.columns else np.nan,
                 "loss_delta_last_minus_first": loss_delta,
-                "first_val_loss": float(hist_df["val_loss"].iloc[0]) if "val_loss" in hist_df.columns else np.nan,
-                "last_val_loss": float(hist_df["val_loss"].iloc[-1]) if "val_loss" in hist_df.columns else np.nan,
-                "val_loss_delta_last_minus_first": val_loss_delta,
+                "best_smoothed_train_loss": early_stop.best_smoothed_loss,
+                "best_smoothed_train_loss_epoch": early_stop.best_epoch,
+                "early_stopped_epoch": early_stop.stopped_epoch if early_stop.stopped_epoch else np.nan,
+                "early_stopping_min_epochs": early_stopping_min_epochs,
+                "early_stopping_patience": early_stopping_patience,
+                "early_stopping_min_relative_improvement": early_stopping_min_relative_improvement,
+                "early_stopping_smoothing_window": early_stopping_smoothing_window,
             }
         ]
     ).to_csv(out_root / "loss_trend_summary.csv", index=False)
 
-    model_dir = out_root / "saved_model"
-    model_dir.mkdir(parents=True, exist_ok=True)
-    model.save(model_dir / "sd-cnn_model_lineage_holdout.h5", include_optimizer=True)
+    if not best_checkpoint_path.exists():
+        raise FileNotFoundError(f"Best checkpoint was not written: {best_checkpoint_path}")
+    model.load_weights(str(best_checkpoint_path))
+    model.save(str(model_dir / "sd-cnn_model_lineage_holdout.h5"), include_optimizer=True)
 
+    x_test = x_sparse[test_idx, :].todense()
     train_pred = np.squeeze(model.predict(x_train, verbose=0))
     test_pred = np.squeeze(model.predict(x_test, verbose=0))
 
@@ -364,8 +531,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("config", help="Path to SD-CNN YAML/TXT config")
     parser.add_argument("--heldout-lineage", default=None, choices=list(MAJOR_LINEAGES))
+    parser.add_argument("--min-class-count", type=int, default=DEFAULT_MIN_CLASS_COUNT)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--epochs-override", type=int, default=None)
+    parser.add_argument("--batch-size", type=int, default=None)
+    parser.add_argument("--early-stopping-min-epochs", type=int, default=None)
+    parser.add_argument("--early-stopping-patience", type=int, default=None)
+    parser.add_argument("--early-stopping-min-relative-improvement", type=float, default=None)
+    parser.add_argument("--early-stopping-smoothing-window", type=int, default=None)
     args = parser.parse_args()
 
     with open(args.config, "r") as f:
@@ -377,7 +550,18 @@ def main() -> None:
 
     heldouts = [args.heldout_lineage] if args.heldout_lineage else list(MAJOR_LINEAGES)
     for heldout in heldouts:
-        _run_one_lineage(kwargs, str(heldout), args.dry_run, args.epochs_override)
+        _run_one_lineage(
+            kwargs,
+            str(heldout),
+            args.dry_run,
+            args.epochs_override,
+            args.min_class_count,
+            args.batch_size,
+            args.early_stopping_min_epochs,
+            args.early_stopping_patience,
+            args.early_stopping_min_relative_improvement,
+            args.early_stopping_smoothing_window,
+        )
 
     K.clear_session()
 
