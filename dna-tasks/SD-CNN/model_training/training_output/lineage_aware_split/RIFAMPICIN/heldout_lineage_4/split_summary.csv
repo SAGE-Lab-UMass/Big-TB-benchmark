@@ -1,2 +1,0 @@
-drug,heldout_lineage,train_n,test_n,train_sensitive,train_resistant,test_sensitive,test_resistant,nonzero_train_and_test
-RIFAMPICIN,4,7913,8990,5485,2428,6768,2222,True
