@@ -16,7 +16,7 @@ import torch
 from Bio import SeqIO
 from torch.utils.data import Dataset
 
-from evo2_downstream.config import ensure_finetune_utils_on_path
+from zero_shot.random_split.config import ensure_finetune_utils_on_path
 
 try:
     from finetuning.modules.dataloader.locus_order import DRUG_TO_LOCI

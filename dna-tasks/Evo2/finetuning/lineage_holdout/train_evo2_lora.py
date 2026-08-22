@@ -69,7 +69,7 @@ sys.path.insert(0, str(EVO2_DIR))
 sys.path.insert(0, str(THIS_DIR))
 
 from evo2_embed_gen.model.evo2_model import Evo2ModelConfig, Evo2Embedder
-from evo2_downstream.config import ensure_finetune_utils_on_path
+from zero_shot.random_split.config import ensure_finetune_utils_on_path
 from utils.lineage_split import (
     MAJOR_LINEAGES,
     load_isolate_id_map,
