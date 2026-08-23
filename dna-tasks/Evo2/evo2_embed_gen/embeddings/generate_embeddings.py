@@ -17,6 +17,17 @@ from evo2_embed_gen.embeddings.io import save_batch, stack_final_phenotypes, wri
 from evo2_embed_gen.model.evo2_model import Evo2Embedder, Evo2ModelConfig
 
 
+EVO2_DIR = Path(__file__).resolve().parents[2]
+DEFAULT_DATA_DIR = Path(os.environ.get("EVO2_DATA_DIR", EVO2_DIR / "data" / "multidrug_classification" / "training"))
+DEFAULT_PHENOTYPE_FILE = Path(
+    os.environ.get("EVO2_PHENOTYPE_FILE", DEFAULT_DATA_DIR / "phenotype" / "master_resistance_table.csv")
+)
+DEFAULT_GENOTYPE_DIR = Path(
+    os.environ.get("EVO2_GENOTYPE_INPUT_DIRECTORY", EVO2_DIR / "data" / "aligned")
+)
+DEFAULT_EMBED_DIR = Path(os.environ.get("EVO2_EMBED_ROOT", EVO2_DIR / "embeddings"))
+
+
 def main(args: argparse.Namespace) -> None:
     genes = parse_gene_list(args.genes)
     n_gpu = torch.cuda.device_count()
@@ -315,7 +326,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--datapath",
         type=str,
-        default="/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/data/multidrug_classification/training",
+        default=str(DEFAULT_DATA_DIR),
         help="Directory for generated genotype/phenotype CSV files",
     )
     parser.add_argument("--full_dataname", type=str, default="geno_pheno_full_combined.csv")
@@ -324,19 +335,19 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--phenotype_file",
         type=str,
-        default="/project/pi_annagreen_umass_edu/saishradha/project_data_curation/benchmarking/DNABERT_S/finetune_data/multidrug_classification/training/phenotype/master_resistance_table.csv",
+        default=str(DEFAULT_PHENOTYPE_FILE),
         help="Phenotype table used by DNABERT2",
     )
     parser.add_argument(
         "--genotype_input_directory",
         type=str,
-        default="/project/pi_annagreen_umass_edu/saishradha/project_data_curation/genomic_data/aligned",
+        default=str(DEFAULT_GENOTYPE_DIR),
         help="Aligned genotype FASTA directory used by DNABERT2",
     )
     parser.add_argument(
         "--embed_dir",
         type=str,
-        default="/scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/embeddings",
+        default=str(DEFAULT_EMBED_DIR),
         help="Root directory for Evo2 embedding outputs",
     )
     parser.add_argument("--drug", type=str, default="RIFAMPICIN", help="Metadata label matching DNABERT CLI")

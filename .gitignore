@@ -36,3 +36,7 @@ dna-tasks/Evo2/data/
 dna-tasks/Evo2/sbatch_finetune_logs
 dna-tasks/Evo2/sbatch_zero_shot_lineage_holdout_logs
 dna-tasks/Evo2/sbatch_embed_gen_logs/
+
+# Local Evo2 cluster/runtime profile. Commit only the example profile.
+dna-tasks/Evo2/.evo2-site.env
+dna-tasks/Evo2/site.env.example
