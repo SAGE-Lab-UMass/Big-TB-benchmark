@@ -47,7 +47,10 @@ fi
 # Paths
 # ============================================================================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# EVO2_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+SCRIPT_DIR="${SLURM_SUBMIT_DIR}"
 EVO2_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 WORKDIR="${SCRIPT_DIR}"
@@ -117,7 +120,8 @@ echo "Starting Evo2-LoRA fine-tuning..."
     --classifier-lr 1e-3 \
     --num-workers 4 \
     --resume-from auto \
-    --output-dir "${OUTPUT_DIR}"
+    --output-dir "${OUTPUT_DIR}" \
+    --fasta-dir /project/pi_annagreen_umass_edu/saishradha/project_data_curation/genomic_data/aligned
 
 
 echo
