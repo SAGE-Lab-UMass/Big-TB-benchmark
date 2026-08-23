@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Submit one production embedding task per gene in ordered_genes.txt.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,4 +23,4 @@ evo2_submit "${EVO2_SBATCH_ARGS[@]}" \
     --array="0-${ARRAY_END}%${EVO2_EMBED_ARRAY_CONCURRENCY:-3}" \
     --output="${LOG_DIR}/out/%x_%A_%a.out" \
     --error="${LOG_DIR}/error/%x_%A_%a.err" \
-    "${EVO2_DIR}/run_all_evo2_embeddings_sbatch.sh"
+    "${EVO2_DIR}/generate_evo2_embeddings.sh"

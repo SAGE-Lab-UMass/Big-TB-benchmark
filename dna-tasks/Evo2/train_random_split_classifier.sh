@@ -1,4 +1,5 @@
 #!/bin/bash
+# Train an Evo2 downstream classifier using a random train/test split.
 #SBATCH -G 1
 #SBATCH --gres=gpu:1
 # Four DataLoader workers serve large full-token batches. This leaves enough
@@ -6,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=300G
 #SBATCH --time=10:00:00
-#SBATCH --job-name=evo2_downstream_train
+#SBATCH --job-name=evo2_random_split_train
 
 set -euo pipefail
 

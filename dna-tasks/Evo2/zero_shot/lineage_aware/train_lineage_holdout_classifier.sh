@@ -1,32 +1,21 @@
 #!/bin/bash
-#SBATCH -A pi_annagreen_umass_edu
-#SBATCH --partition=superpod-a100
+# Train a downstream classifier while reserving one lineage for evaluation.
 #SBATCH -G 1
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=300G
 #SBATCH --time=16:00:00
-#SBATCH --job-name=evo2_lineage_train
-#SBATCH --mail-user=saishradhamo@umass.edu
-#SBATCH --output=/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/lineage_aware_data_split/logs/out/%x_%J.out
-#SBATCH --error=/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/lineage_aware_data_split/logs/error/%x_%J.err
+#SBATCH --job-name=evo2_lineage_holdout_train
 
 set -euo pipefail
 
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-export PYTHONNOUSERSITE=1
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EVO2_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+# shellcheck source=../../evo2_env.sh
+source "${EVO2_DIR}/evo2_env.sh"
+LINEAGE_SPLIT_DIR="${SCRIPT_DIR}"
 
-EVO2_DIR="/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2"
-LINEAGE_SPLIT_DIR="${EVO2_DIR}/lineage_aware_data_split"
-CONDA_ROOT="/work/pi_annagreen_umass_edu/saishradha/miniconda3"
-ENV_PREFIX="${CONDA_ROOT}/envs/dnabert_s"
-
-mkdir -p "${LINEAGE_SPLIT_DIR}/logs/out" "${LINEAGE_SPLIT_DIR}/logs/error"
-
-source "${CONDA_ROOT}/etc/profile.d/conda.sh"
-conda activate "${ENV_PREFIX}"
-
-export PYTHONPATH="${EVO2_DIR}:${PYTHONPATH:-}"
+export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
 # ── configurable via env vars ─────────────────────────────────────────────────
 DRUG="${DRUG:-ISONIAZID}"
@@ -34,11 +23,11 @@ HELDOUT_LINEAGE="${HELDOUT_LINEAGE:-1}"
 EMBED_TYPE="${EMBED_TYPE:-token}"
 MODEL_NAME="${MODEL_NAME:-DNABERTCNN}"
 
-MEMMAP_ROOT="${MEMMAP_ROOT:-/scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/downstream_inputs/layer20/${EMBED_TYPE}/memmaps}"
-PHENOTYPE_LABEL_PATH="${PHENOTYPE_LABEL_PATH:-/scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/embeddings/zero-shot/token/layer20/full/zs_full_stacked_phenotypes.npz}"
+MEMMAP_ROOT="${MEMMAP_ROOT:-${EVO2_DOWNSTREAM_DATA_ROOT}/${EMBED_TYPE}/memmaps}"
+PHENOTYPE_LABEL_PATH="${PHENOTYPE_LABEL_PATH:-${EVO2_EMBED_ROOT}/zs_full_stacked_phenotypes.npz}"
 
-# Output paths default to training_output/lineage_aware_holdout/<drug>/
-OUTPUT_ROOT="${OUTPUT_ROOT:-${EVO2_DIR}/training_output/lineage_aware_holdout}"
+# Output paths default to training_output/zero_shot/lineage_aware_holdout/<drug>/
+OUTPUT_ROOT="${OUTPUT_ROOT:-${EVO2_DIR}/training_output/zero_shot/lineage_aware_holdout}"
 OUTPUT_PATH="${OUTPUT_PATH:-${OUTPUT_ROOT}/${DRUG}/classification_results/evo2/${EMBED_TYPE}}"
 SAVED_MODEL_PATH="${SAVED_MODEL_PATH:-${OUTPUT_ROOT}/${DRUG}/saved_models/evo2/${EMBED_TYPE}}"
 
@@ -101,8 +90,6 @@ if [[ -z "${DATA_LOADER_WORKERS+x}" ]]; then
             DATA_LOADER_WORKERS="1"
         fi
     fi
-else
-    DATA_LOADER_WORKERS="${DATA_LOADER_WORKERS}"
 fi
 TRAIN_FOLD="${TRAIN_FOLD:-${SLURM_ARRAY_TASK_ID:-}}"
 
@@ -117,22 +104,33 @@ if [[ "${DRY_RUN:-0}" == "1" ]]; then
     EXTRA_ARGS+=(--dry-run)
 fi
 if [[ "${USE_AUC_EARLY_STOPPING:-0}" == "1" ]]; then
-    EXTRA_ARGS+=(--use_auc_early_stopping)
+    EXTRA_ARGS+=(--use_validation_early_stopping)
 fi
 
 echo "[runner] DRUG=${DRUG} HELDOUT_LINEAGE=${HELDOUT_LINEAGE} DATA_LOADER_WORKERS=${DATA_LOADER_WORKERS}"
 echo "[runner] Early stopping: min_epochs=${EARLY_STOPPING_MIN_EPOCHS} patience=${EARLY_STOPPING_PATIENCE}"
 echo "[runner] AUC early stopping: ${USE_AUC_EARLY_STOPPING:-0}"
 
+evo2_require_executable "${EVO2_TRAIN_PYTHON}"
+if [[ "${EVO2_LAUNCH_DRY_RUN:-0}" != "1" ]]; then
+    evo2_require_paths \
+        "${MEMMAP_ROOT}" \
+        "${PHENOTYPE_LABEL_PATH}" \
+        "${EVO2_GENO_PHENO_CSV}" \
+        "${EVO2_LINEAGE_CSV}"
+fi
+
 cd "${EVO2_DIR}"
 
-python "${LINEAGE_SPLIT_DIR}/train_lineage_holdout.py" \
+evo2_run "${EVO2_TRAIN_PYTHON}" "${LINEAGE_SPLIT_DIR}/train_lineage_holdout.py" \
     --drug "${DRUG}" \
     --heldout-lineage "${HELDOUT_LINEAGE}" \
     --embed_type "${EMBED_TYPE}" \
     --model_name "${MODEL_NAME}" \
     --saved_embed_memmap_dir "${MEMMAP_ROOT}" \
     --phenotype_label_path "${PHENOTYPE_LABEL_PATH}" \
+    --geno-pheno-csv "${EVO2_GENO_PHENO_CSV}" \
+    --lineage-csv "${EVO2_LINEAGE_CSV}" \
     --output_path "${OUTPUT_PATH}" \
     --saved_model_path "${SAVED_MODEL_PATH}" \
     --random_seed "${RANDOM_SEED}" \

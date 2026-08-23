@@ -1,4 +1,5 @@
 #!/bin/bash
+# Evaluate a saved downstream classifier on its held-out lineage.
 #SBATCH -A pi_annagreen_umass_edu
 #SBATCH --partition=superpod-a100
 #SBATCH -G 1
@@ -6,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=300G
 #SBATCH --time=04:00:00
-#SBATCH --job-name=evo2_lineage_eval
+#SBATCH --job-name=evo2_lineage_holdout_eval
 #SBATCH --mail-user=saishradhamo@umass.edu
 #SBATCH --output=/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/sbatch_zero_shot_lineage_holdout_logs/out/%x_%J.out
 #SBATCH --error=/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/sbatch_zero_shot_lineage_holdout_logs/error/%x_%J.err

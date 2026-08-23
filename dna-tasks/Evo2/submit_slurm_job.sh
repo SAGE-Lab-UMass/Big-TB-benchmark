@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Submit one Evo2 Slurm entry point with site-specific settings from
+# Submit one Slurm entry point with Evo2 site-specific settings from
 # .evo2-site.env. Additional arguments are passed to sbatch.
 
 set -euo pipefail

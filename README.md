@@ -108,11 +108,24 @@ cd dna-tasks/Evo2
 
 The workflow has three required stages:
 
-1. `submit_all_evo2_embeddings.sh` submits one resumable GPU array task per gene.
+1. `submit_evo2_embedding_array.sh` submits one resumable GPU array task per gene.
 2. `evo2_embed_gen.utils.prepare_memmaps` converts the raw `.npy` batches into downstream memmaps.
-3. `zero_shot/lineage_aware/run_lineage_holdout_train.sh` makes the lineage split and trains the downstream classifier.
+3. `zero_shot/lineage_aware/train_lineage_holdout_classifier.sh` makes the lineage split and trains the downstream classifier.
 
-Do not run the legacy `lineage_aware_data_split/` entry point for this workflow. The maintained frozen-embedding lineage code is under `zero_shot/lineage_aware/`.
+The shell entry points are named for the operation they perform:
+
+| Script | Purpose |
+| --- | --- |
+| `generate_evo2_embeddings.sh` | Run one embedding job; supports both smoke-test and production-array settings. |
+| `submit_evo2_embedding_array.sh` | Submit `generate_evo2_embeddings.sh` as one Slurm array task per gene. |
+| `train_random_split_classifier.sh` | Train the downstream classifier with a random split. |
+| `zero_shot/lineage_aware/train_lineage_holdout_classifier.sh` | Train the downstream classifier while holding out one lineage. |
+| `zero_shot/lineage_aware/evaluate_lineage_holdout_classifier.sh` | Evaluate a saved classifier on its held-out lineage. |
+| `submit_slurm_job.sh` | Submit any one of the Slurm job scripts with shared site settings. |
+| `evo2_env.sh` | Source-only shared runtime configuration and shell helpers. |
+| `setup_evo2_env.sh` | Create the original UMass-specific Conda environment. |
+
+The two former embedding workers were consolidated into `generate_evo2_embeddings.sh`; set `SMOKE_TEST=1` for the small validation run. The duplicate launcher under the legacy `lineage_aware_data_split/` directory was removed. The maintained frozen-embedding lineage workflow is under `zero_shot/lineage_aware/`.
 
 ### 1. Environment and site configuration
 
@@ -155,7 +168,7 @@ The `evo2_7b` checkpoint must also be accessible. Export `HF_TOKEN`, set `HF_AUT
 Slurm account, partition, mail, CUDA-module, and array-concurrency settings can also be set in `.evo2-site.env`; see `site.env.example`. Use this command to verify the resolved embedding command without launching Python:
 
 ```bash
-EVO2_LAUNCH_DRY_RUN=1 bash run_embed_gen_sbatch.sh
+SMOKE_TEST=1 EVO2_LAUNCH_DRY_RUN=1 bash generate_evo2_embeddings.sh
 ```
 
 Use `EVO2_SUBMIT_DRY_RUN=1` with either submission helper to print the resolved `sbatch` command without submitting it.
@@ -214,8 +227,7 @@ If the FASTA or phenotype inputs change, point `EVO2_DATA_DIR`, `EVO2_EMBED_ROOT
 First run a five-isolate, single-gene smoke job:
 
 ```bash
-GENE=rpoB DRUG=RIFAMPICIN MAX_ISOLATES=5 \
-  ./submit_evo2_job.sh run_embed_gen_sbatch.sh
+SMOKE_TEST=1 ./submit_slurm_job.sh generate_evo2_embeddings.sh
 ```
 
 The smoke launcher writes under `${EVO2_EMBED_ROOT}/smoke` by default. Inspect the job log and the three batch files (embedding, phenotype, and isolate IDs) before starting the full run.
@@ -223,10 +235,10 @@ The smoke launcher writes under `${EVO2_EMBED_ROOT}/smoke` by default. Inspect t
 Submit the full resumable gene array:
 
 ```bash
-./submit_all_evo2_embeddings.sh
+./submit_evo2_embedding_array.sh
 ```
 
-`submit_all_evo2_embeddings.sh` reads `ordered_genes.txt`; each array task invokes `run_all_evo2_embeddings_sbatch.sh`. The default output is `${EVO2_EMBED_ROOT}/<gene>/`. The launcher uses Evo2-7B layer `blocks.20.mlp.l3`, a maximum sequence length of 5,000, token embeddings, and `float16` output. It also passes `--resume`, so rerunning the array continues after the contiguous set of validated, completed batches.
+`submit_evo2_embedding_array.sh` reads `ordered_genes.txt`; each array task invokes `generate_evo2_embeddings.sh`. The default output is `${EVO2_EMBED_ROOT}/<gene>/`. The launcher uses Evo2-7B layer `blocks.20.mlp.l3`, a maximum sequence length of 5,000, token embeddings, and `float16` output. Production jobs enable `--resume`, so rerunning the array continues after the contiguous set of validated, completed batches.
 
 For a custom gene list, set `GENE_FILE` to a newline-delimited file before submission. The supplied `ordered_genes.txt` contains every locus used by the downstream drug models; it intentionally does not request an unused `fabG1` embedding even though the corresponding input FASTA is required to construct the common isolate table.
 
@@ -278,7 +290,7 @@ Run a split-only validation before using a GPU. This loads the phenotype stack a
 
 ```bash
 DRUG=RIFAMPICIN HELDOUT_LINEAGE=1 DRY_RUN=1 \
-  bash zero_shot/lineage_aware/run_lineage_holdout_train.sh
+  bash zero_shot/lineage_aware/train_lineage_holdout_classifier.sh
 ```
 
 The default feasibility check requires at least 50 resistant and 50 susceptible samples in both the training and held-out sets. Change `MIN_CLASS_COUNT` only when a different threshold is scientifically intended.
@@ -287,7 +299,7 @@ Submit the real training job after the dry run succeeds:
 
 ```bash
 DRUG=RIFAMPICIN HELDOUT_LINEAGE=1 RANDOM_SEED=1 \
-  ./submit_evo2_job.sh zero_shot/lineage_aware/run_lineage_holdout_train.sh
+  ./submit_slurm_job.sh zero_shot/lineage_aware/train_lineage_holdout_classifier.sh
 ```
 
 Repeat with `HELDOUT_LINEAGE=1`, `2`, `3`, and `4` for leave-one-major-lineage-out evaluation. By default, lineage `N` is excluded from model fitting; all other lineage-annotated samples and samples without a lineage annotation are used as the training pool. A random 80/20 split inside that pool supplies the model-training and validation subsets.
@@ -303,7 +315,7 @@ dna-tasks/Evo2/training_output/zero_shot/lineage_aware_holdout/
 
 The classifier script relies on one invariant: `full_N` in every memmap is row `N` of `${EVO2_GENO_PHENO_CSV}`. Do not sort, filter, or regenerate that CSV after embedding generation, and do not combine a phenotype stack or gene memmaps from different embedding runs.
 
-To evaluate a saved model on its held-out lineage, use `zero_shot/lineage_aware/run_lineage_holdout_eval.sh` with the same `DRUG`, `HELDOUT_LINEAGE`, `EMBED_TYPE`, memmap, phenotype, genotype/phenotype, and lineage paths used for training. The evaluator writes `test_set_auc_<DRUG>.csv` under the matching `classification_results/.../heldout_lineage_<N>/<DRUG>/seed_<seed>/` directory.
+To evaluate a saved model on its held-out lineage, use `zero_shot/lineage_aware/evaluate_lineage_holdout_classifier.sh` with the same `DRUG`, `HELDOUT_LINEAGE`, `EMBED_TYPE`, memmap, phenotype, genotype/phenotype, and lineage paths used for training. The evaluator writes `test_set_auc_<DRUG>.csv` under the matching `classification_results/.../heldout_lineage_<N>/<DRUG>/seed_<seed>/` directory.
 
 ## Reproducibility
 
