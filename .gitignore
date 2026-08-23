@@ -35,3 +35,4 @@ dna-tasks/Evo2/training_output/
 dna-tasks/Evo2/data/
 dna-tasks/Evo2/sbatch_finetune_logs
 dna-tasks/Evo2/sbatch_zero_shot_lineage_holdout_logs
+dna-tasks/Evo2/sbatch_embed_gen_logs/

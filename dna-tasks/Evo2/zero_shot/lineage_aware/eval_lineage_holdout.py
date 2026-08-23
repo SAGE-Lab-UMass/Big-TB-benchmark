@@ -154,7 +154,7 @@ def _load_or_compute_threshold(model, dataloader, args, device):
         raise ValueError(f"No Threshold entry found in {threshold_path}")
 
     y_train, y_train_pred = _predict_probabilities(
-        model, dataloader, args.saved_model_name, device
+        model, dataloader, args.model_name, device
     )
     threshold = calculate_single_drug_threshold(
         y_train.ravel(), y_train_pred.ravel(), get_threshold_val=ThresholdValue()
@@ -235,7 +235,7 @@ def main(args: argparse.Namespace) -> None:
         )
 
     model = get_model_class(
-        model_name=args.saved_model_name,
+        model_name=args.model_name,
         in_dim=model_dim,
         seq_len=model_seq_len,
         device=device,
@@ -251,7 +251,7 @@ def main(args: argparse.Namespace) -> None:
 
     print("\nEvaluating on held-out lineage test data...")
     y_test, y_test_pred = _predict_probabilities(
-        model, test_dataloader, args.saved_model_name, device
+        model, test_dataloader, args.model_name, device
     )
     test_results = calculate_test_metrics_single_drug(
         y_test.ravel(),
