@@ -12,3 +12,26 @@ dna-tasks/notebooks/*
 DNABERT-S/
 **/DNABERT-S/
 protein-tasks/slurm/logs/
+
+# SD-CNN lineage-aware split runtime artifacts
+dna-tasks/SD-CNN/model_training/lineage_aware_data_split/logs/
+dna-tasks/SD-CNN/model_training/lineage_aware_data_split/run_sdcnn_lineage_holdout_sai.sh
+dna-tasks/SD-CNN/model_training/lineage_aware_data_split/submit_sdcnn_lineage_holdout_sai.sh
+dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/*
+!dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/test_set_metrics.csv
+
+# MD-CNN/MDCNN lineage-aware split runtime artifacts
+dna-tasks/MDCNN/model_training/lineage_aware_data_split/
+dna-tasks/MDCNN/model_training/training_output/
+dna-tasks/MD-CNN/
+
+# Regression lineage-aware split runtime artifacts
+dna-tasks/Regression/lineage_aware_data_split/
+dna-tasks/Regression/training_output/
+
+# Evo2 lineage-aware split runtime artifacts
+dna-tasks/Evo2/lineage_aware_data_split
+dna-tasks/Evo2/training_output/
+dna-tasks/Evo2/data/
+dna-tasks/Evo2/sbatch_finetune_logs
+dna-tasks/Evo2/sbatch_zero_shot_lineage_holdout_logs
