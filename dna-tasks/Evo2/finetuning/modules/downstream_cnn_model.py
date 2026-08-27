@@ -89,7 +89,7 @@ class PooledDNABERTCNN(nn.Module):
         self.pool1 = nn.MaxPool1d(3)
 
         self.conv2 = nn.Conv1d(64, 32, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv1d(32, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv1d(32, 32, kernel_size=3, padding=1)
         self.pool2 = nn.MaxPool1d(3)
 
         # After convs, we will apply global average pooling: (B, 32, L') → (B, 32)
