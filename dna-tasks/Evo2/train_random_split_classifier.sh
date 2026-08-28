@@ -11,9 +11,9 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EVO2_DIR="${EVO2_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 # shellcheck source=evo2_env.sh
-source "${SCRIPT_DIR}/evo2_env.sh"
+source "${EVO2_DIR}/evo2_env.sh"
 
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
