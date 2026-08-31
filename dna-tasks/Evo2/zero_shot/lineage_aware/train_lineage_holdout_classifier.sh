@@ -10,10 +10,10 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-EVO2_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+EVO2_DIR="${EVO2_DIR:-$(cd "${SCRIPT_DIR}/../.." && pwd)}"
 # shellcheck source=../../evo2_env.sh
 source "${EVO2_DIR}/evo2_env.sh"
-LINEAGE_SPLIT_DIR="${SCRIPT_DIR}"
+LINEAGE_SPLIT_DIR="${EVO2_DIR}/zero_shot/lineage_aware"
 
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
