@@ -1,0 +1,26 @@
+[info] host=cpu027
+[info] job_id=63919822
+[info] python=/work/pi_annagreen_umass_edu/saishradha/miniconda3/envs/cnn/bin/python
+[info] parameter_file=/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/interpretability/lineage_aware_split/parameter_files/lineage_aware_interpretability.yaml
+[info] cpu_only=1
+=== AMIKACIN ===
+AMIKACIN: eligible lineages = ['2', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/AMIKACIN
+=== CAPREOMYCIN ===
+CAPREOMYCIN: eligible lineages = ['2', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/CAPREOMYCIN
+=== ETHAMBUTOL ===
+ETHAMBUTOL: eligible lineages = ['1', '2', '3', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/ETHAMBUTOL
+=== ETHIONAMIDE ===
+ETHIONAMIDE: eligible lineages = ['2', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/ETHIONAMIDE
+=== ISONIAZID ===
+ISONIAZID: available output aliases (INH=1786240226, ISONIAZID=1784126178); selected INH
+ISONIAZID: eligible lineages = ['1', '2', '3', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/INH
+=== KANAMYCIN ===
+KANAMYCIN: eligible lineages = ['2', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/KANAMYCIN
+=== MOXIFLOXACIN ===
+MOXIFLOXACIN: eligible lineages = ['2', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/MOXIFLOXACIN
+=== PYRAZINAMIDE ===
+PYRAZINAMIDE: eligible lineages = ['1', '2', '3', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/PYRAZINAMIDE
+=== RIFAMPICIN ===
+RIFAMPICIN: eligible lineages = ['1', '2', '3', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/RIFAMPICIN
+=== STREPTOMYCIN ===
+STREPTOMYCIN: eligible lineages = ['1', '2', '3', '4']; training output = /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/STREPTOMYCIN

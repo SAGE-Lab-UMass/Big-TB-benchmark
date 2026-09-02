@@ -1,0 +1,27 @@
+# One configuration serves every drug; use --drug or run_all_drugs.sh.
+drug: ISONIAZID
+
+training_output_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split
+eligibility_file: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/all_drugs_split_counts.csv
+training_config_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/lineage_aware_data_split
+model_filename: sd-cnn_model_lineage_holdout.h5
+
+WHO_VCF_mapped_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/vcf_who_mapped_data
+output_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/interpretability/lineage_aware_split/outputs
+
+# Match the random-split feature mapping, ranking, and k values.
+has_neg_strand: true
+k_values: [1, 5, 10]
+importance_fraction_threshold: 0.2
+features_below_threshold: 10
+
+# Match the random-split stratified SHAP background selection. Computation is
+# batched to bound memory while preserving the same mean-absolute ranking.
+shap_background_fraction: 0.2
+shap_max_background: 160
+shap_batch_size: 128
+random_seed: 42
+
+# Mean SHAP values and selected rankings are always saved. Full collapsed SHAP
+# matrices are optional because saving one for every lineage is very large.
+save_shap_values: false

@@ -1,0 +1,16 @@
+{
+  "background_fraction": 0.2,
+  "data_shape": [
+    466,
+    5,
+    1737,
+    3
+  ],
+  "feature_count": 5211,
+  "max_background": 160,
+  "model_mtime_ns": 1786237407113303504,
+  "model_path": "/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/ETHIONAMIDE/heldout_lineage_2/saved_model/sd-cnn_model_lineage_holdout.h5",
+  "model_size": 20278400,
+  "random_seed": 42,
+  "save_shap_values": false
+}
