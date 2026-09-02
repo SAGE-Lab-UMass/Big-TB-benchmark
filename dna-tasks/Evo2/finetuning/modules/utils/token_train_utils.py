@@ -12,10 +12,6 @@ from torch.utils.data import Subset, DataLoader
 from dataloader.locus_order import DRUGS as drugs
 from downstream_cnn_model import *
 
-START_FOLD = {
-    "ETHAMBUTOL": 3,
-}
-
 class EarlyStopping:
     """
     Early stops the training if validation metric doesn't improve after a given patience.
@@ -1206,10 +1202,6 @@ def cross_val_train_on_token_embeddings(
         fold_number = fold_index + 1
         if fold is not None and fold_number != fold:
             continue
-        if fold_index < START_FOLD.get(drug, 0):
-            print(f"Skipping fold {fold_number} for drug: {drug}")
-            continue
-
         fold_path = os.path.join(saved_model_path, f"{drug}/seed_{random_seed}/fold_{fold_number}")
         save_path = os.path.join(fold_path, f"{model_name}.pt")
         hist_path = os.path.join(output_path, f"{drug}/seed_{random_seed}")
