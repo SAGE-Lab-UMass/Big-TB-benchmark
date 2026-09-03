@@ -65,27 +65,33 @@ def discover_eligible_lineages(
     model_dir: str | Path,
     drug: str,
     model_filename: str = DEFAULT_MODEL_FILENAME,
-) -> list[tuple[str, Path]]:
+) -> list[tuple[str, Path, Path]]:
     """Return held-out lineages that have the model used for test evaluation."""
     drug_dir = Path(model_dir) / drug
     if not drug_dir.is_dir():
         raise FileNotFoundError(f"Training output for {drug} not found: {drug_dir}")
 
-    eligible: list[tuple[str, Path]] = []
+    eligible: list[tuple[str, Path, Path]] = []
     for lineage_dir in drug_dir.glob("heldout_lineage_*"):
         if not lineage_dir.is_dir():
             continue
         lineage = lineage_dir.name.removeprefix("heldout_lineage_")
         model_path = lineage_dir / "saved_models" / model_filename
         test_predictions = lineage_dir / "test_predictions.csv"
+        split_manifest = lineage_dir / "split_manifest.csv"
         if model_path.is_file() and test_predictions.is_file():
-            eligible.append((lineage, model_path))
+            if not split_manifest.is_file():
+                raise FileNotFoundError(
+                    f"Training split manifest for {drug} lineage {lineage} is missing: "
+                    f"{split_manifest}"
+                )
+            eligible.append((lineage, model_path, split_manifest))
         elif model_path.is_file():
             print(
                 f"[warn] Ignoring lineage {lineage}: model exists but test_predictions.csv is missing"
             )
 
-    def lineage_sort_key(item: tuple[str, Path]) -> tuple[int, int | str]:
+    def lineage_sort_key(item: tuple[str, Path, Path]) -> tuple[int, int | str]:
         lineage = item[0]
         return (0, int(lineage)) if lineage.isdigit() else (1, lineage)
 
@@ -154,11 +160,15 @@ def prepare_interpretability_data(
     genotype_columns: list[str],
     drug: str,
     dedup_cache: str | Path,
-) -> tuple[pd.DataFrame, pd.Series]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series]:
     input_df = pd.read_csv(input_data_file, index_col=0, low_memory=False)
     missing = sorted(set(genotype_columns + [drug]) - set(input_df.columns))
     if missing:
         raise ValueError(f"Input data is missing columns: {missing[:10]}")
+
+    input_df.index = input_df.index.map(str)
+    if input_df.index.has_duplicates:
+        raise ValueError("Input data row IDs must be unique")
 
     indices = deduplicate_indices(input_df[genotype_columns], input_df[drug], dedup_cache)
     deduplicated = input_df.iloc[indices]
@@ -167,7 +177,7 @@ def prepare_interpretability_data(
     y = pd.to_numeric(valid[drug], errors="raise").astype(int)
     if len(X) < 2:
         raise ValueError(f"Not enough non-missing samples for {drug}")
-    return X, y
+    return input_df[genotype_columns], X, y
 
 
 def select_background_indices(
@@ -234,34 +244,169 @@ def _normalize_shap_values(values: Any) -> np.ndarray:
     return values
 
 
+def load_training_labels(split_manifest: str | Path) -> pd.Series:
+    """Load the exact rows and labels used to train one held-out-lineage model."""
+    manifest = pd.read_csv(split_manifest, dtype={"row_id": str})
+    required = {"row_id", "label", "split"}
+    missing = sorted(required - set(manifest.columns))
+    if missing:
+        raise ValueError(f"Split manifest {split_manifest} is missing columns: {missing}")
+
+    manifest["row_id"] = manifest["row_id"].astype(str)
+    training = manifest.loc[
+        manifest["split"].astype(str).str.strip().str.lower().eq("train"),
+        ["row_id", "label"],
+    ].copy()
+    if training.empty:
+        raise ValueError(f"Split manifest has no training rows: {split_manifest}")
+    if training["row_id"].duplicated().any():
+        raise ValueError(f"Split manifest has duplicate training row IDs: {split_manifest}")
+
+    training["label"] = pd.to_numeric(training["label"], errors="raise").astype(int)
+    invalid_labels = sorted(set(training["label"]) - {0, 1})
+    if invalid_labels:
+        raise ValueError(
+            f"Split manifest {split_manifest} has labels outside 0/1: {invalid_labels}"
+        )
+    return training.set_index("row_id")["label"]
+
+
+def _row_signatures(X: pd.DataFrame, y: pd.Series) -> list[tuple[bytes, int]]:
+    """Return exact (genotype, phenotype) signatures in dataframe row order."""
+    values = X.to_numpy()
+    labels = y.to_numpy(dtype=int)
+    return [(values[index].tobytes(), int(labels[index])) for index in range(len(X))]
+
+
+def select_lineage_background(
+    X_full: pd.DataFrame,
+    training_labels: pd.Series,
+    X_explanation: pd.DataFrame,
+    y_explanation: pd.Series,
+    *,
+    max_background: int,
+    seed: int,
+) -> tuple[pd.DataFrame, pd.Series, int]:
+    """Select a unique training-only background disjoint from the fixed explainer."""
+    if max_background < 1:
+        raise ValueError("shap_max_background must be positive")
+
+    missing_training_rows = training_labels.index.difference(X_full.index)
+    if len(missing_training_rows):
+        raise ValueError(
+            f"{len(missing_training_rows)} training row IDs are absent from the input data; "
+            f"first missing IDs: {missing_training_rows[:10].tolist()}"
+        )
+
+    explanation_ids = set(X_explanation.index.astype(str))
+    candidate_ids = training_labels.index[~training_labels.index.isin(explanation_ids)]
+    X_candidates = X_full.loc[candidate_ids]
+    y_candidates = training_labels.loc[candidate_ids]
+
+    # The random-split workflow deduplicates before separating background and
+    # explainer data.  Excluding explainer signatures here gives the lineage
+    # workflow the same pattern-level disjointness, not merely row-ID disjointness.
+    explanation_signatures = set(_row_signatures(X_explanation, y_explanation))
+    seen: set[tuple[bytes, int]] = set()
+    unique_positions: list[int] = []
+    for position, signature in enumerate(_row_signatures(X_candidates, y_candidates)):
+        if signature in explanation_signatures or signature in seen:
+            continue
+        seen.add(signature)
+        unique_positions.append(position)
+
+    if not unique_positions:
+        raise ValueError(
+            "No unique training background samples remain after excluding the fixed explainer"
+        )
+
+    X_unique = X_candidates.iloc[unique_positions]
+    y_unique = y_candidates.iloc[unique_positions]
+    candidate_count = len(X_unique)
+
+    if candidate_count > max_background:
+        positions = np.arange(candidate_count)
+        labels = y_unique.to_numpy(dtype=int)
+        class_counts = pd.Series(labels).value_counts()
+        can_stratify = len(class_counts) > 1 and int(class_counts.min()) >= 2
+        if can_stratify:
+            try:
+                selected_positions, _ = train_test_split(
+                    positions,
+                    train_size=max_background,
+                    stratify=labels,
+                    random_state=seed,
+                )
+            except ValueError:
+                selected_positions = np.random.default_rng(seed).choice(
+                    positions, size=max_background, replace=False
+                )
+        else:
+            selected_positions = np.random.default_rng(seed).choice(
+                positions, size=max_background, replace=False
+            )
+        X_background = X_unique.iloc[selected_positions]
+        y_background = y_unique.iloc[selected_positions]
+    else:
+        X_background = X_unique
+        y_background = y_unique
+
+    background_signatures = _row_signatures(X_background, y_background)
+    if len(background_signatures) != len(set(background_signatures)):
+        raise AssertionError("Background contains duplicate genotype/phenotype signatures")
+    if set(background_signatures) & explanation_signatures:
+        raise AssertionError("Background and explainer genotype/phenotype signatures overlap")
+    if not set(X_background.index).issubset(set(training_labels.index)):
+        raise AssertionError("Background contains rows outside the model training set")
+    if not set(X_background.index).isdisjoint(explanation_ids):
+        raise AssertionError("Background and explainer row IDs overlap")
+    if len(X_background) > max_background:
+        raise AssertionError("Background exceeds shap_max_background")
+
+    return X_background, y_background, candidate_count
+
+
+def save_sample_manifest(path: str | Path, X: pd.DataFrame, y: pd.Series) -> None:
+    """Save row IDs and labels for an auditable SHAP sample set."""
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(
+        {
+            "row_id": X.index.astype(str),
+            "label": y.to_numpy(dtype=int),
+        }
+    ).to_csv(output_path, index=False)
+
+
 def compute_mean_abs_shap(
     model: Any,
-    X: pd.DataFrame,
-    y: pd.Series,
+    X_background: pd.DataFrame,
+    X_explanation: pd.DataFrame,
+    y_explanation: pd.Series,
     output_dir: str | Path,
     *,
-    background_fraction: float,
-    max_background: int,
     batch_size: int,
-    seed: int,
     save_shap_values: bool,
 ) -> pd.Series:
     """Compute mean absolute linear SHAP values in bounded-memory batches."""
     if batch_size < 1:
         raise ValueError("shap_batch_size must be positive")
-    if model.coef_.shape[1] != X.shape[1]:
+    if model.coef_.shape[1] != X_explanation.shape[1]:
         raise ValueError(
-            f"Model expects {model.coef_.shape[1]} features but {X.shape[1]} were selected"
+            f"Model expects {model.coef_.shape[1]} features but "
+            f"{X_explanation.shape[1]} were selected"
         )
+    if X_background.shape[1] != X_explanation.shape[1]:
+        raise ValueError("Background and explainer feature counts differ")
+    if len(X_explanation) != len(y_explanation):
+        raise ValueError("Explainer samples and labels have different lengths")
 
-    background_indices, explanation_indices = select_background_indices(
-        y, background_fraction, max_background, seed
-    )
-    X_values = X.to_numpy()
+    background_values = X_background.to_numpy()
+    explanation_values = X_explanation.to_numpy()
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    explainer = shap.LinearExplainer(model, X_values[background_indices])
+    explainer = shap.LinearExplainer(model, background_values)
     shap_file = output_path / "shap_values.npy"
     shap_memmap = None
     if save_shap_values:
@@ -269,14 +414,13 @@ def compute_mean_abs_shap(
             shap_file,
             mode="w+",
             dtype=np.float64,
-            shape=(len(explanation_indices), X.shape[1]),
+            shape=(len(X_explanation), X_explanation.shape[1]),
         )
 
-    absolute_sum = np.zeros(X.shape[1], dtype=np.float64)
-    for start in range(0, len(explanation_indices), batch_size):
-        stop = min(start + batch_size, len(explanation_indices))
-        batch_indices = explanation_indices[start:stop]
-        values = _normalize_shap_values(explainer.shap_values(X_values[batch_indices]))
+    absolute_sum = np.zeros(X_explanation.shape[1], dtype=np.float64)
+    for start in range(0, len(X_explanation), batch_size):
+        stop = min(start + batch_size, len(X_explanation))
+        values = _normalize_shap_values(explainer.shap_values(explanation_values[start:stop]))
         absolute_sum += np.abs(values).sum(axis=0)
         if shap_memmap is not None:
             shap_memmap[start:stop] = values
@@ -288,10 +432,10 @@ def compute_mean_abs_shap(
         # Avoid leaving a stale full matrix after a later run disables saving.
         shap_file.unlink()
 
-    np.save(output_path / "explained_labels.npy", y.to_numpy()[explanation_indices])
+    np.save(output_path / "explained_labels.npy", y_explanation.to_numpy(dtype=int))
     mean_abs = pd.Series(
-        absolute_sum / len(explanation_indices),
-        index=X.columns,
+        absolute_sum / len(X_explanation),
+        index=X_explanation.columns,
         name="mean_abs_shap",
     ).sort_values(ascending=False)
     mean_abs.rename_axis("feature").to_csv(output_path / "mean_abs_shap.csv")
@@ -317,16 +461,30 @@ def run(config: dict[str, Any]) -> tuple[Path, Path]:
     drug = config["drug"]
     model_filename = config.get("model_filename", DEFAULT_MODEL_FILENAME)
     eligible = discover_eligible_lineages(config["model_dir"], drug, model_filename)
-    print(f"{drug}: eligible held-out lineages = {[lineage for lineage, _ in eligible]}")
+    print(f"{drug}: eligible held-out lineages = {[lineage for lineage, _, _ in eligible]}")
 
     genotype_columns = read_genotype_columns(config["genotype_sites_file"], drug)
     output_dir = Path(config["output_dir"])
     map_mar_dir = output_dir / "map_mar"
     dedup_cache = output_dir / "dedup_geno_data" / f"{drug}_full_dedup_indices.npy"
-    X, y = prepare_interpretability_data(
+    X_full, X, y = prepare_interpretability_data(
         config["input_data_file"], genotype_columns, drug, dedup_cache
     )
     print(f"{drug}: interpreting {len(X)} deduplicated non-missing samples, {X.shape[1]} features")
+
+    background_fraction = float(config.get("shap_background_fraction", 0.2))
+    max_background = int(config.get("shap_max_background", 160))
+    seed = int(config.get("random_seed", 42))
+    _, explanation_indices = select_background_indices(
+        y, background_fraction, max_background, seed
+    )
+    X_explanation = X.iloc[explanation_indices]
+    y_explanation = y.iloc[explanation_indices]
+    drug_shap_dir = output_dir / "shap_values" / drug
+    save_sample_manifest(
+        drug_shap_dir / "explainer_samples.csv", X_explanation, y_explanation
+    )
+    print(f"{drug}: fixed explainer samples = {len(X_explanation)}")
 
     relevant = load_relevant_features(
         config["WHO_VCF_mapped_dir"],
@@ -338,19 +496,45 @@ def run(config: dict[str, Any]) -> tuple[Path, Path]:
 
     k_values: Iterable[int] = config.get("k_values", K_VALUES)
     lineage_rows: list[dict[str, Any]] = []
-    for lineage, model_path in eligible:
+    selection_rows: list[dict[str, Any]] = []
+    for lineage, model_path, split_manifest in eligible:
         print(f"{drug} lineage {lineage}: loading {model_path}")
         model = joblib.load(model_path)
-        lineage_shap_dir = output_dir / "shap_values" / drug / f"heldout_lineage_{lineage}"
+        lineage_shap_dir = drug_shap_dir / f"heldout_lineage_{lineage}"
+        training_labels = load_training_labels(split_manifest)
+        X_background, y_background, candidate_count = select_lineage_background(
+            X_full,
+            training_labels,
+            X_explanation,
+            y_explanation,
+            max_background=max_background,
+            seed=seed,
+        )
+        save_sample_manifest(
+            lineage_shap_dir / "background_samples.csv", X_background, y_background
+        )
+        selection_rows.append(
+            {
+                "drug": drug,
+                "heldout_lineage": lineage,
+                "explainer_count": len(X_explanation),
+                "unique_background_candidates": candidate_count,
+                "background_count": len(X_background),
+                "background_label_0": int((y_background == 0).sum()),
+                "background_label_1": int((y_background == 1).sum()),
+            }
+        )
+        print(
+            f"{drug} lineage {lineage}: unique training background candidates = "
+            f"{candidate_count}, selected = {len(X_background)}"
+        )
         mean_abs = compute_mean_abs_shap(
             model,
-            X,
-            y,
+            X_background,
+            X_explanation,
+            y_explanation,
             lineage_shap_dir,
-            background_fraction=float(config.get("shap_background_fraction", 0.2)),
-            max_background=int(config.get("shap_max_background", 160)),
             batch_size=int(config.get("shap_batch_size", 512)),
-            seed=int(config.get("random_seed", 42)),
             save_shap_values=bool(config.get("save_shap_values", False)),
         )
         ranked_features = rank_selected_features(
@@ -374,6 +558,10 @@ def run(config: dict[str, Any]) -> tuple[Path, Path]:
     by_lineage = pd.DataFrame(lineage_rows).sort_values(["heldout_lineage", "k"])
     mean_rows = mean_map_mar_rows(by_lineage)
     mean_rows.insert(0, "drug", drug)
+
+    pd.DataFrame(selection_rows).to_csv(
+        drug_shap_dir / "sample_selection_summary.csv", index=False
+    )
 
     map_mar_dir.mkdir(parents=True, exist_ok=True)
     by_lineage_path = map_mar_dir / f"map_mar_{drug}_by_lineage.csv"
