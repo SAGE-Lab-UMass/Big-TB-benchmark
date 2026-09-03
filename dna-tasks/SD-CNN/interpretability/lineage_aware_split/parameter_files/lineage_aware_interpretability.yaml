@@ -15,8 +15,10 @@ k_values: [1, 5, 10]
 importance_fraction_threshold: 0.2
 features_below_threshold: 10
 
-# Match the random-split stratified SHAP background selection. Computation is
-# batched to bound memory while preserving the same mean-absolute ranking.
+# Use the random-split method to select one fixed explainer per drug. Each
+# lineage background is then selected from that model's training manifest,
+# deduplicated, made disjoint from the explainer, and capped at 160 samples.
+# Computation is batched to bound memory.
 shap_background_fraction: 0.2
 shap_max_background: 160
 shap_batch_size: 128

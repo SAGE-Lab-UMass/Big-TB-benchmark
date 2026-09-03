@@ -38,3 +38,8 @@ dna-tasks/Regression/run_lineage_holdout_all_drugs_sai.sh
 dna-tasks/Regression/training_output/lineage_aware_results_logreg_1000/*
 !dna-tasks/Regression/training_output/lineage_aware_results_logreg_1000/test_set_metrics.csv
 dna-tasks/Regression/training_output/**/saved_models/
+dna-tasks/Regression/interpretability/lineage_aware_split/outputs
+
+# Interpretability runtime artifacts
+dna-tasks/**/interpretability/**/outputs/
+dna-tasks/**/interpretability/**/logs/

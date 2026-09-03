@@ -38,3 +38,13 @@ The k values and metric definitions match random split: 1, 5, and 10, with
 `P@k`, `R@k`, `MAP@k`, and `Hits@k`. Per-lineage mean absolute SHAP values,
 selected features, and plots are stored under
 `outputs/shap_values/<DRUG>/heldout_lineage_<N>/`.
+
+The explainer cohort is selected once per drug from the deduplicated labelled
+data and reused for every eligible lineage. Each lineage background is selected
+only from that model's training rows in `split_manifest.csv`, deduplicated by
+genotype and phenotype, and made disjoint from the explainer by both row ID and
+genotype/phenotype signature. Background size is capped at 160 without a lower
+bound.
+
+Drug-level `explainer_samples.csv` and `sample_selection_summary.csv` files,
+plus per-lineage `background_samples.csv` files, record the exact selections.
