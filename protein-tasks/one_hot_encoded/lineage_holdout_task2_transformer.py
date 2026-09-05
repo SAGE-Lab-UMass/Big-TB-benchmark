@@ -1,5 +1,16 @@
 """Task 2 (WHO-catalogued resistance variant recovery) under lineage holdout,
 for the one-hot Transformer. Mirrors lineage_holdout_task2_cnn.py.
+
+NOTE - output not used for reporting: per the 2026-09 agreement with
+Sai/Anna/Mahbuba, Task 2's lineage-aware result uses the FIXED random-split
+(Table 3) explain set with the lineage-trained model swapped in, not this
+script's held-out-lineage explain set - see
+controlled_shap_task2_transformer.py for that actual deliverable. This
+script's remaining real purpose is to train and checkpoint the
+lineage-holdout model ({drug}_transformer.pt), which
+controlled_shap_task2_transformer.py loads directly rather than retraining.
+This file's own Precision@k/Recall@k output should not be presented as
+"the" Task 2 lineage-aware result.
 """
 from __future__ import annotations
 

@@ -1,16 +1,16 @@
 """Task 2 (WHO-catalogued resistance variant recovery) under lineage holdout,
 for ESM embedding CNN models.
 
-NOTE: `significance_testing.train_token_split`'s `compute_shap=True` branch
-calls an undefined name (`shap_per_residue` is not defined anywhere in that
-module or its imports — a latent bug never triggered because
-lineage_holdout_esm.py always calls it with compute_shap=False). We do not
-reuse that branch. Instead we compute SHAP here directly, modeled on the
-already-working one-hot CNN/Transformer `shap_per_residue` (background from
-train, explained samples from the held-out-lineage test set), using the same
-`Wrapped` SHAP adapter and DeepExplainer call as shap_esm.py's
-shap_per_residue_single_pool, but with disjoint train/test pools instead of a
-single pool split internally.
+NOTE - output not used for reporting: per the 2026-09 agreement with
+Sai/Anna/Mahbuba, Task 2's lineage-aware result uses the FIXED random-split
+(Table 3) explain set with the lineage-trained model swapped in, not this
+script's held-out-lineage explain set - see controlled_shap_task2_esm.py for
+that actual deliverable. Unlike the CNN/Transformer versions, this script
+isn't a training dependency for the controlled one (ESM's controlled
+script retrains from scratch since no checkpoint is saved here) - so this
+file's own Precision@k/Recall@k output is unused entirely, not just
+unreported.
+
 """
 from __future__ import annotations
 
