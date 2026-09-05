@@ -1,8 +1,16 @@
 """Task 2 (WHO-catalogued resistance variant recovery) under lineage holdout,
 for the one-hot CNN. Trains on the leave-one-major-lineage-out split from
-lineage_holdout_cnn.py, computes SHAP on the held-out lineage test set, and
-converts it to Precision@k/Recall@k via interp_pr_utils (same methodology as
-the random-split Table 5 CNN rows), so results are directly comparable.
+lineage_holdout_cnn.py and computes SHAP on the held-out lineage test set.
+
+NOTE - output not used for reporting: per the agreement with
+Sai/Anna/Mahbuba, Task 2's lineage-aware result uses the FIXED random-split
+(Table 3) explain set with the lineage-trained model swapped in, not this
+script's held-out-lineage explain set - see controlled_shap_task2_cnn.py for
+that actual deliverable. This script's remaining real purpose is to train
+and checkpoint the lineage-holdout model ({drug}_cnn.pt), which
+controlled_shap_task2_cnn.py loads directly rather than retraining. This
+file's own Precision@k/Recall@k output should not be presented as "the"
+Task 2 lineage-aware result.
 """
 from __future__ import annotations
 
