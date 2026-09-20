@@ -53,6 +53,23 @@ TEST_SPLIT="${TEST_SPLIT:-0.2}"
 PCA_COMPONENTS="${PCA_COMPONENTS:-10}"
 MIN_CLASS_COUNT="${MIN_CLASS_COUNT:-50}"
 
+# These live in the data-bearing checkout, which is not necessarily EVO2_DIR.
+GENO_PHENO_CSV="${GENO_PHENO_CSV:-${EVO2_DIR}/data/multidrug_classification/training/geno_pheno_full_combined.csv}"
+LINEAGE_CSV="${LINEAGE_CSV:-$(cd "${EVO2_DIR}/../.." && pwd)/BIG_TB_isolates_with_lineages.csv}"
+
+for path in "${MEMMAP_ROOT}" "${PHENOTYPE_LABEL_PATH}" "${GENO_PHENO_CSV}" "${LINEAGE_CSV}"; do
+    if [[ ! -e "${path}" ]]; then
+        echo "Required input path does not exist: ${path}" >&2
+        exit 1
+    fi
+done
+
+CHECKPOINT="${SAVED_MODEL_PATH}/heldout_lineage_${HELDOUT_LINEAGE}/${DRUG}/seed_${RANDOM_SEED}/${SAVED_MODEL_NAME}.pt"
+if [[ ! -f "${CHECKPOINT}" ]]; then
+    echo "Checkpoint not found: ${CHECKPOINT}" >&2
+    exit 1
+fi
+
 cd "${EVO2_DIR}"
 
 "${EVO2_ENV_PREFIX}/bin/python" -I "${SCRIPT_DIR}/eval_lineage_holdout.py" \
@@ -72,4 +89,6 @@ cd "${EVO2_DIR}"
     --test_split "${TEST_SPLIT}" \
     --pca_components "${PCA_COMPONENTS}" \
     --min-class-count "${MIN_CLASS_COUNT}" \
+    --geno-pheno-csv "${GENO_PHENO_CSV}" \
+    --lineage-csv "${LINEAGE_CSV}" \
     "$@"
