@@ -1,4 +1,4 @@
-# significance_testing_cnn_cv.py
+# cnn_cv_training.py
 # Stratified K-fold CV for CNN with optional per-fold SHAP,
 
 

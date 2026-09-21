@@ -12,3 +12,10 @@ dna-tasks/notebooks/*
 DNABERT-S/
 **/DNABERT-S/
 protein-tasks/slurm/logs/
+latex_paper
+skills
+slurm
+
+
+*.pdf
+*.pptx

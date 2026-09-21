@@ -1,4 +1,4 @@
-# significance_testing_transformer.py
+# transformer_utils.py
 # Transformer CV + significance + per-residue SHAP (per fold)
 import os, math, random, argparse
 from pathlib import Path
