@@ -30,7 +30,7 @@ sys.path.insert(0, str(PROTEIN_TASKS_DIR))
 sys.path.insert(0, str(THIS_DIR))
 
 from lineage_split_utils import build_and_save_drug_splits, DEFAULT_MIN_CLASS_COUNT, MAJOR_LINEAGES
-from significance_testing import DRUG2GENES, load_dataset_for_cv, train_token_split, _eval_subset
+from esm_cv_training import DRUG2GENES, load_dataset_for_cv, train_token_split, _eval_subset
 from data_utils import pad_collate
 from shap_esm import Wrapped
 from interp_pr_utils import load_catalog_normalized, precision_recall_from_shap

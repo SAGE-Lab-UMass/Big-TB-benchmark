@@ -36,7 +36,7 @@ sys.path.insert(0, str(THIS_DIR))
 from lineage_split_utils import build_and_save_drug_splits, DEFAULT_MIN_CLASS_COUNT, MAJOR_LINEAGES
 from cnn_model import ProteinCNN1x1
 from cnn_utils import ProteinDataset, shap_per_residue
-from significance_testing_cnn import DRUG2GENES, DEVICE
+from cnn_cv_training import DRUG2GENES, DEVICE
 from interp_pr_utils import load_catalog_normalized, precision_recall_from_shap
 from original_explain_set import recover_original_explain_filenames
 
@@ -44,7 +44,10 @@ LINEAGE_OUT_ROOT = PROTEIN_TASKS_DIR / 'data/latest/lineage_ood_all_train/cnn_ta
 CONTROLLED_OUT_ROOT = PROTEIN_TASKS_DIR / 'data/latest/lineage_ood_all_train/cnn_task2_controlled_shap'
 SHAP_SOURCE_DIR = PROTEIN_TASKS_DIR / 'data/latest/results/interpretability/cnn'
 WHO_CATALOG = PROTEIN_TASKS_DIR / 'data/filtered_variants_output.csv'
-ELIGIBLE_DRUGS = ['rifampicin', 'isoniazid', 'ethambutol', 'pyrazinamide', 'streptomycin']
+ELIGIBLE_DRUGS = ['rifampicin', 'isoniazid', 'ethambutol', 'pyrazinamide', 'streptomycin',
+                  # secondary drugs: feasible for only 2/4 lineages (L2, L4); run_controlled_shap_for_drug
+                  # already skips infeasible/missing-checkpoint lineages, so this is safe to include.
+                  'capreomycin', 'moxifloxacin', 'ethionamide']
 BG_SIZE = 100
 SEED = 42
 
