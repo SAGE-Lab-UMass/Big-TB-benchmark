@@ -23,7 +23,7 @@ sys.path.insert(0, str(PROTEIN_TASKS_DIR))
 from lineage_split_utils import build_and_save_drug_splits, DEFAULT_MIN_CLASS_COUNT
 from cnn_model import ProteinCNN1x1
 from cnn_utils import ProteinDataset, bootstrap_auc_ci, set_seed
-from significance_testing_cnn import _train_one_fold, DRUG2GENES, N_EPOCHS, LR, BATCH_SIZE, DEVICE, SEED
+from cnn_cv_training import _train_one_fold, DRUG2GENES, N_EPOCHS, LR, BATCH_SIZE, DEVICE, SEED
 
 # train contains all non-held-out lineaged isolates.
 OUT_ROOT = PROTEIN_TASKS_DIR / 'data/latest/lineage_ood_all_train/cnn'

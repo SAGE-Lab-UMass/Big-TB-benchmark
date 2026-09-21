@@ -37,14 +37,17 @@ sys.path.insert(0, str(PROTEIN_TASKS_DIR))
 sys.path.insert(0, str(THIS_DIR))
 
 from lineage_split_utils import build_and_save_drug_splits, DEFAULT_MIN_CLASS_COUNT, MAJOR_LINEAGES
-from significance_testing import DRUG2GENES, load_dataset_for_cv, train_token_split
+from esm_cv_training import DRUG2GENES, load_dataset_for_cv, train_token_split
 from shap_esm import Wrapped
 from interp_pr_utils import load_catalog_normalized, precision_recall_from_shap
 from original_explain_set import recover_original_explain_filenames
 
 OUT_ROOT = PROTEIN_TASKS_DIR / 'data/latest/lineage_ood_all_train/esm_task2_controlled_shap'
 WHO_CATALOG = PROTEIN_TASKS_DIR / 'data/filtered_variants_output.csv'
-ELIGIBLE_DRUGS = ['rifampicin', 'isoniazid', 'ethambutol', 'pyrazinamide', 'streptomycin']
+ELIGIBLE_DRUGS = ['rifampicin', 'isoniazid', 'ethambutol', 'pyrazinamide', 'streptomycin',
+                  # secondary drugs: feasible for only 2/4 lineages (L2, L4); run_controlled_shap_for_drug
+                  # already skips infeasible lineages via build_and_save_drug_splits' feasible flag.
+                  'capreomycin', 'moxifloxacin', 'ethionamide']
 MODE2DIM = {'full': 320, 'pca': 10, 'mean': 1}
 SEED = 42
 BG_SIZE = 100
