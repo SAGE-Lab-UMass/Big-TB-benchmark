@@ -36,16 +36,28 @@ OUT_ROOT = PROTEIN_TASKS_DIR / 'data/latest/lineage_ood_all_train/regression_tas
 WHO_CATALOG = PROTEIN_TASKS_DIR / 'data/filtered_variants_output.csv'
 ALLOWED_CONF = ['1) Assoc w R', '2) Assoc w R - Interim']
 MODEL_NAME = 'logreg_shap_independent'
-ELIGIBLE_DRUGS = ['rifampicin', 'isoniazid', 'ethambutol', 'pyrazinamide', 'streptomycin']
+ELIGIBLE_DRUGS = ['rifampicin', 'isoniazid', 'ethambutol', 'pyrazinamide', 'streptomycin',
+                  # secondary drugs: feasible for only 2/4 lineages (L2, L4).
+                  'capreomycin', 'moxifloxacin', 'ethionamide']
 BG_FRAC = 0.10
 MAX_BG = 160
 SEED = 42
 
 
-def run_controlled_for_drug(drug: str, heldout_lineage: str, k_vals=(1, 5, 10), seed: int = SEED):
+def run_controlled_for_drug(drug: str, heldout_lineage: str, k_vals=(1, 5, 10), seed: int = SEED,
+                             min_class_count: int = DEFAULT_MIN_CLASS_COUNT):
     X, y, manifest = _prepare_lineage_annotated_subset(drug)
     test_mask = manifest['Lineage'].astype(str) == str(heldout_lineage)
     train_mask = ~test_mask
+
+    train_labels = manifest.loc[train_mask, 'saved_label']
+    test_labels = manifest.loc[test_mask, 'saved_label']
+    counts = [int((train_labels == 'R').sum()), int((train_labels == 'S').sum()),
+              int((test_labels == 'R').sum()), int((test_labels == 'S').sum())]
+    if min(counts) < min_class_count:
+        print(f'[skip] {drug} held-out lineage {heldout_lineage}: underpowered (train/test R/S counts={counts})')
+        return []
+
     train_idx = np.flatnonzero(train_mask.to_numpy())
 
     explain_filenames = set(recover_original_explain_filenames(drug))
