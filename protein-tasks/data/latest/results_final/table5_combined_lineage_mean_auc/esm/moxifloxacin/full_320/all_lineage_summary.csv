@@ -1,0 +1,3 @@
+drug,mode,in_dim,heldout_lineage,train_n,train_r,train_s,test_n,test_r,test_s,feasible,train_n_dataset,test_n_dataset,auc,last_val_auc,last_val_acc
+moxifloxacin,full,320,2,1981,183,1798,887,205,682,True,1981,887,0.8526822115728488,0.8526822115728488,0.8861330326944757
+moxifloxacin,full,320,4,1080,212,868,1788,176,1612,True,1080,1788,0.7206956350101511,0.7206956350101511,0.930089485458613
