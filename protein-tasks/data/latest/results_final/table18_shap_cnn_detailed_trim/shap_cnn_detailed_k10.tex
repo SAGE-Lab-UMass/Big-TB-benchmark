@@ -1,0 +1,24 @@
+\begin{table}[ht]
+\centering
+\small
+\caption{\small SHAP recovery for CNN-OHE at top-$k{=}10$ by drug/gene. Total resistance positions from the WHO set.}
+\label{tab:shap_cnn_detailed}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{l l r r c c c l}
+\toprule
+\textbf{Drug} & \textbf{Gene} & \textbf{\#Res.~Pos.} & \textbf{TP@10} & \textbf{Prec@10} & \textbf{Rec@10} & \textbf{F1@10} & \textbf{Identified Variants} \\
+\midrule
+amikacin & \textit{ALL} & 0 & 0 & 0.000 & 0.000 & 0.000 & nan \\
+capreomycin & \textit{ALL} & 2 & 1 & 0.100 & 0.500 & 0.167 & tlyA\_p.Gly232Asp \\
+ethambutol & \textit{ALL} & 6 & 6 & 0.600 & 1.000 & 0.750 & embB\_p.Asp328Tyr, embB\_p.Asp354Ala, embB\_p.Gln497Arg, embB\_p.Gly406Ala, embB\_p.Met306Ile, embB\_p.Tyr319Cys \\
+ethionamide & \textit{ALL} & 10 & 1 & 0.100 & 0.100 & 0.100 & inhA\_p.Ser94Ala \\
+isoniazid & \textit{ALL} & 3 & 2 & 0.200 & 0.667 & 0.308 & katG\_p.Ser315Arg, inhA\_p.Ser94Ala \\
+levofloxacin & \textit{ALL} & 10 & 7 & 0.700 & 0.700 & 0.700 & gyrB\_p.Asn499Asp, gyrB\_p.Ser447Phe, gyrA\_p.Ala90Val, gyrA\_p.Asp89Asn, gyrA\_p.Asp94Ala, gyrA\_p.Gly88Ala, gyrA\_p.Ser91Pro \\
+moxifloxacin & \textit{ALL} & 10 & 5 & 0.500 & 0.500 & 0.500 & gyrA\_p.Ala90Val, gyrA\_p.Asp89Asn, gyrA\_p.Asp94Ala, gyrA\_p.Gly88Ala, gyrA\_p.Ser91Pro \\
+pyrazinamide & \textit{ALL} & 95 & 10 & 1.000 & 0.105 & 0.190 & pncA\_p.Asp8Ala, pncA\_p.Cys138Arg, pncA\_p.Gln10Arg, pncA\_p.Gln141Pro, pncA\_p.His51Arg, pncA\_p.His57Arg, pncA\_p.Leu85Arg, pncA\_p.Pro69Leu, pncA\_p.Thr135Asn, pncA\_p.Val139Ala \\
+rifampicin & \textit{ALL} & 26 & 10 & 1.000 & 0.385 & 0.556 & rpoB\_p.Arg448Gln, rpoB\_p.Asp435Ala, rpoB\_p.Gln432Asn, rpoB\_p.Gln436Arg, rpoB\_p.His445Arg, rpoB\_p.Leu452Met, rpoB\_p.Met434Arg, rpoB\_p.Ser441Ala, rpoB\_p.Ser450Ala, rpoB\_p.Val170Phe \\
+streptomycin & \textit{ALL} & 10 & 7 & 0.700 & 0.700 & 0.700 & rpsL\_p.Lys43Arg, rpsL\_p.Lys88Arg, gid\_p.Asp67His, gid\_p.Gly73Ala, gid\_p.His48Gln, gid\_p.Pro84Leu, gid\_p.Ser70Asn \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
