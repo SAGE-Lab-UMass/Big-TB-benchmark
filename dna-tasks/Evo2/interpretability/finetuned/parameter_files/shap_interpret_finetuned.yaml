@@ -1,0 +1,27 @@
+drug: ISONIAZID
+
+model_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/training_output/lora_finetuned
+geno_pheno_csv: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/data/multidrug_classification/training/geno_pheno_full_combined.csv
+lineage_csv: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/BIG_TB_isolates_with_lineages.csv
+fasta_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/genomic_data/aligned
+WHO_VCF_mapped_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/vcf_who_mapped_data
+output_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB-evo2-finetuned/dna-tasks/Evo2/interpretability/finetuned/outputs
+
+# PYRAZINAMIDE heldout_lineage_1 is the only lineage (across all drugs) with a
+# complete best/ checkpoint but no test_metrics.json; include it via its best model.
+require_test_metrics: false
+has_neg_strand: true
+k_values: [1, 5, 10]
+top_n_positions: 100
+
+background_frac: 0.2
+max_background: 160
+max_explain: 360
+val_frac: 0.2
+random_seed: 42
+
+hidden_batch_size: 1
+shap_batch_size: 1
+shap_background_batch_size: 8
+hidden_dtype: float16
+save_shap_values: false

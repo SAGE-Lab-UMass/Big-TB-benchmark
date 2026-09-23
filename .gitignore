@@ -47,3 +47,10 @@ dna-tasks/Evo2/sbatch_embed_gen_logs/
 # Local Evo2 cluster/runtime profile. Commit only the example profile.
 dna-tasks/Evo2/.evo2-site.env
 dna-tasks/Evo2/site.env.example
+
+# remove interpretability output files
+dna-tasks/Evo2/interpretability/finetuned/logs
+dna-tasks/Evo2/interpretability/finetuned/outputs
+dna-tasks/Evo2/interpretability/finetuned/activations_debug.log
+
+
