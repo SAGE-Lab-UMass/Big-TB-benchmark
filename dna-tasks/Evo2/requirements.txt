@@ -1,0 +1,31 @@
+# Unified Evo2 environment for embedding generation and downstream training
+# (random and lineage-holdout splits).
+#
+# Platform: Linux x86_64, Python 3.12, CUDA 12.8.
+# Install with: python -m pip install -r requirements.txt
+
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+# Evo2 7B inference stack. The FlashAttention wheel is selected for the same
+# Python, PyTorch, CUDA, and C++ ABI as the pinned PyTorch wheel.
+torch==2.7.1+cu128
+flash-attn @ https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.0.post2/flash_attn-2.8.0.post2%2Bcu12torch2.7cxx11abiTRUE-cp312-cp312-linux_x86_64.whl
+evo2==0.6.0
+vtx==1.1.0
+einops==0.8.1
+huggingface-hub==1.4.1
+
+# Embedding preparation and storage.
+biopython==1.86
+h5py==3.14.0
+numpy==1.26.4
+pandas==2.3.3
+scikit-learn==1.7.0
+scipy==1.16.0
+tqdm==4.67.1
+PyYAML==6.0.3
+
+# Random-split and lineage-holdout downstream training/evaluation utilities.
+tensorboard==2.21.0
+transformers==5.2.0
+ipdb==0.13.13
