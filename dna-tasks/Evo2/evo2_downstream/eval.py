@@ -95,7 +95,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--threshold_dir", type=str, default=None)
     parser.add_argument("--random_seed", type=int, default=1)
     parser.add_argument("--fold", type=int, choices=range(1, 6), default=None)
-    parser.add_argument("--pca_components", type=int, default=10)
+    parser.add_argument(
+        "--pca_components",
+        type=int,
+        default=10,
+        help="Component count in precomputed PCA embedding files",
+    )
     parser.add_argument("--max_length", type=int, default=5000)
     return parser
 
@@ -123,16 +128,19 @@ def _load_dataset(args) -> Tuple[Subset, Subset, int, int]:
 
     loci = DRUG_TO_LOCI[args.drug]
     if len(loci) == 1:
-        meta_paths = sorted(
-            glob.glob(
-                f"{args.saved_embed_memmap_dir}/{loci[0]}/*_{args.embed_type}_meta.npz"
+        if args.embed_type == "pca":
+            meta_pattern = (
+                f"{args.saved_embed_memmap_dir}/{loci[0]}"
+                f"/*_pc{args.pca_components}_meta.npz"
             )
-        )
+        else:
+            meta_pattern = (
+                f"{args.saved_embed_memmap_dir}/{loci[0]}"
+                f"/*_{args.embed_type}_meta.npz"
+            )
+        meta_paths = sorted(glob.glob(meta_pattern))
         if not meta_paths:
-            raise FileNotFoundError(
-                f"No {args.embed_type} metadata found for {loci[0]} under "
-                f"{args.saved_embed_memmap_dir}"
-            )
+            raise FileNotFoundError(f"No embedding metadata matched {meta_pattern}")
         if args.embed_type == "token":
             full_dataset = TokenMemmapMap(meta_paths, full_label_map)
         elif args.embed_type == "pca":

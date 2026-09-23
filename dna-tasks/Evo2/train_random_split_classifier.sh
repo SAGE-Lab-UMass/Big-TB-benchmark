@@ -11,7 +11,22 @@
 
 set -euo pipefail
 
-EVO2_DIR="${EVO2_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+if [[ -z "${EVO2_DIR:-}" ]]; then
+    EVO2_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    # Slurm runs a spool copy; direct sbatch submissions use the submit directory.
+    if [[ ! -r "${EVO2_DIR}/evo2_env.sh" && -n "${SLURM_SUBMIT_DIR:-}" ]]; then
+        EVO2_DIR="${SLURM_SUBMIT_DIR}"
+    fi
+fi
+if [[ ! -r "${EVO2_DIR}/evo2_env.sh" ]]; then
+    echo "Cannot find evo2_env.sh in ${EVO2_DIR}. Set EVO2_DIR to the Evo2 project directory before submitting." >&2
+    exit 1
+fi
+CONDA_ROOT="${CONDA_ROOT:-/work/pi_annagreen_umass_edu/saishradha/miniconda3}"
+# Use the downstream-training environment even if EVO2_TRAIN_PYTHON was
+# exported previously for another Evo2 workflow. TRAIN_PYTHON is the explicit
+# override for this launcher.
+export EVO2_TRAIN_PYTHON="${TRAIN_PYTHON:-${CONDA_ROOT}/envs/dnabert_s/bin/python}"
 # shellcheck source=evo2_env.sh
 source "${EVO2_DIR}/evo2_env.sh"
 

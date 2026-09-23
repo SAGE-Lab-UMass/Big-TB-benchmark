@@ -58,8 +58,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fold", type=int, choices=range(1, 6), default=None)
     parser.add_argument("--data_loader_workers", type=int, default=0)
     parser.add_argument("--skip_completed", action="store_true")
-    parser.add_argument("--pca_components", type=int, default=10)
-    parser.add_argument("--use_pca", action="store_true")
+    parser.add_argument(
+        "--pca_components", type=int, default=10,
+        help="Component count in precomputed PCA embedding files",
+    )
     
     # Early stopping parameters (matching SD-CNN defaults)
     parser.add_argument("--early_stopping_min_epochs", type=int, default=5,

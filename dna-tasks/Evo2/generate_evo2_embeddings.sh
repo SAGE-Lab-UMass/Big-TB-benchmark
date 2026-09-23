@@ -1,16 +1,25 @@
 #!/bin/bash
-# Generate Evo2 token embeddings for one gene on Slurm.
+# Generate Evo2 embeddings (token/mean_seq/mean_dim) for one gene on Slurm.
 # Use SMOKE_TEST=1 for the five-isolate validation profile.
+# --partition here is only a default; override with `sbatch --partition=<name>`
+# if your account requires a different GPU partition (e.g. a lab-specific one).
+#SBATCH --partition=gpu
 #SBATCH -G 1                  # Number of GPUs
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=500G
-#SBATCH --time=7:00:00
+#SBATCH --time=10:00:00
 #SBATCH --job-name=evo2_embeddings
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Slurm copies this script into a spool directory before running it, so
+# BASH_SOURCE no longer points at the real file; fall back to the submit dir.
+if [[ -n "${SLURM_SUBMIT_DIR:-}" ]]; then
+    SCRIPT_DIR="${SLURM_SUBMIT_DIR}"
+else
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
 # shellcheck source=evo2_env.sh
 source "${SCRIPT_DIR}/evo2_env.sh"
 
@@ -18,18 +27,24 @@ export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:T
 
 GENE_FILE="${GENE_FILE:-${EVO2_DIR}/ordered_genes.txt}"
 
+# EMBED_TYPE selects the pooling saved by the python entry point; the default
+# root mirrors the existing scratch token layout so runs never collide.
+EMBED_TYPE="${EMBED_TYPE:-token}"
+SCRATCH_EMBED_BASE="${SCRATCH_EMBED_BASE:-/scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/embeddings/zero-shot}"
+DEFAULT_EMBED_ROOT="${SCRATCH_EMBED_BASE}/${EMBED_TYPE}/layer20"
+
 # The same worker handles both a small smoke test and production array tasks.
 # SMOKE_TEST=1 selects conservative defaults without duplicating the Evo2
 # command in a second launcher. Every value remains individually overridable.
 if [[ "${SMOKE_TEST:-0}" == "1" ]]; then
-    EMBED_ROOT="${EMBED_ROOT:-${EVO2_EMBED_ROOT}/smoke}"
+    EMBED_ROOT="${EMBED_ROOT:-${DEFAULT_EMBED_ROOT}/smoke}"
     GENE="${GENE:-rpoB}"
     DRUG="${DRUG:-RIFAMPICIN}"
     FULL_BATCH_SIZE="${FULL_BATCH_SIZE:-5}"
     MAX_ISOLATES="${MAX_ISOLATES:-5}"
     RESUME="${RESUME:-0}"
 else
-    EMBED_ROOT="${EMBED_ROOT:-${EVO2_EMBED_ROOT}}"
+    EMBED_ROOT="${EMBED_ROOT:-${DEFAULT_EMBED_ROOT}/full}"
     DRUG="${DRUG:-ALL}"
     FULL_BATCH_SIZE="${FULL_BATCH_SIZE:-2}"
     MAX_ISOLATES="${MAX_ISOLATES:-}"
@@ -89,7 +104,7 @@ evo2_run "${EVO2_EMBED_PYTHON}" -m evo2_embed_gen.embeddings.generate_embeddings
     --genes "${GENE}" \
     --drug "${DRUG}" \
     --is_single_gene_algo \
-    --embed_type "token" \
+    --embed_type "${EMBED_TYPE}" \
     --save_dtype "float16" \
     --stack_phenotypes \
     "${EXTRA_ARGS[@]}" \

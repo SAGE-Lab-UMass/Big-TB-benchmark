@@ -15,7 +15,8 @@ export PYTHONNOUSERSITE=1
 export PYTHONPATH="${EVO2_DIR}${PYTHONPATH:+:${PYTHONPATH}}"
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
-EVAL_PYTHON="${EVAL_PYTHON:-/work/pi_annagreen_umass_edu/saishradha/miniconda3/envs/dnabert_s/bin/python}"
+CONDA_ROOT="${CONDA_ROOT:-/work/pi_annagreen_umass_edu/saishradha/miniconda3}"
+EVAL_PYTHON="${EVAL_PYTHON:-${CONDA_ROOT}/envs/dnabert_s/bin/python}"
 
 DRUG="${DRUG:?DRUG must be set}"
 EMBED_TYPE="${EMBED_TYPE:-token}"
