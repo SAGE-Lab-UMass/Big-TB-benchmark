@@ -17,6 +17,13 @@ dna-tasks/Evo2/
 
 
 # for this push just keep regression updates
+latex_paper
+skills
+slurm
+
+
+*.pdf
+*.pptx
 
 # SD-CNN lineage-aware split runtime artifacts
 dna-tasks/SD-CNN/model_training/lineage_aware_data_split/logs/
@@ -25,6 +32,7 @@ dna-tasks/SD-CNN/model_training/lineage_aware_data_split/submit_sdcnn_lineage_ho
 
 # SD-CNN lineage-aware runtime outputs
 dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/**
+dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/*
 !dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/test_set_metrics.csv
 
 # MD-CNN/MDCNN lineage-aware split runtime artifacts
@@ -38,3 +46,17 @@ dna-tasks/Regression/run_lineage_holdout_all_drugs_sai.sh
 dna-tasks/Regression/training_output/lineage_aware_results_logreg_1000/*
 !dna-tasks/Regression/training_output/lineage_aware_results_logreg_1000/test_set_metrics.csv
 dna-tasks/Regression/training_output/**/saved_models/
+dna-tasks/Regression/lineage_aware_data_split/
+dna-tasks/Regression/training_output/
+
+# Evo2 lineage-aware split runtime artifacts
+dna-tasks/Evo2/lineage_aware_data_split
+dna-tasks/Evo2/training_output/
+dna-tasks/Evo2/data/
+dna-tasks/Evo2/sbatch_finetune_logs
+dna-tasks/Evo2/sbatch_zero_shot_lineage_holdout_logs
+dna-tasks/Evo2/sbatch_embed_gen_logs/
+
+# Local Evo2 cluster/runtime profile. Commit only the example profile.
+dna-tasks/Evo2/.evo2-site.env
+dna-tasks/Evo2/site.env.example

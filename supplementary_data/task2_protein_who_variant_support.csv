@@ -1,0 +1,380 @@
+Drug,Gene,WHO variant,WHO confidence,Amino-acid position,Model-ready isolates,Carrier isolates,Resistant carriers,Susceptible carriers,Resistant among carriers,Exact variant observed
+Rifampicin,rpoB,rpoB_p.Val170Phe,1) Assoc w R,170,17582,44,43,1,0.9772727272727273,True
+Rifampicin,rpoB,rpoB_p.Gly426Ser,2) Assoc w R - Interim,426,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Thr427Ala,2) Assoc w R - Interim,427,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Thr427Asn,2) Assoc w R - Interim,427,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Thr427Gly,2) Assoc w R - Interim,427,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Thr427Ile,2) Assoc w R - Interim,427,17582,4,4,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Thr427Pro,2) Assoc w R - Interim,427,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Thr427Ser,2) Assoc w R - Interim,427,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser428Arg,2) Assoc w R - Interim,428,17582,6,6,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser428Gly,2) Assoc w R - Interim,428,17582,4,4,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser428Ile,2) Assoc w R - Interim,428,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ser428Thr,2) Assoc w R - Interim,428,17582,2,2,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Gln429His,2) Assoc w R - Interim,429,17582,8,7,1,0.875,True
+Rifampicin,rpoB,rpoB_p.Gln429Leu,2) Assoc w R - Interim,429,17582,2,2,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Gln429Pro,2) Assoc w R - Interim,429,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Leu430Arg,2) Assoc w R - Interim,430,17582,16,15,1,0.9375,True
+Rifampicin,rpoB,rpoB_p.Leu430Pro,1) Assoc w R,430,17582,69,39,30,0.5652173913043478,True
+Rifampicin,rpoB,rpoB_p.Ser431Arg,2) Assoc w R - Interim,431,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ser431Asn,2) Assoc w R - Interim,431,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ser431Gly,2) Assoc w R - Interim,431,17582,4,4,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser431Thr,2) Assoc w R - Interim,431,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Gln432Asn,2) Assoc w R - Interim,432,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Gln432Glu,2) Assoc w R - Interim,432,17582,2,2,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Gln432His,2) Assoc w R - Interim,432,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Gln432Leu,1) Assoc w R,432,17582,10,10,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Gln432Lys,1) Assoc w R,432,17582,19,19,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Gln432Pro,1) Assoc w R,432,17582,13,13,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Met434Arg,2) Assoc w R - Interim,434,17582,2,2,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Met434Ile,2) Assoc w R - Interim,434,17582,21,18,3,0.8571428571428571,True
+Rifampicin,rpoB,rpoB_p.Met434Leu,2) Assoc w R - Interim,434,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Met434Thr,2) Assoc w R - Interim,434,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Met434Val,2) Assoc w R - Interim,434,17582,2,1,1,0.5,True
+Rifampicin,rpoB,rpoB_p.Asp435Ala,2) Assoc w R - Interim,435,17582,8,6,2,0.75,True
+Rifampicin,rpoB,rpoB_p.Asp435Asn,2) Assoc w R - Interim,435,17582,2,2,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Asp435Glu,2) Assoc w R - Interim,435,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Asp435Gly,2) Assoc w R - Interim,435,17582,53,50,3,0.9433962264150944,True
+Rifampicin,rpoB,rpoB_p.Asp435His,2) Assoc w R - Interim,435,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Asp435Leu,2) Assoc w R - Interim,435,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Asp435Phe,1) Assoc w R,435,17582,27,23,4,0.8518518518518519,True
+Rifampicin,rpoB,rpoB_p.Asp435Tyr,1) Assoc w R,435,17582,147,119,28,0.8095238095238095,True
+Rifampicin,rpoB,rpoB_p.Asp435Val,1) Assoc w R,435,17582,428,422,6,0.985981308411215,True
+Rifampicin,rpoB,rpoB_p.Gln436Arg,2) Assoc w R - Interim,436,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Gln436Asn,2) Assoc w R - Interim,436,17582,1,0,1,0.0,True
+Rifampicin,rpoB,rpoB_p.Gln436Pro,2) Assoc w R - Interim,436,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Asn437Asp,2) Assoc w R - Interim,437,17582,6,5,1,0.8333333333333334,True
+Rifampicin,rpoB,rpoB_p.Asn437His,2) Assoc w R - Interim,437,17582,3,3,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Asn437Ile,2) Assoc w R - Interim,437,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Asn437Ser,2) Assoc w R - Interim,437,17582,2,2,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Asn437Tyr,2) Assoc w R - Interim,437,17582,1,0,1,0.0,True
+Rifampicin,rpoB,rpoB_p.Pro439Ala,2) Assoc w R - Interim,439,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Pro439Leu,2) Assoc w R - Interim,439,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Pro439Ser,2) Assoc w R - Interim,439,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser441Ala,2) Assoc w R - Interim,441,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ser441Gln,1) Assoc w R,441,17582,4,3,1,0.75,True
+Rifampicin,rpoB,rpoB_p.Ser441Leu,1) Assoc w R,441,17582,17,15,2,0.8823529411764706,True
+Rifampicin,rpoB,rpoB_p.Ser441Lys,2) Assoc w R - Interim,441,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ser441Met,2) Assoc w R - Interim,441,17582,3,3,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser441Trp,2) Assoc w R - Interim,441,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ser441Val,2) Assoc w R - Interim,441,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Leu443Phe,2) Assoc w R - Interim,443,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Leu443Ser,2) Assoc w R - Interim,443,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Leu443Trp,2) Assoc w R - Interim,443,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Thr444Ile,2) Assoc w R - Interim,444,17582,2,2,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Thr444Pro,2) Assoc w R - Interim,444,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Thr444Ser,2) Assoc w R - Interim,444,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.His445Arg,1) Assoc w R,445,17582,50,49,1,0.98,True
+Rifampicin,rpoB,rpoB_p.His445Asn,1) Assoc w R,445,17582,54,21,33,0.3888888888888889,True
+Rifampicin,rpoB,rpoB_p.His445Asp,1) Assoc w R,445,17582,164,162,2,0.9878048780487805,True
+Rifampicin,rpoB,rpoB_p.His445Cys,1) Assoc w R,445,17582,23,23,0,1.0,True
+Rifampicin,rpoB,rpoB_p.His445Gln,2) Assoc w R - Interim,445,17582,8,8,0,1.0,True
+Rifampicin,rpoB,rpoB_p.His445Gly,2) Assoc w R - Interim,445,17582,6,5,1,0.8333333333333334,True
+Rifampicin,rpoB,rpoB_p.His445Leu,1) Assoc w R,445,17582,64,61,3,0.953125,True
+Rifampicin,rpoB,rpoB_p.His445Phe,2) Assoc w R - Interim,445,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.His445Pro,2) Assoc w R - Interim,445,17582,5,5,0,1.0,True
+Rifampicin,rpoB,rpoB_p.His445Ser,1) Assoc w R,445,17582,6,5,1,0.8333333333333334,True
+Rifampicin,rpoB,rpoB_p.His445Thr,2) Assoc w R - Interim,445,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.His445Tyr,1) Assoc w R,445,17582,211,206,5,0.976303317535545,True
+Rifampicin,rpoB,rpoB_p.Lys446Arg,2) Assoc w R - Interim,446,17582,3,3,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Lys446Gln,2) Assoc w R - Interim,446,17582,4,4,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Lys446Glu,2) Assoc w R - Interim,446,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Lys446Thr,2) Assoc w R - Interim,446,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Arg448Gln,2) Assoc w R - Interim,448,17582,6,6,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Arg448Leu,2) Assoc w R - Interim,448,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Arg448Lys,2) Assoc w R - Interim,448,17582,2,2,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Leu449Met,2) Assoc w R - Interim,449,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser450Ala,2) Assoc w R - Interim,450,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ser450Cys,2) Assoc w R - Interim,450,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser450Gln,2) Assoc w R - Interim,450,17582,11,11,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser450Gly,2) Assoc w R - Interim,450,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ser450Leu,1) Assoc w R,450,17582,3019,2946,73,0.975819807883405,True
+Rifampicin,rpoB,rpoB_p.Ser450Met,2) Assoc w R - Interim,450,17582,4,3,1,0.75,True
+Rifampicin,rpoB,rpoB_p.Ser450Phe,1) Assoc w R,450,17582,35,35,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser450Trp,1) Assoc w R,450,17582,89,84,5,0.9438202247191011,True
+Rifampicin,rpoB,rpoB_p.Ser450Tyr,1) Assoc w R,450,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ser450Val,2) Assoc w R - Interim,450,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ala451Gly,2) Assoc w R - Interim,451,17582,2,2,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Ala451Val,2) Assoc w R - Interim,451,17582,1,1,0,1.0,True
+Rifampicin,rpoB,rpoB_p.Leu452Met,2) Assoc w R - Interim,452,17582,1,0,1,0.0,True
+Rifampicin,rpoB,rpoB_p.Leu452Pro,1) Assoc w R,452,17582,141,113,28,0.8014184397163121,True
+Rifampicin,rpoB,rpoB_p.Leu452Val,2) Assoc w R - Interim,452,17582,0,0,0,,False
+Rifampicin,rpoB,rpoB_p.Ile491Phe,1) Assoc w R,491,17582,67,41,26,0.6119402985074627,True
+Isoniazid,inhA,inhA_p.Ser94Ala,2) Assoc w R - Interim,94,17436,143,134,9,0.9370629370629371,True
+Isoniazid,katG,katG_p.Ser315Arg,1) Assoc w R,315,17436,5,4,1,0.8,True
+Isoniazid,katG,katG_p.Ser315Asn,1) Assoc w R,315,17436,83,83,0,1.0,True
+Isoniazid,katG,katG_p.Ser315Ile,2) Assoc w R - Interim,315,17436,8,8,0,1.0,True
+Isoniazid,katG,katG_p.Ser315Thr,1) Assoc w R,315,17436,4290,4222,68,0.9841491841491842,True
+Isoniazid,katG,katG_p.Trp328Leu,1) Assoc w R,328,17436,9,9,0,1.0,True
+Ethambutol,embB,embB_p.Met306Ile,1) Assoc w R,306,15111,963,696,267,0.7227414330218068,True
+Ethambutol,embB,embB_p.Met306Leu,1) Assoc w R,306,15111,46,33,13,0.717391304347826,True
+Ethambutol,embB,embB_p.Met306Val,1) Assoc w R,306,15111,1008,839,169,0.8323412698412699,True
+Ethambutol,embB,embB_p.Tyr319Cys,1) Assoc w R,319,15111,13,10,3,0.7692307692307693,True
+Ethambutol,embB,embB_p.Tyr319Ser,1) Assoc w R,319,15111,64,56,8,0.875,True
+Ethambutol,embB,embB_p.Asp328Tyr,1) Assoc w R,328,15111,21,18,3,0.8571428571428571,True
+Ethambutol,embB,embB_p.Asp354Ala,1) Assoc w R,354,15111,274,155,119,0.5656934306569343,True
+Ethambutol,embB,embB_p.Gly406Ala,1) Assoc w R,406,15111,151,106,45,0.7019867549668874,True
+Ethambutol,embB,embB_p.Gly406Asp,1) Assoc w R,406,15111,137,87,50,0.635036496350365,True
+Ethambutol,embB,embB_p.Gly406Cys,1) Assoc w R,406,15111,10,8,2,0.8,True
+Ethambutol,embB,embB_p.Gly406Ser,1) Assoc w R,406,15111,84,64,20,0.7619047619047619,True
+Ethambutol,embB,embB_p.Gln497Arg,1) Assoc w R,497,15111,270,217,53,0.8037037037037037,True
+Ethambutol,embB,embB_p.Gln497Lys,1) Assoc w R,497,15111,44,29,15,0.6590909090909091,True
+Pyrazinamide,pncA,pncA_p.Ala3Glu,2) Assoc w R - Interim,3,12842,1,0,1,0.0,True
+Pyrazinamide,pncA,pncA_p.Leu4Ser,1) Assoc w R,4,12842,38,34,4,0.8947368421052632,True
+Pyrazinamide,pncA,pncA_p.Leu4Trp,1) Assoc w R,4,12842,10,7,3,0.7,True
+Pyrazinamide,pncA,pncA_p.Ile5Ser,1) Assoc w R,5,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Ile6Thr,1) Assoc w R,6,12842,10,10,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val7Ala,2) Assoc w R - Interim,7,12842,1,0,1,0.0,True
+Pyrazinamide,pncA,pncA_p.Val7Gly,1) Assoc w R,7,12842,11,10,1,0.9090909090909091,True
+Pyrazinamide,pncA,pncA_p.Val7Leu,1) Assoc w R,7,12842,2,1,1,0.5,True
+Pyrazinamide,pncA,pncA_p.Val7Phe,2) Assoc w R - Interim,7,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Asp8Ala,2) Assoc w R - Interim,8,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Asp8Asn,1) Assoc w R,8,12842,9,9,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Asp8Glu,1) Assoc w R,8,12842,6,5,1,0.8333333333333334,True
+Pyrazinamide,pncA,pncA_p.Asp8Gly,1) Assoc w R,8,12842,9,8,1,0.8888888888888888,True
+Pyrazinamide,pncA,pncA_p.Asp8His,2) Assoc w R - Interim,8,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Asp8Tyr,2) Assoc w R - Interim,8,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Val9Gly,1) Assoc w R,9,12842,7,6,1,0.8571428571428571,True
+Pyrazinamide,pncA,pncA_p.Gln10Arg,1) Assoc w R,10,12842,64,59,5,0.921875,True
+Pyrazinamide,pncA,pncA_p.Gln10His,1) Assoc w R,10,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Gln10Pro,1) Assoc w R,10,12842,48,44,4,0.9166666666666666,True
+Pyrazinamide,pncA,pncA_p.Asp12Ala,1) Assoc w R,12,12842,23,12,11,0.5217391304347826,True
+Pyrazinamide,pncA,pncA_p.Asp12Asn,2) Assoc w R - Interim,12,12842,5,5,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Asp12Glu,1) Assoc w R,12,12842,3,2,1,0.6666666666666666,True
+Pyrazinamide,pncA,pncA_p.Asp12Gly,1) Assoc w R,12,12842,9,7,2,0.7777777777777778,True
+Pyrazinamide,pncA,pncA_p.Phe13Ile,1) Assoc w R,13,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Phe13Leu,2) Assoc w R - Interim,13,12842,8,7,1,0.875,True
+Pyrazinamide,pncA,pncA_p.Phe13Ser,1) Assoc w R,13,12842,3,0,3,0.0,True
+Pyrazinamide,pncA,pncA_p.Cys14Arg,1) Assoc w R,14,12842,36,35,1,0.9722222222222222,True
+Pyrazinamide,pncA,pncA_p.Cys14Trp,2) Assoc w R - Interim,14,12842,2,1,1,0.5,True
+Pyrazinamide,pncA,pncA_p.Gly17Asp,2) Assoc w R - Interim,17,12842,2,1,1,0.5,True
+Pyrazinamide,pncA,pncA_p.Leu19Pro,1) Assoc w R,19,12842,5,4,1,0.8,True
+Pyrazinamide,pncA,pncA_p.Val21Gly,2) Assoc w R - Interim,21,12842,13,9,4,0.6923076923076923,True
+Pyrazinamide,pncA,pncA_p.Gly24Asp,1) Assoc w R,24,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Leu27Pro,1) Assoc w R,27,12842,8,6,2,0.75,True
+Pyrazinamide,pncA,pncA_p.Ile31Ser,1) Assoc w R,31,12842,4,4,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ile31Thr,2) Assoc w R - Interim,31,12842,1,0,1,0.0,True
+Pyrazinamide,pncA,pncA_p.Tyr34Asp,1) Assoc w R,34,12842,7,7,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Tyr34Ser,2) Assoc w R - Interim,34,12842,2,1,1,0.5,True
+Pyrazinamide,pncA,pncA_p.Leu35Pro,2) Assoc w R - Interim,35,12842,3,2,1,0.6666666666666666,True
+Pyrazinamide,pncA,pncA_p.His43Pro,2) Assoc w R - Interim,43,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val44Gly,2) Assoc w R - Interim,44,12842,3,2,1,0.6666666666666666,True
+Pyrazinamide,pncA,pncA_p.Ala46Glu,2) Assoc w R - Interim,46,12842,3,2,1,0.6666666666666666,True
+Pyrazinamide,pncA,pncA_p.Ala46Val,2) Assoc w R - Interim,46,12842,4,2,2,0.5,True
+Pyrazinamide,pncA,pncA_p.Thr47Ala,1) Assoc w R,47,12842,11,3,8,0.2727272727272727,True
+Pyrazinamide,pncA,pncA_p.Thr47Pro,1) Assoc w R,47,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Lys48Glu,2) Assoc w R - Interim,48,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Lys48Thr,2) Assoc w R - Interim,48,12842,41,18,23,0.43902439024390244,True
+Pyrazinamide,pncA,pncA_p.Asp49Ala,1) Assoc w R,49,12842,6,6,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Asp49Asn,2) Assoc w R - Interim,49,12842,14,13,1,0.9285714285714286,True
+Pyrazinamide,pncA,pncA_p.Asp49Glu,2) Assoc w R - Interim,49,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Asp49Gly,1) Assoc w R,49,12842,9,8,1,0.8888888888888888,True
+Pyrazinamide,pncA,pncA_p.His51Arg,1) Assoc w R,51,12842,90,81,9,0.9,True
+Pyrazinamide,pncA,pncA_p.His51Asp,1) Assoc w R,51,12842,24,24,0,1.0,True
+Pyrazinamide,pncA,pncA_p.His51Gln,1) Assoc w R,51,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.His51Pro,1) Assoc w R,51,12842,2,1,1,0.5,True
+Pyrazinamide,pncA,pncA_p.His51Tyr,1) Assoc w R,51,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Pro54Arg,1) Assoc w R,54,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Pro54Gln,2) Assoc w R - Interim,54,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Pro54Leu,1) Assoc w R,54,12842,31,27,4,0.8709677419354839,True
+Pyrazinamide,pncA,pncA_p.Pro54Ser,2) Assoc w R - Interim,54,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Pro54Thr,2) Assoc w R - Interim,54,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.His57Arg,1) Assoc w R,57,12842,24,24,0,1.0,True
+Pyrazinamide,pncA,pncA_p.His57Asp,1) Assoc w R,57,12842,73,71,2,0.9726027397260274,True
+Pyrazinamide,pncA,pncA_p.His57Gln,2) Assoc w R - Interim,57,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.His57Leu,2) Assoc w R - Interim,57,12842,6,5,1,0.8333333333333334,True
+Pyrazinamide,pncA,pncA_p.His57Tyr,1) Assoc w R,57,12842,4,4,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Phe58Cys,2) Assoc w R - Interim,58,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Phe58Leu,1) Assoc w R,58,12842,10,5,5,0.5,True
+Pyrazinamide,pncA,pncA_p.Phe58Ser,2) Assoc w R - Interim,58,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ser59Pro,1) Assoc w R,59,12842,4,4,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Thr61Pro,2) Assoc w R - Interim,61,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Pro62Arg,2) Assoc w R - Interim,62,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Pro62Leu,1) Assoc w R,62,12842,4,4,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Pro62Ser,2) Assoc w R - Interim,62,12842,6,4,2,0.6666666666666666,True
+Pyrazinamide,pncA,pncA_p.Pro62Thr,2) Assoc w R - Interim,62,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Asp63Ala,1) Assoc w R,63,12842,12,9,3,0.75,True
+Pyrazinamide,pncA,pncA_p.Asp63Gly,2) Assoc w R - Interim,63,12842,6,3,3,0.5,True
+Pyrazinamide,pncA,pncA_p.Tyr64Asp,2) Assoc w R - Interim,64,12842,2,1,1,0.5,True
+Pyrazinamide,pncA,pncA_p.Ser66Pro,1) Assoc w R,66,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ser67Pro,1) Assoc w R,67,12842,11,11,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Trp68Arg,1) Assoc w R,68,12842,11,10,1,0.9090909090909091,True
+Pyrazinamide,pncA,pncA_p.Trp68Cys,1) Assoc w R,68,12842,3,3,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Trp68Gly,1) Assoc w R,68,12842,23,20,3,0.8695652173913043,True
+Pyrazinamide,pncA,pncA_p.Trp68Leu,2) Assoc w R - Interim,68,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Pro69Leu,1) Assoc w R,69,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.His71Arg,1) Assoc w R,71,12842,10,6,4,0.6,True
+Pyrazinamide,pncA,pncA_p.His71Pro,1) Assoc w R,71,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.His71Tyr,1) Assoc w R,71,12842,21,17,4,0.8095238095238095,True
+Pyrazinamide,pncA,pncA_p.Cys72Arg,1) Assoc w R,72,12842,3,2,1,0.6666666666666666,True
+Pyrazinamide,pncA,pncA_p.Cys72Tyr,2) Assoc w R - Interim,72,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Thr76Ile,1) Assoc w R,76,12842,2,1,1,0.5,True
+Pyrazinamide,pncA,pncA_p.Thr76Pro,1) Assoc w R,76,12842,20,18,2,0.9,True
+Pyrazinamide,pncA,pncA_p.Gly78Asp,2) Assoc w R - Interim,78,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Gly78Ser,2) Assoc w R - Interim,78,12842,3,1,2,0.3333333333333333,True
+Pyrazinamide,pncA,pncA_p.Gly78Val,2) Assoc w R - Interim,78,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.His82Arg,1) Assoc w R,82,12842,5,4,1,0.8,True
+Pyrazinamide,pncA,pncA_p.Leu85Arg,1) Assoc w R,85,12842,7,5,2,0.7142857142857143,True
+Pyrazinamide,pncA,pncA_p.Leu85Pro,1) Assoc w R,85,12842,8,7,1,0.875,True
+Pyrazinamide,pncA,pncA_p.Ile90Asn,2) Assoc w R - Interim,90,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Ile90Ser,1) Assoc w R,90,12842,7,4,3,0.5714285714285714,True
+Pyrazinamide,pncA,pncA_p.Ile90Thr,2) Assoc w R - Interim,90,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Val93Ala,2) Assoc w R - Interim,93,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Val93Leu,2) Assoc w R - Interim,93,12842,5,5,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Phe94Cys,1) Assoc w R,94,12842,3,2,1,0.6666666666666666,True
+Pyrazinamide,pncA,pncA_p.Phe94Leu,1) Assoc w R,94,12842,6,3,3,0.5,True
+Pyrazinamide,pncA,pncA_p.Phe94Ser,2) Assoc w R - Interim,94,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Tyr95Asp,2) Assoc w R - Interim,95,12842,1,0,1,0.0,True
+Pyrazinamide,pncA,pncA_p.Lys96Arg,1) Assoc w R,96,12842,13,8,5,0.6153846153846154,True
+Pyrazinamide,pncA,pncA_p.Lys96Asn,2) Assoc w R - Interim,96,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Lys96Gln,1) Assoc w R,96,12842,3,1,2,0.3333333333333333,True
+Pyrazinamide,pncA,pncA_p.Lys96Glu,1) Assoc w R,96,12842,5,5,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Lys96Thr,1) Assoc w R,96,12842,9,9,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Gly97Arg,1) Assoc w R,97,12842,3,3,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Gly97Asp,1) Assoc w R,97,12842,30,26,4,0.8666666666666667,True
+Pyrazinamide,pncA,pncA_p.Gly97Cys,1) Assoc w R,97,12842,12,12,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Gly97Ser,1) Assoc w R,97,12842,16,15,1,0.9375,True
+Pyrazinamide,pncA,pncA_p.Gly97Val,2) Assoc w R - Interim,97,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Thr100Pro,2) Assoc w R - Interim,100,12842,5,5,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ala102Pro,1) Assoc w R,102,12842,5,3,2,0.6,True
+Pyrazinamide,pncA,pncA_p.Ala102Thr,2) Assoc w R - Interim,102,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Tyr103Asp,2) Assoc w R - Interim,103,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Tyr103Cys,1) Assoc w R,103,12842,8,3,5,0.375,True
+Pyrazinamide,pncA,pncA_p.Tyr103His,1) Assoc w R,103,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ser104Arg,1) Assoc w R,104,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Ser104Gly,2) Assoc w R - Interim,104,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ser104Ile,2) Assoc w R - Interim,104,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Gly105Asp,1) Assoc w R,105,12842,4,4,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Gly105Val,2) Assoc w R - Interim,105,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Phe106Leu,2) Assoc w R - Interim,106,12842,1,0,1,0.0,True
+Pyrazinamide,pncA,pncA_p.Phe106Ser,2) Assoc w R - Interim,106,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Gly108Arg,1) Assoc w R,108,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Gly108Glu,2) Assoc w R - Interim,108,12842,2,1,1,0.5,True
+Pyrazinamide,pncA,pncA_p.Thr114Pro,2) Assoc w R - Interim,114,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Leu116Arg,2) Assoc w R - Interim,116,12842,4,4,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Leu116Pro,2) Assoc w R - Interim,116,12842,4,2,2,0.5,True
+Pyrazinamide,pncA,pncA_p.Trp119Arg,2) Assoc w R - Interim,119,12842,5,3,2,0.6,True
+Pyrazinamide,pncA,pncA_p.Trp119Cys,2) Assoc w R - Interim,119,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Trp119Gly,2) Assoc w R - Interim,119,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Trp119Leu,2) Assoc w R - Interim,119,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Leu120Arg,1) Assoc w R,120,12842,5,3,2,0.6,True
+Pyrazinamide,pncA,pncA_p.Leu120Gln,2) Assoc w R - Interim,120,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Leu120Pro,1) Assoc w R,120,12842,25,25,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Arg121Pro,2) Assoc w R - Interim,121,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Val125Gly,1) Assoc w R,125,12842,20,20,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val125Phe,2) Assoc w R - Interim,125,12842,4,2,2,0.5,True
+Pyrazinamide,pncA,pncA_p.Val128Gly,1) Assoc w R,128,12842,11,8,3,0.7272727272727273,True
+Pyrazinamide,pncA,pncA_p.Asp129Asn,2) Assoc w R - Interim,129,12842,1,0,1,0.0,True
+Pyrazinamide,pncA,pncA_p.Val130Gly,2) Assoc w R - Interim,130,12842,5,5,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val130Met,2) Assoc w R - Interim,130,12842,3,3,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val131Gly,2) Assoc w R - Interim,131,12842,5,4,1,0.8,True
+Pyrazinamide,pncA,pncA_p.Val131Phe,2) Assoc w R - Interim,131,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Gly132Ala,1) Assoc w R,132,12842,6,4,2,0.6666666666666666,True
+Pyrazinamide,pncA,pncA_p.Gly132Asp,2) Assoc w R - Interim,132,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Gly132Cys,2) Assoc w R - Interim,132,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Gly132Ser,1) Assoc w R,132,12842,8,8,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ile133Thr,1) Assoc w R,133,12842,23,15,8,0.6521739130434783,True
+Pyrazinamide,pncA,pncA_p.Ala134Val,1) Assoc w R,134,12842,6,5,1,0.8333333333333334,True
+Pyrazinamide,pncA,pncA_p.Thr135Asn,2) Assoc w R - Interim,135,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Thr135Pro,1) Assoc w R,135,12842,37,34,3,0.918918918918919,True
+Pyrazinamide,pncA,pncA_p.Asp136Gly,1) Assoc w R,136,12842,9,3,6,0.3333333333333333,True
+Pyrazinamide,pncA,pncA_p.Asp136Val,2) Assoc w R - Interim,136,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.His137Pro,2) Assoc w R - Interim,137,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Cys138Arg,1) Assoc w R,138,12842,8,8,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val139Ala,1) Assoc w R,139,12842,26,17,9,0.6538461538461539,True
+Pyrazinamide,pncA,pncA_p.Val139Gly,1) Assoc w R,139,12842,8,8,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val139Leu,2) Assoc w R - Interim,139,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Val139Met,1) Assoc w R,139,12842,7,6,1,0.8571428571428571,True
+Pyrazinamide,pncA,pncA_p.Arg140Pro,2) Assoc w R - Interim,140,12842,4,4,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Gln141Pro,1) Assoc w R,141,12842,23,20,3,0.8695652173913043,True
+Pyrazinamide,pncA,pncA_p.Thr142Ala,1) Assoc w R,142,12842,3,3,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Thr142Lys,2) Assoc w R - Interim,142,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Thr142Met,1) Assoc w R,142,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Thr142Pro,2) Assoc w R - Interim,142,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ala143Gly,2) Assoc w R - Interim,143,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ala146Glu,2) Assoc w R - Interim,146,12842,12,11,1,0.9166666666666666,True
+Pyrazinamide,pncA,pncA_p.Ala146Thr,1) Assoc w R,146,12842,3,1,2,0.3333333333333333,True
+Pyrazinamide,pncA,pncA_p.Ala146Val,1) Assoc w R,146,12842,14,14,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Leu151Ser,1) Assoc w R,151,12842,11,6,5,0.5454545454545454,True
+Pyrazinamide,pncA,pncA_p.Arg154Gly,1) Assoc w R,154,12842,7,6,1,0.8571428571428571,True
+Pyrazinamide,pncA,pncA_p.Arg154Met,1) Assoc w R,154,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Val155Ala,2) Assoc w R - Interim,155,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val155Gly,1) Assoc w R,155,12842,6,5,1,0.8333333333333334,True
+Pyrazinamide,pncA,pncA_p.Val155Met,1) Assoc w R,155,12842,4,3,1,0.75,True
+Pyrazinamide,pncA,pncA_p.Leu159Arg,1) Assoc w R,159,12842,9,9,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Leu159Pro,2) Assoc w R - Interim,159,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Leu159Val,2) Assoc w R - Interim,159,12842,3,1,2,0.3333333333333333,True
+Pyrazinamide,pncA,pncA_p.Thr160Lys,2) Assoc w R - Interim,160,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Thr160Pro,1) Assoc w R,160,12842,5,4,1,0.8,True
+Pyrazinamide,pncA,pncA_p.Gly162Asp,2) Assoc w R - Interim,162,12842,3,3,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val163Ala,2) Assoc w R - Interim,163,12842,4,1,3,0.25,True
+Pyrazinamide,pncA,pncA_p.Ser164Pro,1) Assoc w R,164,12842,7,6,1,0.8571428571428571,True
+Pyrazinamide,pncA,pncA_p.Thr168Pro,2) Assoc w R - Interim,168,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Ala171Glu,2) Assoc w R - Interim,171,12842,4,2,2,0.5,True
+Pyrazinamide,pncA,pncA_p.Ala171Pro,2) Assoc w R - Interim,171,12842,0,0,0,,False
+Pyrazinamide,pncA,pncA_p.Leu172Pro,1) Assoc w R,172,12842,10,8,2,0.8,True
+Pyrazinamide,pncA,pncA_p.Met175Arg,1) Assoc w R,175,12842,2,2,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Met175Ile,2) Assoc w R - Interim,175,12842,5,1,4,0.2,True
+Pyrazinamide,pncA,pncA_p.Met175Thr,2) Assoc w R - Interim,175,12842,4,4,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Met175Val,1) Assoc w R,175,12842,9,7,2,0.7777777777777778,True
+Pyrazinamide,pncA,pncA_p.Thr177Pro,1) Assoc w R,177,12842,3,1,2,0.3333333333333333,True
+Pyrazinamide,pncA,pncA_p.Val180Ala,1) Assoc w R,180,12842,1,1,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val180Gly,1) Assoc w R,180,12842,8,8,0,1.0,True
+Pyrazinamide,pncA,pncA_p.Val180Phe,1) Assoc w R,180,12842,11,8,3,0.7272727272727273,True
+Pyrazinamide,pncA,pncA_p.Leu182Ser,1) Assoc w R,182,12842,7,3,4,0.42857142857142855,True
+Pyrazinamide,pncA,pncA_p.Leu182Trp,1) Assoc w R,182,12842,0,0,0,,False
+Streptomycin,gid,gid_p.His48Gln,1) Assoc w R,48,7682,1,1,0,1.0,True
+Streptomycin,gid,gid_p.Asp67His,2) Assoc w R - Interim,67,7682,0,0,0,,False
+Streptomycin,gid,gid_p.Ser70Asn,1) Assoc w R,70,7682,2,1,1,0.5,True
+Streptomycin,gid,gid_p.Gly73Ala,2) Assoc w R - Interim,73,7682,23,15,8,0.6521739130434783,True
+Streptomycin,gid,gid_p.Gly73Glu,1) Assoc w R,73,7682,0,0,0,,False
+Streptomycin,gid,gid_p.Pro84Leu,2) Assoc w R - Interim,84,7682,37,10,27,0.2702702702702703,True
+Streptomycin,gid,gid_p.Val105Glu,1) Assoc w R,105,7682,1,1,0,1.0,True
+Streptomycin,gid,gid_p.Ala134Glu,1) Assoc w R,134,7682,4,3,1,0.75,True
+Streptomycin,gid,gid_p.Ala200Glu,1) Assoc w R,200,7682,2,2,0,1.0,True
+Streptomycin,rpsL,rpsL_p.Lys43Arg,1) Assoc w R,43,7682,942,896,46,0.9511677282377919,True
+Streptomycin,rpsL,rpsL_p.Lys88Arg,1) Assoc w R,88,7682,191,180,11,0.9424083769633508,True
+Streptomycin,rpsL,rpsL_p.Lys88Gln,2) Assoc w R - Interim,88,7682,3,3,0,1.0,True
+Streptomycin,rpsL,rpsL_p.Lys88Met,1) Assoc w R,88,7682,7,5,2,0.7142857142857143,True
+Moxifloxacin,gyrA,gyrA_p.Gly88Ala,2) Assoc w R - Interim,88,2868,0,0,0,,False
+Moxifloxacin,gyrA,gyrA_p.Gly88Cys,1) Assoc w R,88,2868,4,3,1,0.75,True
+Moxifloxacin,gyrA,gyrA_p.Asp89Asn,1) Assoc w R,89,2868,5,3,2,0.6,True
+Moxifloxacin,gyrA,gyrA_p.Ala90Val,1) Assoc w R,90,2868,61,37,24,0.6065573770491803,True
+Moxifloxacin,gyrA,gyrA_p.Ser91Pro,1) Assoc w R,91,2868,21,13,8,0.6190476190476191,True
+Moxifloxacin,gyrA,gyrA_p.Asp94Ala,1) Assoc w R,94,2868,44,21,23,0.4772727272727273,True
+Moxifloxacin,gyrA,gyrA_p.Asp94Asn,1) Assoc w R,94,2868,20,18,2,0.9,True
+Moxifloxacin,gyrA,gyrA_p.Asp94Gly,1) Assoc w R,94,2868,127,111,16,0.8740157480314961,True
+Moxifloxacin,gyrA,gyrA_p.Asp94His,1) Assoc w R,94,2868,5,4,1,0.8,True
+Moxifloxacin,gyrA,gyrA_p.Asp94Tyr,1) Assoc w R,94,2868,12,11,1,0.9166666666666666,True
+Moxifloxacin,gyrB,gyrB_p.Ser447Phe,2) Assoc w R - Interim,447,2868,2,0,2,0.0,True
+Moxifloxacin,gyrB,gyrB_p.Asp461Asn,2) Assoc w R - Interim,461,2868,2,1,1,0.5,True
+Moxifloxacin,gyrB,gyrB_p.Asp461His,2) Assoc w R - Interim,461,2868,2,0,2,0.0,True
+Moxifloxacin,gyrB,gyrB_p.Asn499Asp,2) Assoc w R - Interim,499,2868,1,1,0,1.0,True
+Moxifloxacin,gyrB,gyrB_p.Asn499Thr,2) Assoc w R - Interim,499,2868,1,1,0,1.0,True
+Moxifloxacin,gyrB,gyrB_p.Glu501Asp,1) Assoc w R,501,2868,10,6,4,0.6,True
+Moxifloxacin,gyrB,gyrB_p.Glu501Val,2) Assoc w R - Interim,501,2868,0,0,0,,False
+Moxifloxacin,gyrB,gyrB_p.Ala504Val,2) Assoc w R - Interim,504,2868,2,1,1,0.5,True
+Levofloxacin,gyrA,gyrA_p.Gly88Ala,2) Assoc w R - Interim,88,269,0,0,0,,False
+Levofloxacin,gyrA,gyrA_p.Gly88Cys,1) Assoc w R,88,269,1,1,0,1.0,True
+Levofloxacin,gyrA,gyrA_p.Asp89Asn,1) Assoc w R,89,269,2,0,2,0.0,True
+Levofloxacin,gyrA,gyrA_p.Ala90Val,1) Assoc w R,90,269,19,15,4,0.7894736842105263,True
+Levofloxacin,gyrA,gyrA_p.Ser91Pro,1) Assoc w R,91,269,6,4,2,0.6666666666666666,True
+Levofloxacin,gyrA,gyrA_p.Asp94Ala,1) Assoc w R,94,269,9,3,6,0.3333333333333333,True
+Levofloxacin,gyrA,gyrA_p.Asp94Asn,1) Assoc w R,94,269,4,4,0,1.0,True
+Levofloxacin,gyrA,gyrA_p.Asp94Gly,1) Assoc w R,94,269,31,31,0,1.0,True
+Levofloxacin,gyrA,gyrA_p.Asp94His,1) Assoc w R,94,269,0,0,0,,False
+Levofloxacin,gyrA,gyrA_p.Asp94Tyr,1) Assoc w R,94,269,3,3,0,1.0,True
+Levofloxacin,gyrB,gyrB_p.Ser447Phe,2) Assoc w R - Interim,447,269,2,0,2,0.0,True
+Levofloxacin,gyrB,gyrB_p.Asn499Asp,1) Assoc w R,499,269,0,0,0,,False
+Levofloxacin,gyrB,gyrB_p.Asn499Thr,1) Assoc w R,499,269,2,1,1,0.5,True
+Ethionamide,ethA,ethA_p.Leu35Arg,2) Assoc w R - Interim,35,2153,0,0,0,,False
+Ethionamide,ethA,ethA_p.Ser57Tyr,2) Assoc w R - Interim,57,2153,0,0,0,,False
+Ethionamide,ethA,ethA_p.Thr88Ile,2) Assoc w R - Interim,88,2153,1,1,0,1.0,True
+Ethionamide,ethA,ethA_p.Val202Gly,2) Assoc w R - Interim,202,2153,0,0,0,,False
+Ethionamide,ethA,ethA_p.Arg207Gly,1) Assoc w R,207,2153,2,2,0,1.0,True
+Ethionamide,ethA,ethA_p.Ala341Val,2) Assoc w R - Interim,341,2153,2,0,2,0.0,True
+Ethionamide,ethA,ethA_p.Asn379Asp,2) Assoc w R - Interim,379,2153,1,1,0,1.0,True
+Ethionamide,ethA,ethA_p.Ser390Phe,2) Assoc w R - Interim,390,2153,4,3,1,0.75,True
+Ethionamide,ethA,ethA_p.Cys403Tyr,2) Assoc w R - Interim,403,2153,0,0,0,,False
+Ethionamide,inhA,inhA_p.Ser94Ala,2) Assoc w R - Interim,94,2153,96,84,12,0.875,True
+Capreomycin,tlyA,tlyA_p.Gly232Asp,2) Assoc w R - Interim,232,3852,8,5,3,0.625,True

@@ -1,0 +1,7 @@
+drug,heldout_lineage,train_n,train_r,train_s,test_n,test_r,test_s,feasible,ambiguous_rows_total,cross_lineage_ambiguous_rows_total,ambiguous_rows_test,cross_lineage_ambiguous_rows_test,model,auc,acc,pooled_auc,ci_lo,ci_hi
+capreomycin,2,2529,376,2153,1323,298,1025,True,0,0,0,0,lasso,0.5,0.7747543461829176,0.5,0.5,0.5
+capreomycin,2,2529,376,2153,1323,298,1025,True,0,0,0,0,logreg,0.5,0.7747543461829176,0.5,0.5,0.5
+capreomycin,2,2529,376,2153,1323,298,1025,True,0,0,0,0,ridge,0.5,0.7747543461829176,0.5,0.5,0.5
+capreomycin,4,1575,325,1250,2277,349,1928,True,0,0,0,0,lasso,0.5,0.8467281510759772,0.5,0.5,0.5
+capreomycin,4,1575,325,1250,2277,349,1928,True,0,0,0,0,logreg,0.5,0.8467281510759772,0.5,0.5,0.5
+capreomycin,4,1575,325,1250,2277,349,1928,True,0,0,0,0,ridge,0.5,0.8467281510759772,0.5,0.5,0.5
