@@ -1,5 +1,5 @@
-# significance_testing_cnn_cv.py
-# Stratified K-fold CV for CNN with optional per-fold SHAP,
+# transformer_cv_training.py
+# Stratified K-fold CV for Transformer with optional per-fold SHAP,
 
 
 import os

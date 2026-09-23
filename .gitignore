@@ -12,6 +12,13 @@ dna-tasks/notebooks/*
 DNABERT-S/
 **/DNABERT-S/
 protein-tasks/slurm/logs/
+latex_paper
+skills
+slurm
+
+
+*.pdf
+*.pptx
 
 # SD-CNN lineage-aware split runtime artifacts
 dna-tasks/SD-CNN/model_training/lineage_aware_data_split/logs/
