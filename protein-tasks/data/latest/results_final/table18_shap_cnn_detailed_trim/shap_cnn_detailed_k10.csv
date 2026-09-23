@@ -1,0 +1,11 @@
+drug,gene,total_res_pos,TP,precision,recall,F1,variants
+amikacin,ALL,0,0,0.0,0.0,0.0,
+capreomycin,ALL,2,1,0.1,0.5,0.1666666638888889,tlyA_p.Gly232Asp
+ethambutol,ALL,6,6,0.6,1.0,0.7499999953125,"embB_p.Asp328Tyr, embB_p.Asp354Ala, embB_p.Gln497Arg, embB_p.Gly406Ala, embB_p.Met306Ile, embB_p.Tyr319Cys"
+ethionamide,ALL,10,1,0.1,0.1,0.0999999950000002,inhA_p.Ser94Ala
+isoniazid,ALL,3,2,0.2,0.6666666666666666,0.3076923041420118,"katG_p.Ser315Arg, inhA_p.Ser94Ala"
+levofloxacin,ALL,10,7,0.7,0.7,0.699999995,"gyrB_p.Asn499Asp, gyrB_p.Ser447Phe, gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro"
+moxifloxacin,ALL,10,5,0.5,0.5,0.4999999950000001,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro"
+pyrazinamide,ALL,95,10,1.0,0.1052631578947368,0.1904761887528345,"pncA_p.Asp8Ala, pncA_p.Cys138Arg, pncA_p.Gln10Arg, pncA_p.Gln141Pro, pncA_p.His51Arg, pncA_p.His57Arg, pncA_p.Leu85Arg, pncA_p.Pro69Leu, pncA_p.Thr135Asn, pncA_p.Val139Ala"
+rifampicin,ALL,26,10,1.0,0.3846153846153846,0.55555555154321,"rpoB_p.Arg448Gln, rpoB_p.Asp435Ala, rpoB_p.Gln432Asn, rpoB_p.Gln436Arg, rpoB_p.His445Arg, rpoB_p.Leu452Met, rpoB_p.Met434Arg, rpoB_p.Ser441Ala, rpoB_p.Ser450Ala, rpoB_p.Val170Phe"
+streptomycin,ALL,10,7,0.7,0.7,0.699999995,"rpsL_p.Lys43Arg, rpsL_p.Lys88Arg, gid_p.Asp67His, gid_p.Gly73Ala, gid_p.His48Gln, gid_p.Pro84Leu, gid_p.Ser70Asn"

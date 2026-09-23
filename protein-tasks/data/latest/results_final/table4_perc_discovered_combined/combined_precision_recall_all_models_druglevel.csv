@@ -1,0 +1,151 @@
+variant,drug,gene,k_req,k_eff,total_res_pos,TP,precision,recall,F1,variants,family
+cnn,amikacin,ALL,1,1,0,0,0.0,0.0,0.0,,cnn
+cnn,amikacin,ALL,5,5,0,0,0.0,0.0,0.0,,cnn
+cnn,amikacin,ALL,10,10,0,0,0.0,0.0,0.0,,cnn
+cnn,capreomycin,ALL,1,1,2,1,1.0,0.5,0.6666666622222223,tlyA_p.Gly232Asp,cnn
+cnn,capreomycin,ALL,5,5,2,1,0.2,0.5,0.2857142816326531,tlyA_p.Gly232Asp,cnn
+cnn,capreomycin,ALL,10,10,2,1,0.1,0.5,0.1666666638888889,tlyA_p.Gly232Asp,cnn
+cnn,ethambutol,ALL,1,1,6,0,0.0,0.0,0.0,,cnn
+cnn,ethambutol,ALL,5,5,6,3,0.6,0.5,0.5454545404958678,"embB_p.Gln497Arg, embB_p.Met306Ile, embB_p.Tyr319Cys",cnn
+cnn,ethambutol,ALL,10,10,6,6,0.6,1.0,0.7499999953125,"embB_p.Asp328Tyr, embB_p.Asp354Ala, embB_p.Gln497Arg, embB_p.Gly406Ala, embB_p.Met306Ile, embB_p.Tyr319Cys",cnn
+cnn,ethionamide,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,inhA_p.Ser94Ala,cnn
+cnn,ethionamide,ALL,5,5,10,1,0.2,0.1,0.133333328888889,inhA_p.Ser94Ala,cnn
+cnn,ethionamide,ALL,10,10,10,1,0.1,0.1,0.0999999950000002,inhA_p.Ser94Ala,cnn
+cnn,isoniazid,ALL,1,1,3,1,1.0,0.3333333333333333,0.4999999962500001,katG_p.Ser315Arg,cnn
+cnn,isoniazid,ALL,5,5,3,2,0.4,0.6666666666666666,0.4999999953125,"katG_p.Ser315Arg, inhA_p.Ser94Ala",cnn
+cnn,isoniazid,ALL,10,10,3,2,0.2,0.6666666666666666,0.3076923041420118,"katG_p.Ser315Arg, inhA_p.Ser94Ala",cnn
+cnn,levofloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,gyrA_p.Asp94Ala,cnn
+cnn,levofloxacin,ALL,5,5,10,4,0.8,0.4,0.533333328888889,"gyrB_p.Ser447Phe, gyrA_p.Ala90Val, gyrA_p.Asp94Ala, gyrA_p.Ser91Pro",cnn
+cnn,levofloxacin,ALL,10,10,10,7,0.7,0.7,0.699999995,"gyrB_p.Asn499Asp, gyrB_p.Ser447Phe, gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",cnn
+cnn,moxifloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,gyrA_p.Asp94Ala,cnn
+cnn,moxifloxacin,ALL,5,5,10,5,1.0,0.5,0.6666666622222223,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",cnn
+cnn,moxifloxacin,ALL,10,10,10,5,0.5,0.5,0.4999999950000001,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",cnn
+cnn,pyrazinamide,ALL,1,1,95,1,1.0,0.0105263157894736,0.0208333331271701,pncA_p.Pro69Leu,cnn
+cnn,pyrazinamide,ALL,5,5,95,5,1.0,0.0526315789473684,0.09999999905,"pncA_p.Gln141Pro, pncA_p.His51Arg, pncA_p.Pro69Leu, pncA_p.Thr135Asn, pncA_p.Val139Ala",cnn
+cnn,pyrazinamide,ALL,10,10,95,10,1.0,0.1052631578947368,0.1904761887528345,"pncA_p.Asp8Ala, pncA_p.Cys138Arg, pncA_p.Gln10Arg, pncA_p.Gln141Pro, pncA_p.His51Arg, pncA_p.His57Arg, pncA_p.Leu85Arg, pncA_p.Pro69Leu, pncA_p.Thr135Asn, pncA_p.Val139Ala",cnn
+cnn,rifampicin,ALL,1,1,26,1,1.0,0.0384615384615384,0.0740740733607681,rpoB_p.His445Arg,cnn
+cnn,rifampicin,ALL,5,5,26,5,1.0,0.1923076923076923,0.3225806424557753,"rpoB_p.Gln432Asn, rpoB_p.His445Arg, rpoB_p.Leu452Met, rpoB_p.Ser450Ala, rpoB_p.Val170Phe",cnn
+cnn,rifampicin,ALL,10,10,26,10,1.0,0.3846153846153846,0.55555555154321,"rpoB_p.Arg448Gln, rpoB_p.Asp435Ala, rpoB_p.Gln432Asn, rpoB_p.Gln436Arg, rpoB_p.His445Arg, rpoB_p.Leu452Met, rpoB_p.Met434Arg, rpoB_p.Ser441Ala, rpoB_p.Ser450Ala, rpoB_p.Val170Phe",cnn
+cnn,streptomycin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,rpsL_p.Lys43Arg,cnn
+cnn,streptomycin,ALL,5,5,10,5,1.0,0.5,0.6666666622222223,"rpsL_p.Lys43Arg, rpsL_p.Lys88Arg, gid_p.Gly73Ala, gid_p.His48Gln, gid_p.Pro84Leu",cnn
+cnn,streptomycin,ALL,10,10,10,7,0.7,0.7,0.699999995,"rpsL_p.Lys43Arg, rpsL_p.Lys88Arg, gid_p.Asp67His, gid_p.Gly73Ala, gid_p.His48Gln, gid_p.Pro84Leu, gid_p.Ser70Asn",cnn
+full320,amikacin,ALL,1,1,0,0,0.0,0.0,0.0,,full320
+full320,amikacin,ALL,5,5,0,0,0.0,0.0,0.0,,full320
+full320,amikacin,ALL,10,10,0,0,0.0,0.0,0.0,,full320
+full320,capreomycin,ALL,1,1,2,0,0.0,0.0,0.0,,full320
+full320,capreomycin,ALL,5,5,2,0,0.0,0.0,0.0,,full320
+full320,capreomycin,ALL,10,10,2,0,0.0,0.0,0.0,,full320
+full320,ethambutol,ALL,1,1,6,1,1.0,0.1666666666666666,0.2857142832653061,embB_p.Met306Ile,full320
+full320,ethambutol,ALL,5,5,6,1,0.2,0.1666666666666666,0.1818181768595042,embB_p.Met306Ile,full320
+full320,ethambutol,ALL,10,10,6,1,0.1,0.1666666666666666,0.1249999953125001,embB_p.Met306Ile,full320
+full320,ethionamide,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,inhA_p.Ser94Ala,full320
+full320,ethionamide,ALL,5,5,10,1,0.2,0.1,0.133333328888889,inhA_p.Ser94Ala,full320
+full320,ethionamide,ALL,10,10,10,1,0.1,0.1,0.0999999950000002,inhA_p.Ser94Ala,full320
+full320,isoniazid,ALL,1,1,3,0,0.0,0.0,0.0,,full320
+full320,isoniazid,ALL,5,5,3,0,0.0,0.0,0.0,,full320
+full320,isoniazid,ALL,10,10,3,0,0.0,0.0,0.0,,full320
+full320,levofloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,gyrA_p.Asp94Ala,full320
+full320,levofloxacin,ALL,5,5,10,4,0.8,0.4,0.533333328888889,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Ser91Pro",full320
+full320,levofloxacin,ALL,10,10,10,5,0.5,0.5,0.4999999950000001,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",full320
+full320,moxifloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,gyrA_p.Asp89Asn,full320
+full320,moxifloxacin,ALL,5,5,10,5,1.0,0.5,0.6666666622222223,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",full320
+full320,moxifloxacin,ALL,10,10,10,5,0.5,0.5,0.4999999950000001,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",full320
+full320,pyrazinamide,ALL,1,1,95,1,1.0,0.0105263157894736,0.0208333331271701,pncA_p.Gly105Asp,full320
+full320,pyrazinamide,ALL,5,5,95,4,0.8,0.0421052631578947,0.0799999990499999,"pncA_p.Gly105Asp, pncA_p.Pro62Arg, pncA_p.Trp68Arg, pncA_p.Val131Gly",full320
+full320,pyrazinamide,ALL,10,10,95,9,0.9,0.0947368421052631,0.1714285697052154,"pncA_p.Ala102Pro, pncA_p.Gly105Asp, pncA_p.His51Arg, pncA_p.Leu85Arg, pncA_p.Pro54Arg, pncA_p.Pro62Arg, pncA_p.Trp68Arg, pncA_p.Tyr103Asp, pncA_p.Val131Gly",full320
+full320,rifampicin,ALL,1,1,26,1,1.0,0.0384615384615384,0.0740740733607681,rpoB_p.Val170Phe,full320
+full320,rifampicin,ALL,5,5,26,5,1.0,0.1923076923076923,0.3225806424557753,"rpoB_p.Asn437Asp, rpoB_p.Gln432Asn, rpoB_p.His445Arg, rpoB_p.Ser450Ala, rpoB_p.Val170Phe",full320
+full320,rifampicin,ALL,10,10,26,7,0.7,0.2692307692307692,0.3888888848765432,"rpoB_p.Asn437Asp, rpoB_p.Asp435Ala, rpoB_p.Gln432Asn, rpoB_p.His445Arg, rpoB_p.Ser441Ala, rpoB_p.Ser450Ala, rpoB_p.Val170Phe",full320
+full320,streptomycin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,rpsL_p.Lys43Arg,full320
+full320,streptomycin,ALL,5,5,10,4,0.8,0.4,0.533333328888889,"rpsL_p.Lys43Arg, rpsL_p.Lys88Arg, gid_p.Ala134Glu, gid_p.Pro84Leu",full320
+full320,streptomycin,ALL,10,10,10,4,0.4,0.4,0.3999999950000001,"rpsL_p.Lys43Arg, rpsL_p.Lys88Arg, gid_p.Ala134Glu, gid_p.Pro84Leu",full320
+logreg,amikacin,ALL,1,1,0,0,0.0,0.0,0.0,,regression
+logreg,amikacin,ALL,5,5,0,0,0.0,0.0,0.0,,regression
+logreg,amikacin,ALL,10,10,0,0,0.0,0.0,0.0,,regression
+logreg,capreomycin,ALL,1,1,2,0,0.0,0.0,0.0,,regression
+logreg,capreomycin,ALL,5,5,2,0,0.0,0.0,0.0,,regression
+logreg,capreomycin,ALL,10,10,2,0,0.0,0.0,0.0,,regression
+logreg,ethambutol,ALL,1,1,6,1,1.0,0.1666666666666666,0.2857142832653061,"embB_p.Met306Ile, embB_p.Met306Leu, embB_p.Met306Val",regression
+logreg,ethambutol,ALL,5,5,6,5,1.0,0.8333333333333334,0.9090909041322316,"embB_p.Met306Ile, embB_p.Met306Leu, embB_p.Met306Val, embB_p.Gln497Arg, embB_p.Gln497Lys, embB_p.Tyr319Cys, embB_p.Tyr319Ser, embB_p.Gly406Ala, embB_p.Gly406Asp, embB_p.Gly406Cys, embB_p.Gly406Ser, embB_p.Asp328Tyr",regression
+logreg,ethambutol,ALL,10,10,6,6,0.6,1.0,0.7499999953125,"embB_p.Met306Ile, embB_p.Met306Leu, embB_p.Met306Val, embB_p.Gln497Arg, embB_p.Gln497Lys, embB_p.Tyr319Cys, embB_p.Tyr319Ser, embB_p.Gly406Ala, embB_p.Gly406Asp, embB_p.Gly406Cys, embB_p.Gly406Ser, embB_p.Asp328Tyr, embB_p.Asp354Ala",regression
+logreg,ethionamide,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,inhA_p.Ser94Ala,regression
+logreg,ethionamide,ALL,5,5,10,1,0.2,0.1,0.133333328888889,inhA_p.Ser94Ala,regression
+logreg,ethionamide,ALL,10,10,10,1,0.1,0.1,0.0999999950000002,inhA_p.Ser94Ala,regression
+logreg,isoniazid,ALL,1,1,3,1,1.0,0.3333333333333333,0.4999999962500001,"katG_p.Ser315Arg, katG_p.Ser315Asn, katG_p.Ser315Ile, katG_p.Ser315Thr",regression
+logreg,isoniazid,ALL,5,5,3,3,0.6,1.0,0.7499999953125,"katG_p.Ser315Arg, katG_p.Ser315Asn, katG_p.Ser315Ile, katG_p.Ser315Thr, inhA_p.Ser94Ala, katG_p.Trp328Leu",regression
+logreg,isoniazid,ALL,10,10,3,3,0.3,1.0,0.4615384579881657,"katG_p.Ser315Arg, katG_p.Ser315Asn, katG_p.Ser315Ile, katG_p.Ser315Thr, inhA_p.Ser94Ala, katG_p.Trp328Leu",regression
+logreg,levofloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,"gyrA_p.Asp94Ala, gyrA_p.Asp94Asn, gyrA_p.Asp94Gly, gyrA_p.Asp94His, gyrA_p.Asp94Tyr",regression
+logreg,levofloxacin,ALL,5,5,10,3,0.6,0.3,0.3999999955555556,"gyrA_p.Asp94Ala, gyrA_p.Asp94Asn, gyrA_p.Asp94Gly, gyrA_p.Asp94His, gyrA_p.Asp94Tyr, gyrA_p.Ala90Val, gyrB_p.Asn499Asp, gyrB_p.Asn499Thr",regression
+logreg,levofloxacin,ALL,10,10,10,6,0.6,0.6,0.5999999950000001,"gyrA_p.Asp94Ala, gyrA_p.Asp94Asn, gyrA_p.Asp94Gly, gyrA_p.Asp94His, gyrA_p.Asp94Tyr, gyrA_p.Ala90Val, gyrB_p.Asn499Asp, gyrB_p.Asn499Thr, gyrA_p.Ser91Pro, gyrB_p.Ser447Phe, gyrA_p.Asp89Asn",regression
+logreg,moxifloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,"gyrA_p.Asp94Ala, gyrA_p.Asp94Asn, gyrA_p.Asp94Gly, gyrA_p.Asp94His, gyrA_p.Asp94Tyr",regression
+logreg,moxifloxacin,ALL,5,5,10,5,1.0,0.5,0.6666666622222223,"gyrA_p.Asp94Ala, gyrA_p.Asp94Asn, gyrA_p.Asp94Gly, gyrA_p.Asp94His, gyrA_p.Asp94Tyr, gyrA_p.Ala90Val, gyrA_p.Ser91Pro, gyrA_p.Gly88Ala, gyrA_p.Gly88Cys, gyrB_p.Glu501Asp, gyrB_p.Glu501Val",regression
+logreg,moxifloxacin,ALL,10,10,10,7,0.7,0.7,0.699999995,"gyrA_p.Asp94Ala, gyrA_p.Asp94Asn, gyrA_p.Asp94Gly, gyrA_p.Asp94His, gyrA_p.Asp94Tyr, gyrA_p.Ala90Val, gyrA_p.Ser91Pro, gyrA_p.Gly88Ala, gyrA_p.Gly88Cys, gyrB_p.Glu501Asp, gyrB_p.Glu501Val, gyrA_p.Asp89Asn, gyrB_p.Asn499Asp, gyrB_p.Asn499Thr",regression
+logreg,pyrazinamide,ALL,1,1,95,0,0.0,0.0,0.0,,regression
+logreg,pyrazinamide,ALL,5,5,95,4,0.8,0.0421052631578947,0.0799999990499999,"pncA_p.Val9Gly, pncA_p.Lys96Arg, pncA_p.Lys96Asn, pncA_p.Lys96Gln, pncA_p.Lys96Glu, pncA_p.Lys96Thr, pncA_p.Ser67Pro, pncA_p.Phe13Ile, pncA_p.Phe13Leu, pncA_p.Phe13Ser",regression
+logreg,pyrazinamide,ALL,10,10,95,8,0.8,0.0842105263157894,0.1523809506575963,"pncA_p.Val9Gly, pncA_p.Lys96Arg, pncA_p.Lys96Asn, pncA_p.Lys96Gln, pncA_p.Lys96Glu, pncA_p.Lys96Thr, pncA_p.Ser67Pro, pncA_p.Phe13Ile, pncA_p.Phe13Leu, pncA_p.Phe13Ser, pncA_p.Ala3Glu, pncA_p.Cys138Arg, pncA_p.Asp129Asn, pncA_p.Ala134Val",regression
+logreg,rifampicin,ALL,1,1,26,0,0.0,0.0,0.0,,regression
+logreg,rifampicin,ALL,5,5,26,3,0.6,0.1153846153846153,0.1935483843912591,"rpoB_p.Ser431Arg, rpoB_p.Ser431Asn, rpoB_p.Ser431Gly, rpoB_p.Ser431Thr, rpoB_p.Met434Arg, rpoB_p.Met434Ile, rpoB_p.Met434Leu, rpoB_p.Met434Thr, rpoB_p.Met434Val, rpoB_p.Leu449Met",regression
+logreg,rifampicin,ALL,10,10,26,7,0.7,0.2692307692307692,0.3888888848765432,"rpoB_p.Ser431Arg, rpoB_p.Ser431Asn, rpoB_p.Ser431Gly, rpoB_p.Ser431Thr, rpoB_p.Met434Arg, rpoB_p.Met434Ile, rpoB_p.Met434Leu, rpoB_p.Met434Thr, rpoB_p.Met434Val, rpoB_p.Leu449Met, rpoB_p.Thr444Ile, rpoB_p.Thr444Pro, rpoB_p.Thr444Ser, rpoB_p.Ala451Gly, rpoB_p.Ala451Val, rpoB_p.Gln436Arg, rpoB_p.Gln436Asn, rpoB_p.Gln436Pro, rpoB_p.Thr427Ala, rpoB_p.Thr427Asn, rpoB_p.Thr427Gly, rpoB_p.Thr427Ile, rpoB_p.Thr427Pro, rpoB_p.Thr427Ser",regression
+logreg,streptomycin,ALL,1,1,10,0,0.0,0.0,0.0,,regression
+logreg,streptomycin,ALL,5,5,10,2,0.4,0.2,0.2666666622222223,"rpsL_p.Lys88Arg, rpsL_p.Lys88Gln, rpsL_p.Lys88Met, rpsL_p.Lys43Arg",regression
+logreg,streptomycin,ALL,10,10,10,4,0.4,0.4,0.3999999950000001,"rpsL_p.Lys88Arg, rpsL_p.Lys88Gln, rpsL_p.Lys88Met, rpsL_p.Lys43Arg, gid_p.Ala200Glu, gid_p.His48Gln",regression
+pca10,amikacin,ALL,1,1,0,0,0.0,0.0,0.0,,pca10
+pca10,amikacin,ALL,5,5,0,0,0.0,0.0,0.0,,pca10
+pca10,amikacin,ALL,10,10,0,0,0.0,0.0,0.0,,pca10
+pca10,capreomycin,ALL,1,1,2,0,0.0,0.0,0.0,,pca10
+pca10,capreomycin,ALL,5,5,2,1,0.2,0.5,0.2857142816326531,tlyA_p.Gly232Asp,pca10
+pca10,capreomycin,ALL,10,10,2,1,0.1,0.5,0.1666666638888889,tlyA_p.Gly232Asp,pca10
+pca10,ethambutol,ALL,1,1,6,1,1.0,0.1666666666666666,0.2857142832653061,embB_p.Gln497Arg,pca10
+pca10,ethambutol,ALL,5,5,6,4,0.8,0.6666666666666666,0.7272727223140496,"embB_p.Asp328Tyr, embB_p.Gln497Arg, embB_p.Met306Ile, embB_p.Tyr319Cys",pca10
+pca10,ethambutol,ALL,10,10,6,5,0.5,0.8333333333333334,0.6249999953125001,"embB_p.Asp328Tyr, embB_p.Gln497Arg, embB_p.Gly406Ala, embB_p.Met306Ile, embB_p.Tyr319Cys",pca10
+pca10,ethionamide,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,inhA_p.Ser94Ala,pca10
+pca10,ethionamide,ALL,5,5,10,1,0.2,0.1,0.133333328888889,inhA_p.Ser94Ala,pca10
+pca10,ethionamide,ALL,10,10,10,2,0.2,0.2,0.1999999950000001,"inhA_p.Ser94Ala, ethA_p.Ala341Val",pca10
+pca10,isoniazid,ALL,1,1,3,0,0.0,0.0,0.0,,pca10
+pca10,isoniazid,ALL,5,5,3,1,0.2,0.3333333333333333,0.2499999953125,katG_p.Ser315Arg,pca10
+pca10,isoniazid,ALL,10,10,3,1,0.1,0.3333333333333333,0.153846150295858,katG_p.Ser315Arg,pca10
+pca10,levofloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,gyrA_p.Asp94Ala,pca10
+pca10,levofloxacin,ALL,5,5,10,4,0.8,0.4,0.533333328888889,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Ser91Pro",pca10
+pca10,levofloxacin,ALL,10,10,10,5,0.5,0.5,0.4999999950000001,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",pca10
+pca10,moxifloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,gyrA_p.Asp94Ala,pca10
+pca10,moxifloxacin,ALL,5,5,10,4,0.8,0.4,0.533333328888889,"gyrA_p.Ala90Val, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",pca10
+pca10,moxifloxacin,ALL,10,10,10,5,0.5,0.5,0.4999999950000001,"gyrA_p.Ala90Val, gyrA_p.Asp89Asn, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",pca10
+pca10,pyrazinamide,ALL,1,1,95,1,1.0,0.0105263157894736,0.0208333331271701,pncA_p.Val139Ala,pca10
+pca10,pyrazinamide,ALL,5,5,95,5,1.0,0.0526315789473684,0.09999999905,"pncA_p.Gln141Pro, pncA_p.Gly105Asp, pncA_p.His51Arg, pncA_p.Val139Ala, pncA_p.Val155Ala",pca10
+pca10,pyrazinamide,ALL,10,10,95,10,1.0,0.1052631578947368,0.1904761887528345,"pncA_p.Ala146Glu, pncA_p.Gln141Pro, pncA_p.Gly105Asp, pncA_p.Gly162Asp, pncA_p.His51Arg, pncA_p.His71Arg, pncA_p.Thr76Ile, pncA_p.Trp68Arg, pncA_p.Val139Ala, pncA_p.Val155Ala",pca10
+pca10,rifampicin,ALL,1,1,26,1,1.0,0.0384615384615384,0.0740740733607681,rpoB_p.Val170Phe,pca10
+pca10,rifampicin,ALL,5,5,26,5,1.0,0.1923076923076923,0.3225806424557753,"rpoB_p.Asp435Ala, rpoB_p.Gln432Asn, rpoB_p.His445Arg, rpoB_p.Ile491Phe, rpoB_p.Val170Phe",pca10
+pca10,rifampicin,ALL,10,10,26,8,0.8,0.3076923076923077,0.4444444404320988,"rpoB_p.Asp435Ala, rpoB_p.Gln432Asn, rpoB_p.His445Arg, rpoB_p.Ile491Phe, rpoB_p.Leu430Arg, rpoB_p.Met434Arg, rpoB_p.Ser450Ala, rpoB_p.Val170Phe",pca10
+pca10,streptomycin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,rpsL_p.Lys43Arg,pca10
+pca10,streptomycin,ALL,5,5,10,3,0.6,0.3,0.3999999955555556,"rpsL_p.Lys43Arg, rpsL_p.Lys88Arg, gid_p.Ala200Glu",pca10
+pca10,streptomycin,ALL,10,10,10,3,0.3,0.3,0.2999999950000001,"rpsL_p.Lys43Arg, rpsL_p.Lys88Arg, gid_p.Ala200Glu",pca10
+transformer,amikacin,ALL,1,1,0,0,0.0,0.0,0.0,,transformer
+transformer,amikacin,ALL,5,5,0,0,0.0,0.0,0.0,,transformer
+transformer,amikacin,ALL,10,10,0,0,0.0,0.0,0.0,,transformer
+transformer,capreomycin,ALL,1,1,2,0,0.0,0.0,0.0,,transformer
+transformer,capreomycin,ALL,5,5,2,0,0.0,0.0,0.0,,transformer
+transformer,capreomycin,ALL,10,10,2,0,0.0,0.0,0.0,,transformer
+transformer,ethambutol,ALL,1,1,6,0,0.0,0.0,0.0,,transformer
+transformer,ethambutol,ALL,5,5,6,1,0.2,0.1666666666666666,0.1818181768595042,embB_p.Gln497Arg,transformer
+transformer,ethambutol,ALL,10,10,6,2,0.2,0.3333333333333333,0.2499999953125,"embB_p.Asp328Tyr, embB_p.Gln497Arg",transformer
+transformer,ethionamide,ALL,1,1,10,0,0.0,0.0,0.0,,transformer
+transformer,ethionamide,ALL,5,5,10,0,0.0,0.0,0.0,,transformer
+transformer,ethionamide,ALL,10,10,10,0,0.0,0.0,0.0,,transformer
+transformer,isoniazid,ALL,1,1,3,0,0.0,0.0,0.0,,transformer
+transformer,isoniazid,ALL,5,5,3,1,0.2,0.3333333333333333,0.2499999953125,katG_p.Ser315Arg,transformer
+transformer,isoniazid,ALL,10,10,3,1,0.1,0.3333333333333333,0.153846150295858,katG_p.Ser315Arg,transformer
+transformer,levofloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,gyrB_p.Ser447Phe,transformer
+transformer,levofloxacin,ALL,5,5,10,3,0.6,0.3,0.3999999955555556,"gyrB_p.Asn499Asp, gyrB_p.Ser447Phe, gyrA_p.Ser91Pro",transformer
+transformer,levofloxacin,ALL,10,10,10,5,0.5,0.5,0.4999999950000001,"gyrB_p.Asn499Asp, gyrB_p.Ser447Phe, gyrA_p.Asp94Ala, gyrA_p.Gly88Ala, gyrA_p.Ser91Pro",transformer
+transformer,moxifloxacin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,gyrB_p.Ser447Phe,transformer
+transformer,moxifloxacin,ALL,5,5,10,3,0.6,0.3,0.3999999955555556,"gyrB_p.Ala504Val, gyrB_p.Ser447Phe, gyrA_p.Ala90Val",transformer
+transformer,moxifloxacin,ALL,10,10,10,4,0.4,0.4,0.3999999950000001,"gyrB_p.Ala504Val, gyrB_p.Ser447Phe, gyrA_p.Ala90Val, gyrA_p.Ser91Pro",transformer
+transformer,pyrazinamide,ALL,1,1,95,1,1.0,0.0105263157894736,0.0208333331271701,pncA_p.Pro54Arg,transformer
+transformer,pyrazinamide,ALL,5,5,95,3,0.6,0.031578947368421,0.05999999905,"pncA_p.Asp63Ala, pncA_p.Pro54Arg, pncA_p.Pro62Arg",transformer
+transformer,pyrazinamide,ALL,10,10,95,7,0.7,0.0736842105263157,0.1333333316099773,"pncA_p.Asp63Ala, pncA_p.His57Arg, pncA_p.Leu27Pro, pncA_p.Leu35Pro, pncA_p.Pro54Arg, pncA_p.Pro62Arg, pncA_p.Val44Gly",transformer
+transformer,rifampicin,ALL,1,1,26,0,0.0,0.0,0.0,,transformer
+transformer,rifampicin,ALL,5,5,26,2,0.4,0.0769230769230769,0.1290322553590011,"rpoB_p.Ala451Gly, rpoB_p.His445Arg",transformer
+transformer,rifampicin,ALL,10,10,26,5,0.5,0.1923076923076923,0.2777777737654321,"rpoB_p.Ala451Gly, rpoB_p.Asp435Ala, rpoB_p.His445Arg, rpoB_p.Met434Arg, rpoB_p.Ser431Arg",transformer
+transformer,streptomycin,ALL,1,1,10,1,1.0,0.1,0.1818181801652892,gid_p.Pro84Leu,transformer
+transformer,streptomycin,ALL,5,5,10,1,0.2,0.1,0.133333328888889,gid_p.Pro84Leu,transformer
+transformer,streptomycin,ALL,10,10,10,2,0.2,0.2,0.1999999950000001,"gid_p.Ala200Glu, gid_p.Pro84Leu",transformer
