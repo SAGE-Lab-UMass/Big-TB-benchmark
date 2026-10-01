@@ -82,8 +82,17 @@ class MultigeneMultidrugSamples(Dataset):
         return item
 
 
+def _worker_init_fn(worker_id: int) -> None:
+    """Seed random number generators in each worker process for deterministic data loading."""
+    import random
+    random.seed(42 + worker_id)
+    np.random.seed(42 + worker_id)
+    torch.manual_seed(42 + worker_id)
+
+
 def make_loader(config: DataConfig, is_single_gene_algo: bool, load_train: bool, n_gpu: int) -> DataLoader:
-    create_multidrug_classification_data(config, is_single_gene_algo)
+    if not is_single_gene_algo:
+        create_multidrug_classification_data(config, is_single_gene_algo)
 
     if is_single_gene_algo:
         csv_filename = config.full_dataname
@@ -93,12 +102,20 @@ def make_loader(config: DataConfig, is_single_gene_algo: bool, load_train: bool,
         batch_size = config.train_batch_size if load_train else config.val_batch_size
 
     csv_path = Path(config.datapath) / csv_filename
+    if is_single_gene_algo and not csv_path.is_file():
+        raise FileNotFoundError(f"Single-gene embeddings require an existing genotype-phenotype CSV: {csv_path}")
     print(f"Loading data from {csv_path}")
     with csv_path.open(newline="") as csvfile:
         reader = list(csv.reader(csvfile, delimiter=","))
 
     headers = reader[0]
     rows = reader[1:]
+    if is_single_gene_algo:
+        drug_indices = [i for i, header in enumerate(headers) if header in DRUGS]
+        rows = [
+            row for row in rows
+            if any(RESISTANCE_CATEGORIES[row[i]] != -1 for i in drug_indices)
+        ]
     if config.max_isolates is not None:
         rows = rows[: config.max_isolates]
     isolate_ids = [row[0] for row in rows]
@@ -135,6 +152,7 @@ def make_loader(config: DataConfig, is_single_gene_algo: bool, load_train: bool,
         num_workers=config.num_workers * max(n_gpu, 1),
         collate_fn=collate_samples,
         pin_memory=torch.cuda.is_available(),
+        worker_init_fn=_worker_init_fn if config.num_workers > 0 else None,
     )
 
 
@@ -234,10 +252,7 @@ def split_data_into_train_val_sets(
     geno_pheno_data = geno_pheno_df[geno_pheno_df[DRUGS].apply(lambda row: (row != -1).any(), axis=1)]
 
     if is_single_gene_algo:
-        output_path = Path(config.datapath) / config.full_dataname
-        geno_pheno_data.to_csv(output_path, index=False)
-        print(f"Single-gene mode: wrote complete filtered data to {output_path}")
-        print(f"Number of isolates: {len(geno_pheno_data)}")
+        print(f"Single-gene mode: {len(geno_pheno_data)} isolates with drug labels")
         return
 
     all_indices = geno_pheno_df.index

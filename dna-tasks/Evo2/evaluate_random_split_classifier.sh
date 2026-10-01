@@ -9,7 +9,16 @@
 
 set -euo pipefail
 
-EVO2_DIR="${EVO2_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+if [[ -z "${EVO2_DIR:-}" ]]; then
+    EVO2_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [[ ! -d "${EVO2_DIR}/evo2_downstream" && -n "${SLURM_SUBMIT_DIR:-}" ]]; then
+        EVO2_DIR="${SLURM_SUBMIT_DIR}"
+    fi
+fi
+if [[ ! -d "${EVO2_DIR}/evo2_downstream" ]]; then
+    echo "Cannot find evo2_downstream in ${EVO2_DIR}. Set EVO2_DIR before submitting." >&2
+    exit 1
+fi
 export EVO2_DIR
 export PYTHONNOUSERSITE=1
 export PYTHONPATH="${EVO2_DIR}${PYTHONPATH:+:${PYTHONPATH}}"
@@ -34,6 +43,45 @@ VAL_BATCH_SIZE="${VAL_BATCH_SIZE:-16}"
 TEST_SPLIT="${TEST_SPLIT:-0.2}"
 PCA_COMPONENTS="${PCA_COMPONENTS:-10}"
 EVAL_FOLD="${EVAL_FOLD:-${SLURM_ARRAY_TASK_ID:-}}"
+
+if [[ "${USE_BEST_FOLD:-0}" == "1" ]]; then
+    if [[ -n "${EVAL_FOLD}" ]]; then
+        echo "USE_BEST_FOLD=1 requires a single job without EVAL_FOLD or a Slurm array" >&2
+        exit 1
+    fi
+    MANIFEST="${SAVED_MODEL_PATH}/${DRUG}/seed_${RANDOM_SEED}/best_fold.json"
+    EVAL_FOLD="$("${EVAL_PYTHON}" - "${MANIFEST}" "${DRUG}" "${RANDOM_SEED}" "${MODEL_NAME}" "${EMBED_TYPE}" "${PCA_COMPONENTS}" <<'PY'
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+path, drug, seed, model, embed_type, components = sys.argv[1:]
+record = json.loads(Path(path).read_text())
+expected = {"drug": drug, "seed": int(seed), "model_name": model,
+            "embed_type": embed_type}
+for key, value in expected.items():
+    if record.get(key) != value:
+        raise SystemExit(f"Best-fold record mismatch for {key}: {record.get(key)!r} != {value!r}")
+if embed_type == "pca" and record.get("pca_components") != int(components):
+    raise SystemExit("Best-fold record has a different PCA component count")
+fold = int(record["best_fold"])
+if fold not in range(1, 6):
+    raise SystemExit(f"Invalid best fold: {fold}")
+checkpoint = Path(path).parent / f"fold_{fold}" / f"{model}_best_model.pt"
+if checkpoint.resolve() != Path(record["checkpoint"]).resolve():
+    raise SystemExit("Best-fold record points to a different checkpoint")
+digest = hashlib.sha256()
+with checkpoint.open("rb") as stream:
+    for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+        digest.update(chunk)
+if digest.hexdigest() != record["checkpoint_sha256"]:
+    raise SystemExit("Best-fold checkpoint changed after selection; regenerate best_fold.json")
+print(fold)
+PY
+)"
+    echo "Selected fold ${EVAL_FOLD} from ${MANIFEST}"
+fi
 
 EXTRA_ARGS=()
 if [[ -n "${EVAL_FOLD}" ]]; then

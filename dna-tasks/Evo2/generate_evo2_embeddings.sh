@@ -9,6 +9,8 @@
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=500G
 #SBATCH --time=10:00:00
+#SBATCH --output=/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB-evo2-optimized/dna-tasks/Evo2/logs/embed_gen_%A_%a.out \
+#SBATCH --error=/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB-evo2-optimized/dna-tasks/Evo2/logs/embed_gen_%A_%a.err
 #SBATCH --job-name=evo2_embeddings
 
 set -euo pipefail
@@ -91,6 +93,10 @@ OUT_DIR="${EMBED_ROOT}/${GENE}"
 echo "Generating ${GENE} embeddings; output directory: ${OUT_DIR}"
 
 cd "${EVO2_DIR}"
+
+# Set CUBLAS configuration for deterministic behavior on GPUs with CUDA >= 10.2
+# This is required when torch.use_deterministic_algorithms(True) is enabled
+export CUBLAS_WORKSPACE_CONFIG=:16:8
 
 evo2_run "${EVO2_EMBED_PYTHON}" -m evo2_embed_gen.embeddings.generate_embeddings \
     --embed_dir "${EMBED_ROOT}" \
