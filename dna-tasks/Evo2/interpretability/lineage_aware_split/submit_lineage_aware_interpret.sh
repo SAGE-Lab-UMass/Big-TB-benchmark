@@ -14,11 +14,36 @@ EVO2_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 DRUG="${1:-${DRUG:-AMIKACIN}}"
 DRUG="$(echo "${DRUG}" | tr '[:lower:]' '[:upper:]')"
-EMBED_TYPE="${EMBED_TYPE:-token}"
-MODEL_FILENAME="${MODEL_FILENAME:-auto}"
-MODEL_SEED="${MODEL_SEED:-42}"
 SHARD_COUNT="${SHARD_COUNT:-4}"
 PARAM_FILE="${PARAM_FILE:-${SCRIPT_DIR}/parameter_files/shap_interpret_lineage_aware.yaml}"
+
+DEFAULT_PYTHON="/work/pi_annagreen_umass_edu/saishradha/miniconda3/envs/dnabert_s/bin/python"
+PYTHON="${PYTHON:-$DEFAULT_PYTHON}"
+
+yaml_value() {
+  local key="$1"
+  "${PYTHON}" - "${PARAM_FILE}" "${key}" <<'PY'
+import sys
+from pathlib import Path
+import yaml
+
+path, key = sys.argv[1:]
+with Path(path).open("r", encoding="utf-8") as handle:
+    config = yaml.safe_load(handle) or {}
+value = config.get(key, "")
+if value is None:
+    value = ""
+print(value)
+PY
+}
+
+EMBED_TYPE="${EMBED_TYPE:-$(yaml_value embed_type)}"
+EMBED_TYPE="${EMBED_TYPE:-token}"
+MODEL_FILENAME="${MODEL_FILENAME:-$(yaml_value model_filename)}"
+MODEL_FILENAME="${MODEL_FILENAME:-auto}"
+MODEL_SEED="${MODEL_SEED:-$(yaml_value model_seed)}"
+MODEL_SEED="${MODEL_SEED:-42}"
+MODEL_DIR="${MODEL_DIR:-$(yaml_value model_dir)}"
 MODEL_DIR="${MODEL_DIR:-/project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/training_output/lineage_aware_holdout}"
 
 SAVED_MODELS_DIR="${MODEL_DIR}/${DRUG}/saved_models/evo2/${EMBED_TYPE}"

@@ -237,9 +237,18 @@ def select_explainer_shard(
     return shard
 
 
+def _cache_name(drug: str, embed_type: str, config: dict[str, Any]) -> str:
+    if embed_type == "pca":
+        return f"{drug}_pca_pc{int(config.get('pca_components', 10))}_full"
+    if embed_type == "token":
+        return f"{drug}_full"
+    return f"{drug}_{embed_type}_full"
+
+
 def run(config: dict[str, Any]) -> tuple[Path | None, Path | None]:
     drug = config["drug"]
     embed_type = config.get("embed_type", "token")
+    pca_components = int(config.get("pca_components", 10))
     model_name = config.get("model_name", "DNABERTCNN")
     model_filename = config.get("model_filename", DEFAULT_MODEL_FILENAME)
     model_seed = str(config.get("model_seed", DEFAULT_MODEL_SEED))
@@ -278,15 +287,20 @@ def run(config: dict[str, Any]) -> tuple[Path | None, Path | None]:
     dedup_dir = output_dir / "dedup_geno_data"
 
     dataset, label_map, per_gene_len, gene_names = build_full_dataset(
-        drug, embed_type, config["memmap_dir"], config["phenotype_label_path"]
+        drug,
+        embed_type,
+        config["memmap_dir"],
+        config["phenotype_label_path"],
+        pca_components=pca_components,
     )
     print(f"{drug}: dataset has {len(dataset)} labelled samples across genes {gene_names}")
 
+    cache_name = _cache_name(drug, embed_type, config)
     fingerprints = load_or_create_fingerprints(
-        dataset, f"{drug}_full", dedup_dir
+        dataset, cache_name, dedup_dir
     )
     dedup_indices = dedup_and_save_indices(
-        dataset, f"{drug}_full", dedup_dir, fingerprints=fingerprints
+        dataset, cache_name, dedup_dir, fingerprints=fingerprints
     )
     print(f"{drug}: {len(dedup_indices)} deduplicated samples available for SHAP")
 

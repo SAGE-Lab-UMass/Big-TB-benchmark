@@ -60,8 +60,68 @@ class Wrapped(torch.nn.Module):
         return self.base(x).unsqueeze(1)
 
 
-def _gene_token_length(memmap_dir: str, gene: str, embed_type: str) -> int:
-    meta_path = next(Path(memmap_dir, gene).glob(f"*_{embed_type}_meta.npz"))
+def _embedding_meta_pattern(embed_type: str, pca_components: int = 10) -> str:
+    if embed_type == "pca":
+        return f"*_pc{pca_components}_meta.npz"
+    return f"*_{embed_type}_meta.npz"
+
+
+def _resolve_pca_gene_dirs(
+    memmap_dir: str | Path,
+    loci: Sequence[str],
+    pca_components: int,
+) -> dict[str, Path]:
+    root = Path(memmap_dir)
+    loci = list(loci)
+
+    direct = {gene: root / gene for gene in loci}
+    if all(path.is_dir() for path in direct.values()):
+        return direct
+
+    single_gene = {gene: root / f"{gene}_pc{pca_components}" / gene for gene in loci}
+    if all(path.is_dir() for path in single_gene.values()):
+        return single_gene
+
+    candidates = []
+    for group_dir in root.glob(f"*_pc{pca_components}"):
+        if not group_dir.is_dir():
+            continue
+        available = {path.name for path in group_dir.iterdir() if path.is_dir()}
+        if set(loci).issubset(available):
+            candidates.append((available == set(loci), group_dir))
+
+    if candidates:
+        candidates.sort(key=lambda item: (not item[0], item[1].name))
+        group_dir = candidates[0][1]
+        return {gene: group_dir / gene for gene in loci}
+
+    raise FileNotFoundError(
+        f"No PCA pc{pca_components} memmap group for loci {loci} under {root}"
+    )
+
+
+def _gene_memmap_dir(
+    memmap_dir: str | Path,
+    gene: str,
+    embed_type: str,
+    pca_components: int = 10,
+) -> Path:
+    if embed_type == "pca":
+        return _resolve_pca_gene_dirs(memmap_dir, [gene], pca_components)[gene]
+    return Path(memmap_dir, gene)
+
+
+def _gene_token_length(
+    memmap_dir: str,
+    gene: str,
+    embed_type: str,
+    pca_components: int = 10,
+) -> int:
+    meta_path = next(
+        _gene_memmap_dir(memmap_dir, gene, embed_type, pca_components).glob(
+            _embedding_meta_pattern(embed_type, pca_components)
+        )
+    )
     return int(np.load(meta_path, allow_pickle=True)["shape"][1])
 
 
@@ -70,28 +130,63 @@ def build_full_dataset(
     embed_type: str,
     memmap_dir: str,
     phenotype_label_path: str,
+    pca_components: int = 10,
 ):
-    """Build the (single- or multi-gene) Evo2 token dataset for ``drug``.
+    """Build the (single- or multi-gene) Evo2 embedding dataset for ``drug``.
 
     Returns ``(dataset, label_map, per_gene_lengths, gene_names)``.
     """
     full_label_map, _ = build_label_map(phenotype_label_path, drug, prefix="full")
     loci = DRUG_TO_LOCI[drug]
+    meta_pattern = _embedding_meta_pattern(embed_type, pca_components)
 
     if len(loci) == 1:
         gene = loci[0]
-        meta_paths = sorted(glob.glob(f"{memmap_dir}/{gene}/*_{embed_type}_meta.npz"))
+        gene_dir = _gene_memmap_dir(memmap_dir, gene, embed_type, pca_components)
+        meta_paths = sorted(glob.glob(f"{gene_dir}/{meta_pattern}"))
         if not meta_paths:
             raise FileNotFoundError(
-                f"No {embed_type} metadata found for {gene} under {memmap_dir}"
+                f"No {embed_type} metadata matching {meta_pattern} found for "
+                f"{gene} under {gene_dir}"
             )
-        dataset = evo2_data.TokenMemmapMap(meta_paths, full_label_map)
-        per_gene_len = [_gene_token_length(memmap_dir, gene, embed_type)]
+        if embed_type == "token":
+            dataset = evo2_data.TokenMemmapMap(meta_paths, full_label_map)
+        elif embed_type == "pca":
+            dataset = evo2_data.PcaMemmapMap(
+                meta_paths, full_label_map, k=pca_components
+            )
+        elif embed_type in {"mean_dim", "mean_seq"}:
+            dataset = evo2_data.MeanMemmapMap(
+                meta_paths, full_label_map, embed_type=embed_type
+            )
+        else:
+            raise ValueError(f"Unsupported embed_type: {embed_type}")
+        per_gene_len = [
+            _gene_token_length(memmap_dir, gene, embed_type, pca_components)
+        ]
         gene_names = [gene]
     else:
-        gene_dirs = [f"{memmap_dir}/{gene}/" for gene in loci]
-        dataset = evo2_data.MultiGeneConcatDataset(gene_dirs, full_label_map)
-        per_gene_len = [_gene_token_length(memmap_dir, gene, embed_type) for gene in loci]
+        if embed_type == "pca":
+            resolved_dirs = _resolve_pca_gene_dirs(memmap_dir, loci, pca_components)
+            gene_dirs = [str(resolved_dirs[gene]) for gene in loci]
+        else:
+            gene_dirs = [f"{memmap_dir}/{gene}/" for gene in loci]
+        if embed_type == "token":
+            dataset = evo2_data.MultiGeneConcatDataset(gene_dirs, full_label_map)
+        elif embed_type == "pca":
+            dataset = evo2_data.PcaMultiGeneConcatDataset(
+                gene_dirs, full_label_map, k=pca_components
+            )
+        elif embed_type in {"mean_dim", "mean_seq"}:
+            dataset = evo2_data.MeanMultiGeneConcatDataset(
+                gene_dirs, full_label_map, embed_type=embed_type
+            )
+        else:
+            raise ValueError(f"Unsupported embed_type: {embed_type}")
+        per_gene_len = [
+            _gene_token_length(memmap_dir, gene, embed_type, pca_components)
+            for gene in loci
+        ]
         gene_names = list(loci)
 
     return dataset, full_label_map, per_gene_len, gene_names
@@ -352,6 +447,7 @@ def discover_folds(
     model_name: str = "DNABERTCNN",
     model_filename: str = "auto",
     model_seed: str = "42",
+    saved_models_dir: str | Path | None = None,
 ) -> dict[str, tuple[str, Path, str]]:
     """Return ``{fold: (seed, model_path, checkpoint_name)}`` for every fold
     directory that has a usable checkpoint.
@@ -361,11 +457,20 @@ def discover_folds(
     (``<model_name>_best_model.pt``) -- matching the checkpoint-selection
     convention used for the zero-shot random-split evaluation jobs.
     """
-    saved_models_dir = (
-        Path(model_dir) / drug / "saved_models" / "evo2" / embed_type / drug / f"seed_{model_seed}"
-    )
-    if not saved_models_dir.is_dir():
-        raise FileNotFoundError(f"Training output for {drug} not found: {saved_models_dir}")
+    if saved_models_dir is None:
+        fold_root = (
+            Path(model_dir)
+            / drug
+            / "saved_models"
+            / "evo2"
+            / embed_type
+            / drug
+            / f"seed_{model_seed}"
+        )
+    else:
+        fold_root = Path(saved_models_dir) / drug / f"seed_{model_seed}"
+    if not fold_root.is_dir():
+        raise FileNotFoundError(f"Training output for {drug} not found: {fold_root}")
 
     if model_filename == "auto":
         candidates = (f"{model_name}.pt", f"{model_name}_best_model.pt")
@@ -373,7 +478,7 @@ def discover_folds(
         candidates = (model_filename,)
 
     folds: dict[str, tuple[str, Path, str]] = {}
-    for fold_dir in sorted(saved_models_dir.glob("fold_*")):
+    for fold_dir in sorted(fold_root.glob("fold_*")):
         if not fold_dir.is_dir():
             continue
         fold = _fold_number(fold_dir.name)
@@ -385,7 +490,7 @@ def discover_folds(
 
     if not folds:
         raise FileNotFoundError(
-            f"No fold checkpoints found for {drug} below {saved_models_dir} "
+            f"No fold checkpoints found for {drug} below {fold_root} "
             f"(tried {', '.join(candidates)})"
         )
     return folds
@@ -402,18 +507,27 @@ def _history_best_val_auc(
     fold: str,
     model_name: str,
     model_seed: str,
+    history_dir: str | Path | None = None,
 ) -> float | None:
     """Return the maximum ``val_auc`` in a fold's training history, or None."""
-    history_path = (
-        Path(model_dir)
-        / drug
-        / "classification_results"
-        / "evo2"
-        / embed_type
-        / drug
-        / f"seed_{model_seed}"
-        / f"{model_name}_fold{fold}_history.csv"
-    )
+    if history_dir is None:
+        history_path = (
+            Path(model_dir)
+            / drug
+            / "classification_results"
+            / "evo2"
+            / embed_type
+            / drug
+            / f"seed_{model_seed}"
+            / f"{model_name}_fold{fold}_history.csv"
+        )
+    else:
+        history_path = (
+            Path(history_dir)
+            / drug
+            / f"seed_{model_seed}"
+            / f"{model_name}_fold{fold}_history.csv"
+        )
     if not history_path.is_file():
         return None
     history = pd.read_csv(history_path)
@@ -429,18 +543,77 @@ def select_best_fold(
     model_name: str = "DNABERTCNN",
     model_filename: str = "auto",
     model_seed: str = "42",
+    saved_models_dir: str | Path | None = None,
+    history_dir: str | Path | None = None,
+    best_fold_source: str = "auto",
+    pca_components: int | None = None,
 ) -> dict:
     """Pick the fold with the highest validation AUC for ``drug``.
 
     Falls back to the first available fold (lowest fold number) when no
     fold has a training history with a usable ``val_auc`` column.
     """
-    folds = discover_folds(model_dir, drug, embed_type, model_name, model_filename, model_seed)
+    folds = discover_folds(
+        model_dir,
+        drug,
+        embed_type,
+        model_name,
+        model_filename,
+        model_seed,
+        saved_models_dir=saved_models_dir,
+    )
+
+    if best_fold_source not in {"auto", "best_fold_json", "history"}:
+        raise ValueError(
+            "best_fold_source must be one of: auto, best_fold_json, history"
+        )
+
+    if best_fold_source in {"auto", "best_fold_json"} and saved_models_dir is not None:
+        best_fold_path = Path(saved_models_dir) / drug / f"seed_{model_seed}" / "best_fold.json"
+        if best_fold_path.is_file():
+            with best_fold_path.open("r", encoding="utf-8") as handle:
+                record = json.load(handle)
+            if str(record.get("drug", "")).upper() != drug:
+                raise ValueError(f"Drug mismatch in {best_fold_path}")
+            if str(record.get("model_name", model_name)) != model_name:
+                raise ValueError(f"Model-name mismatch in {best_fold_path}")
+            if str(record.get("embed_type", embed_type)) != embed_type:
+                raise ValueError(f"Embedding-type mismatch in {best_fold_path}")
+            if (
+                embed_type == "pca"
+                and pca_components is not None
+                and int(record.get("pca_components", pca_components)) != int(pca_components)
+            ):
+                raise ValueError(f"PCA component-count mismatch in {best_fold_path}")
+            fold = str(record["best_fold"])
+            if fold not in folds:
+                raise ValueError(
+                    f"best_fold.json selected fold {fold}, but available folds are "
+                    f"{sorted(folds, key=_fold_sort_key)}"
+                )
+            seed_used, model_path, checkpoint_name = folds[fold]
+            return {
+                "fold": fold,
+                "seed": seed_used,
+                "model_path": str(model_path),
+                "model_filename": checkpoint_name,
+                "best_val_auc": record.get("best_val_auc"),
+                "reason": f"best_fold.json at {best_fold_path}",
+                "folds_considered": sorted(folds, key=_fold_sort_key),
+            }
+        if best_fold_source == "best_fold_json":
+            raise FileNotFoundError(f"Requested best_fold_json not found: {best_fold_path}")
 
     scored = []
     for fold, (seed_used, model_path, checkpoint_name) in folds.items():
         best_val_auc = _history_best_val_auc(
-            model_dir, drug, embed_type, fold, model_name, seed_used
+            model_dir,
+            drug,
+            embed_type,
+            fold,
+            model_name,
+            seed_used,
+            history_dir=history_dir,
         )
         scored.append((fold, seed_used, model_path, checkpoint_name, best_val_auc))
 

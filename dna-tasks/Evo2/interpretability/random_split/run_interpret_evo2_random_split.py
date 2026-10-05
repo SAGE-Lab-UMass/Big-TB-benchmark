@@ -161,12 +161,21 @@ def _resolve_fold_selection(config: dict[str, Any], selection_path: Path) -> dic
     model_name = config.get("model_name", "DNABERTCNN")
     model_filename = config.get("model_filename", "auto")
     model_seed = str(config.get("model_seed", DEFAULT_MODEL_SEED))
+    saved_models_dir = config.get("saved_models_dir")
+    history_dir = config.get("history_dir")
+    best_fold_source = config.get("best_fold_source", "auto")
     fold_override = config.get("fold")
     fold_override = str(fold_override) if fold_override is not None else None
 
     if fold_override is not None:
         folds = discover_folds(
-            config["model_dir"], drug, embed_type, model_name, model_filename, model_seed
+            config["model_dir"],
+            drug,
+            embed_type,
+            model_name,
+            model_filename,
+            model_seed,
+            saved_models_dir=saved_models_dir,
         )
         if fold_override not in folds:
             raise ValueError(
@@ -190,16 +199,36 @@ def _resolve_fold_selection(config: dict[str, Any], selection_path: Path) -> dic
         return load_fold_selection(selection_path)
 
     selection = select_best_fold(
-        config["model_dir"], drug, embed_type, model_name, model_filename, model_seed
+        config["model_dir"],
+        drug,
+        embed_type,
+        model_name,
+        model_filename,
+        model_seed,
+        saved_models_dir=saved_models_dir,
+        history_dir=history_dir,
+        best_fold_source=best_fold_source,
+        pca_components=(
+            int(config.get("pca_components", 10)) if embed_type == "pca" else None
+        ),
     )
     save_fold_selection(selection_path, selection)
     return selection
+
+
+def _cache_name(drug: str, embed_type: str, config: dict[str, Any]) -> str:
+    if embed_type == "pca":
+        return f"{drug}_pca_pc{int(config.get('pca_components', 10))}_full"
+    if embed_type == "token":
+        return f"{drug}_full"
+    return f"{drug}_{embed_type}_full"
 
 
 def run(config: dict[str, Any]) -> tuple[Path | None, Path | None]:
     drug = config["drug"]
     embed_type = config.get("embed_type", "token")
     model_name = config.get("model_name", "DNABERTCNN")
+    pca_components = int(config.get("pca_components", 10))
 
     shard_count = int(config.get("explainer_shard_count", 1))
     shard_index_value = config.get("explainer_shard_index")
@@ -228,13 +257,18 @@ def run(config: dict[str, Any]) -> tuple[Path | None, Path | None]:
     print(f"{drug}: selected fold {fold} -> {model_path.name} ({selection['reason']})")
 
     dataset, _label_map, per_gene_len, gene_names = build_full_dataset(
-        drug, embed_type, config["memmap_dir"], config["phenotype_label_path"]
+        drug,
+        embed_type,
+        config["memmap_dir"],
+        config["phenotype_label_path"],
+        pca_components=pca_components,
     )
     print(f"{drug}: dataset has {len(dataset)} labelled samples across genes {gene_names}")
 
-    fingerprints = load_or_create_fingerprints(dataset, f"{drug}_full", dedup_dir)
+    cache_name = _cache_name(drug, embed_type, config)
+    fingerprints = load_or_create_fingerprints(dataset, cache_name, dedup_dir)
     dedup_indices = dedup_and_save_indices(
-        dataset, f"{drug}_full", dedup_dir, fingerprints=fingerprints
+        dataset, cache_name, dedup_dir, fingerprints=fingerprints
     )
     print(f"{drug}: {len(dedup_indices)} deduplicated samples available for SHAP")
 

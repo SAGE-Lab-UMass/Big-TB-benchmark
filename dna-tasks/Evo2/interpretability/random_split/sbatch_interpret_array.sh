@@ -25,19 +25,21 @@ PYTHON="${PYTHON:-$DEFAULT_PYTHON}"
 
 DRUG="${DRUG:-AMIKACIN}"
 PARAM_FILE="${PARAM_FILE:-${SCRIPT_DIR}/parameter_files/shap_interpret_random_split.yaml}"
-MODEL_FILENAME="${MODEL_FILENAME:-auto}"
+MODEL_FILENAME="${MODEL_FILENAME:-}"
 SHARD_COUNT="${SHARD_COUNT:-4}"
 
 EXTRA_ARGS=()
 if [[ -n "${FOLD:-}" ]]; then
   EXTRA_ARGS+=(--fold "${FOLD}")
 fi
+if [[ -n "${MODEL_FILENAME}" ]]; then
+  EXTRA_ARGS+=(--model-filename "${MODEL_FILENAME}")
+fi
 
 echo "Array task ${SLURM_ARRAY_TASK_ID} -> ${DRUG} explainer shard $((SLURM_ARRAY_TASK_ID + 1))/${SHARD_COUNT}"
 
 "${PYTHON}" run_interpret_evo2_random_split.py "${PARAM_FILE}" \
   --drug "${DRUG}" \
-  --model-filename "${MODEL_FILENAME}" \
   "${EXTRA_ARGS[@]}" \
   --explainer-shard-index "${SLURM_ARRAY_TASK_ID}" \
   --explainer-shard-count "${SHARD_COUNT}"

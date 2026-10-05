@@ -26,15 +26,17 @@ PYTHON="${PYTHON:-$DEFAULT_PYTHON}"
 
 DRUG="${DRUG:-AMIKACIN}"
 PARAM_FILE="${PARAM_FILE:-${SCRIPT_DIR}/parameter_files/shap_interpret_random_split.yaml}"
-MODEL_FILENAME="${MODEL_FILENAME:-auto}"
+MODEL_FILENAME="${MODEL_FILENAME:-}"
 
 EXTRA_ARGS=()
 if [[ -n "${FOLD:-}" ]]; then
   EXTRA_ARGS+=(--fold "${FOLD}")
 fi
+if [[ -n "${MODEL_FILENAME}" ]]; then
+  EXTRA_ARGS+=(--model-filename "${MODEL_FILENAME}")
+fi
 
 "${PYTHON}" run_interpret_evo2_random_split.py "${PARAM_FILE}" \
   --drug "${DRUG}" \
-  --model-filename "${MODEL_FILENAME}" \
   "${EXTRA_ARGS[@]}" \
   --prep-only

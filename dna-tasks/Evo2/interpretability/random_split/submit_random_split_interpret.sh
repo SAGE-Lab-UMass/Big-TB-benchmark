@@ -18,7 +18,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DRUG="${1:-${DRUG:-AMIKACIN}}"
 DRUG="$(echo "${DRUG}" | tr '[:lower:]' '[:upper:]')"
 PARAM_FILE="${PARAM_FILE:-${SCRIPT_DIR}/parameter_files/shap_interpret_random_split.yaml}"
-MODEL_FILENAME="${MODEL_FILENAME:-auto}"
+MODEL_FILENAME="${MODEL_FILENAME:-}"
 SHARD_COUNT="${SHARD_COUNT:-4}"
 FOLD="${FOLD:-}"
 

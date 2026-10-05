@@ -56,8 +56,68 @@ class Wrapped(torch.nn.Module):
         return self.base(x).unsqueeze(1)
 
 
-def _gene_token_length(memmap_dir: str, gene: str, embed_type: str) -> int:
-    meta_path = next(Path(memmap_dir, gene).glob(f"*_{embed_type}_meta.npz"))
+def _embedding_meta_pattern(embed_type: str, pca_components: int = 10) -> str:
+    if embed_type == "pca":
+        return f"*_pc{pca_components}_meta.npz"
+    return f"*_{embed_type}_meta.npz"
+
+
+def _resolve_pca_gene_dirs(
+    memmap_dir: str | Path,
+    loci: Sequence[str],
+    pca_components: int,
+) -> dict[str, Path]:
+    root = Path(memmap_dir)
+    loci = list(loci)
+
+    direct = {gene: root / gene for gene in loci}
+    if all(path.is_dir() for path in direct.values()):
+        return direct
+
+    single_gene = {gene: root / f"{gene}_pc{pca_components}" / gene for gene in loci}
+    if all(path.is_dir() for path in single_gene.values()):
+        return single_gene
+
+    candidates = []
+    for group_dir in root.glob(f"*_pc{pca_components}"):
+        if not group_dir.is_dir():
+            continue
+        available = {path.name for path in group_dir.iterdir() if path.is_dir()}
+        if set(loci).issubset(available):
+            candidates.append((available == set(loci), group_dir))
+
+    if candidates:
+        candidates.sort(key=lambda item: (not item[0], item[1].name))
+        group_dir = candidates[0][1]
+        return {gene: group_dir / gene for gene in loci}
+
+    raise FileNotFoundError(
+        f"No PCA pc{pca_components} memmap group for loci {loci} under {root}"
+    )
+
+
+def _gene_memmap_dir(
+    memmap_dir: str | Path,
+    gene: str,
+    embed_type: str,
+    pca_components: int = 10,
+) -> Path:
+    if embed_type == "pca":
+        return _resolve_pca_gene_dirs(memmap_dir, [gene], pca_components)[gene]
+    return Path(memmap_dir, gene)
+
+
+def _gene_token_length(
+    memmap_dir: str,
+    gene: str,
+    embed_type: str,
+    pca_components: int = 10,
+) -> int:
+    meta_path = next(
+        _gene_memmap_dir(memmap_dir, gene, embed_type, pca_components).glob(
+            _embedding_meta_pattern(embed_type, pca_components)
+        )
+    )
     return int(np.load(meta_path, allow_pickle=True)["shape"][1])
 
 
@@ -66,28 +126,63 @@ def build_full_dataset(
     embed_type: str,
     memmap_dir: str,
     phenotype_label_path: str,
+    pca_components: int = 10,
 ):
-    """Build the (single- or multi-gene) Evo2 token dataset for ``drug``.
+    """Build the (single- or multi-gene) Evo2 embedding dataset for ``drug``.
 
     Returns ``(dataset, label_map, per_gene_lengths, gene_names)``.
     """
     full_label_map, _ = build_label_map(phenotype_label_path, drug, prefix="full")
     loci = DRUG_TO_LOCI[drug]
+    meta_pattern = _embedding_meta_pattern(embed_type, pca_components)
 
     if len(loci) == 1:
         gene = loci[0]
-        meta_paths = sorted(glob.glob(f"{memmap_dir}/{gene}/*_{embed_type}_meta.npz"))
+        gene_dir = _gene_memmap_dir(memmap_dir, gene, embed_type, pca_components)
+        meta_paths = sorted(glob.glob(f"{gene_dir}/{meta_pattern}"))
         if not meta_paths:
             raise FileNotFoundError(
-                f"No {embed_type} metadata found for {gene} under {memmap_dir}"
+                f"No {embed_type} metadata matching {meta_pattern} found for "
+                f"{gene} under {gene_dir}"
             )
-        dataset = evo2_data.TokenMemmapMap(meta_paths, full_label_map)
-        per_gene_len = [_gene_token_length(memmap_dir, gene, embed_type)]
+        if embed_type == "token":
+            dataset = evo2_data.TokenMemmapMap(meta_paths, full_label_map)
+        elif embed_type == "pca":
+            dataset = evo2_data.PcaMemmapMap(
+                meta_paths, full_label_map, k=pca_components
+            )
+        elif embed_type in {"mean_dim", "mean_seq"}:
+            dataset = evo2_data.MeanMemmapMap(
+                meta_paths, full_label_map, embed_type=embed_type
+            )
+        else:
+            raise ValueError(f"Unsupported embed_type: {embed_type}")
+        per_gene_len = [
+            _gene_token_length(memmap_dir, gene, embed_type, pca_components)
+        ]
         gene_names = [gene]
     else:
-        gene_dirs = [f"{memmap_dir}/{gene}/" for gene in loci]
-        dataset = evo2_data.MultiGeneConcatDataset(gene_dirs, full_label_map)
-        per_gene_len = [_gene_token_length(memmap_dir, gene, embed_type) for gene in loci]
+        if embed_type == "pca":
+            resolved_dirs = _resolve_pca_gene_dirs(memmap_dir, loci, pca_components)
+            gene_dirs = [str(resolved_dirs[gene]) for gene in loci]
+        else:
+            gene_dirs = [f"{memmap_dir}/{gene}/" for gene in loci]
+        if embed_type == "token":
+            dataset = evo2_data.MultiGeneConcatDataset(gene_dirs, full_label_map)
+        elif embed_type == "pca":
+            dataset = evo2_data.PcaMultiGeneConcatDataset(
+                gene_dirs, full_label_map, k=pca_components
+            )
+        elif embed_type in {"mean_dim", "mean_seq"}:
+            dataset = evo2_data.MeanMultiGeneConcatDataset(
+                gene_dirs, full_label_map, embed_type=embed_type
+            )
+        else:
+            raise ValueError(f"Unsupported embed_type: {embed_type}")
+        per_gene_len = [
+            _gene_token_length(memmap_dir, gene, embed_type, pca_components)
+            for gene in loci
+        ]
         gene_names = list(loci)
 
     return dataset, full_label_map, per_gene_len, gene_names

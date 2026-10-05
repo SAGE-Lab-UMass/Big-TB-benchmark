@@ -25,9 +25,14 @@ PYTHON="${PYTHON:-$DEFAULT_PYTHON}"
 
 DRUG="${DRUG:-AMIKACIN}"
 PARAM_FILE="${PARAM_FILE:-${SCRIPT_DIR}/parameter_files/shap_interpret_lineage_aware.yaml}"
-MODEL_FILENAME="${MODEL_FILENAME:-DNABERTCNN.pt}"
+MODEL_FILENAME="${MODEL_FILENAME:-}"
+
+EXTRA_ARGS=()
+if [[ -n "${MODEL_FILENAME}" ]]; then
+  EXTRA_ARGS+=(--model-filename "${MODEL_FILENAME}")
+fi
 
 "${PYTHON}" run_interpret_evo2_lineage_aware.py "${PARAM_FILE}" \
   --drug "${DRUG}" \
-  --model-filename "${MODEL_FILENAME}" \
+  "${EXTRA_ARGS[@]}" \
   --prep-only
