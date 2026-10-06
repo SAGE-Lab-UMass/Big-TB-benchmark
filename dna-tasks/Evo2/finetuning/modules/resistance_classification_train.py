@@ -8,7 +8,6 @@ import torch.nn as nn
 import torch.optim as optim
 from downstream_cnn_model import *
 from torch.utils.data import DataLoader, random_split, Subset
-from sklearn.decomposition import PCA
 from sklearn.model_selection import StratifiedShuffleSplit
 from dataloader.dataloader import *
 from dataloader.locus_order import DRUG_TO_LOCI, DRUGS, locus_order 
@@ -60,40 +59,6 @@ def stratified_split_dataset(full_dataset, label_dict, test_size=0.2, seed=42):
 
     return train_indices, test_indices, y_train, y_test
 
-
-
-def concatenate_gene_embeddings(embeddings, use_pca=False, pca_components=10):
-    """
-    Concatenate embeddings across genes along the sequence length axis.
-
-    Input:
-        embeddings: torch.Tensor of shape (num_samples, dim, seq_len, num_selected_genes)
-    
-    Output:
-        torch.Tensor of shape (num_samples, dim, seq_len * num_selected_genes)
-    """
-    if use_pca:
-        B, D, L, G = embeddings.shape  # (batch, dim, seq_len, num_genes)
-    
-        # Move embedding dim to last → shape: (batch, seq_len, num_genes, dim)
-        embeddings = embeddings.permute(0, 2, 3, 1)
-        
-        # Flatten all time positions → shape: (batch, seq_len * num_genes, dim)
-        flattened = embeddings.reshape(-1, D).cpu().numpy()
-        
-        # Fit PCA
-        pca = PCA(n_components=pca_components)
-        reduced = pca.fit_transform(flattened)  # (batch * seq_len * num_genes, n_components)
-
-        # Reshape back: (batch, seq_len * num_genes, n_components)
-        reduced = torch.from_numpy(reduced).float().reshape(B, L * G, pca_components)
-
-        # Permute to (batch, n_components, seq_len * num_genes)
-        concatenated_embeddings = reduced.permute(0, 2, 1)
-    else:
-        # Combine the seq_len and gene dimensions
-        concatenated_embeddings = embeddings.reshape(embeddings.size(0), embeddings.size(1), -1)
-    return concatenated_embeddings
 
 
 DRUG_INDEX = {
@@ -228,19 +193,26 @@ def main(args):
     prefix = "full"
 
     #-------------------
-    print("Using per token embeddings for classification task.")
+    print(f"Using {args.embed_type} embeddings for classification task.")
 
     if len(DRUG_TO_LOCI[args.drug]) == 1:
-        print(f"Single gene drug {args.drug} selected, using per token embeddings.")
+        print(f"Single gene drug {args.drug} selected.")
         # Load labels and build label map
         full_label_map, drug_index = build_label_map(args.phenotype_label_path, args.drug, prefix=prefix)
 
         gene = DRUG_TO_LOCI[args.drug][0]
         print(f"Using gene: {gene}")
 
-        # Load meta file paths
-        meta_paths = sorted(glob.glob(f"{memmap_dir}/{gene}/*_{args.embed_type}_meta.npz"))
+        # PCA files encode the component count in their suffix (for example,
+        # *_pc10_meta.npz); other representations encode the embed type.
+        if args.embed_type == 'pca':
+            meta_pattern = f"{memmap_dir}/{gene}/*_pc{args.pca_components}_meta.npz"
+        else:
+            meta_pattern = f"{memmap_dir}/{gene}/*_{args.embed_type}_meta.npz"
+        meta_paths = sorted(glob.glob(meta_pattern))
         print(f"Found {len(meta_paths)} meta files")
+        if not meta_paths:
+            raise FileNotFoundError(f"No embedding metadata matched {meta_pattern}")
 
         # Construct the Dataset
         if args.embed_type == 'token':
@@ -262,7 +234,6 @@ def main(args):
         print("model dim:", model_dim)
         print("model seq len:", model_seq_len)
 
-        assert meta_paths, "No meta files found - check path or in_dim"
     else:
         # train_gene_dirs = extract_genes(args.drug, gene_base_path, data_partition="train")
         # val_gene_dirs = extract_genes(args.drug, gene_base_path, data_partition="val")
@@ -412,11 +383,12 @@ if __name__ == "__main__":
     parser.add_argument('--output_path', type=str, default='training_output/transfer_learn/classification_results', help="Directory to save the trained model")
     parser.add_argument('--saved_model_path', type=str, default='training_output/transfer_learn/saved_models', help="Directory to save the trained model")
     parser.add_argument('--random_seed', type=int, default=1, help="Random seed for reproducibility")
-    parser.add_argument('--embed_type', type=str, default='token', help="The type of embedding to use. Options: 'token', 'mean'")
+    parser.add_argument('--embed_type', type=str, default='token',
+                        choices=['token', 'mean_dim', 'mean_seq', 'pca'])
     parser.add_argument('--drug', type=str, default='ISONIAZID', help="Drug to use for classification. Options: 'RIFAMPICIN', 'CIPROFLOXACIN', etc.")
 
-    parser.add_argument('--use_pca', action='store_true', help="Whether to use PCA for dimensionality reduction on embedding dimensions")
-    parser.add_argument('--pca_components', type=int, default=10, help="Number of PCA components to keep if use_pca is True")
+    parser.add_argument('--pca_components', type=int, default=10,
+                        help="Component count in precomputed PCA embedding files")
     
     # Early stopping parameters (matching SD-CNN defaults)
     parser.add_argument('--early_stopping_min_epochs', type=int, default=5,

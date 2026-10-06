@@ -1,0 +1,2 @@
+Model_vs_Baseline,Mean_Baseline,Mean_Model,ΔAUC,W_stat,p_wilcoxon,Num_Drugs,p_wilcoxon_holm
+MD-CNN,0.8670858596835473,0.9221981479505638,0.05511228826701639,0.0,0.0009765625,11,0.0009765625

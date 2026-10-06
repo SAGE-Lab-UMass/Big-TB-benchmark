@@ -289,10 +289,23 @@ def _run_dry_split(args: argparse.Namespace, lineage_split_fn) -> None:
     loci = DRUG_TO_LOCI[args.drug]
     if len(loci) == 1:
         gene = loci[0]
-        meta_paths = sorted(
-            glob.glob(f"{memmap_dir}/{gene}/*_{args.embed_type}_meta.npz")
-        )
-        full_dataset = TokenMemmapMap(meta_paths, full_label_map)
+        # Construct the correct glob pattern based on embed_type
+        if args.embed_type == "pca":
+            # PCA-compressed token embeddings are named with *_token_pc{k}_meta.npz
+            glob_pattern = f"{memmap_dir}/{gene}/*_token_pc{args.pca_components}_meta.npz"
+        else:
+            glob_pattern = f"{memmap_dir}/{gene}/*_{args.embed_type}_meta.npz"
+        
+        meta_paths = sorted(glob.glob(glob_pattern))
+        # Select the appropriate dataloader based on embed_type
+        if args.embed_type == "token":
+            full_dataset = TokenMemmapMap(meta_paths, full_label_map)
+        elif args.embed_type == "pca":
+            from resistance_classification_train import PcaMemmapMap  # noqa: E402
+            full_dataset = PcaMemmapMap(meta_paths, full_label_map, k=args.pca_components)
+        else:
+            from resistance_classification_train import MeanMemmapMap  # noqa: E402
+            full_dataset = MeanMemmapMap(meta_paths, full_label_map, embed_type=args.embed_type)
     else:
         gene_memmap_dirs = [f"{memmap_dir}/{gene}/" for gene in loci]
         full_dataset = MultiGeneConcatDataset(gene_memmap_dirs, full_label_map)

@@ -1,0 +1,30 @@
+## Lineage-aware interpretability parameters for Evo2 DNABERTCNN PCA models
+
+drug: ISONIAZID
+embed_type: pca
+pca_components: 10
+model_name: DNABERTCNN
+model_filename: DNABERTCNN_best_model.pt
+model_seed: 1
+
+model_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB-evo2-optimized/dna-tasks/Evo2/training_output/zero_shot/lineage_aware_holdout
+memmap_dir: /scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/embeddings/zero-shot/token/memmaps/PCA
+phenotype_label_path: /scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/embeddings/zero-shot/token/layer20/full/zs_full_stacked_phenotypes.npz
+geno_pheno_csv: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/data/multidrug_classification/training/geno_pheno_full_combined.csv
+lineage_csv: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/BIG_TB_isolates_with_lineages.csv
+WHO_VCF_mapped_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/vcf_who_mapped_data
+output_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB-evo2-optimized/dna-tasks/Evo2/interpretability/lineage_aware_split/outputs/pca_pc10
+
+has_neg_strand: true
+k_values: [1, 5, 10]
+
+top_n_positions: 100
+
+background_frac: 0.2
+max_background: 160
+max_explain: 360
+shap_batch_size: 4
+shap_background_batch_size: 16
+random_seed: 42
+
+save_shap_values: false

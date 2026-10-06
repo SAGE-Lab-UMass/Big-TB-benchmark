@@ -1,0 +1,41 @@
+## Lineage-aware interpretability parameters for Evo2 DNABERTCNN models
+
+drug: ETHAMBUTOL
+embed_type: token
+model_name: DNABERTCNN
+# Must match eval_lineage_holdout.py's --saved_model_name default ("DNABERTCNN"),
+# i.e. the exact checkpoint that produced test_set_auc_<DRUG>.csv.
+model_filename: DNABERTCNN_best_model.pt
+model_seed: 42
+
+model_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/training_output/zero_shot/lineage_aware_holdout
+memmap_dir: /scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/downstream_inputs/layer20/token/memmaps
+phenotype_label_path: /scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/embeddings/zero-shot/token/layer20/full/zs_full_stacked_phenotypes.npz
+geno_pheno_csv: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/data/multidrug_classification/training/geno_pheno_full_combined.csv
+lineage_csv: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/BIG_TB_isolates_with_lineages.csv
+WHO_VCF_mapped_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/vcf_who_mapped_data
+output_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/interpretability/lineage_aware_split/outputs
+
+has_neg_strand: true
+k_values: [1, 5, 10]
+
+# Number of top SHAP-ranked "<gene>_<position>" features fed into MAP/MAR.
+# Matches DNABERT-2/interpretability's run_shap_interpret.py top_n_positions.
+top_n_positions: 100
+
+# One fixed stratified explainer is selected per drug from the deduplicated
+# labelled dataset and reused for every lineage. Each lineage background is
+# selected from the exact inner-training subset used to fit that model after
+# removing the explainer and duplicate embedding/phenotype fingerprints.
+background_frac: 0.2
+max_background: 160
+max_explain: 360
+shap_batch_size: 4
+# Process the selected background in weighted chunks to bound A100 memory.
+shap_background_batch_size: 16
+random_seed: 42
+
+# Set to true to also persist the full per-sample SHAP matrix per lineage
+# (can be large - disabled by default, same rationale as the Regression
+# lineage-aware parameter file).
+save_shap_values: false
