@@ -1,0 +1,6 @@
+# Additional requirements for LoRA fine-tuning
+# Install after base requirements.txt
+
+peft>=0.13.0
+accelerate>=0.34.0
+tensorboard>=2.20.0

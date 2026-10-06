@@ -20,7 +20,7 @@ PROTEIN_TASKS_DIR = THIS_DIR.parent
 sys.path.insert(0, str(PROTEIN_TASKS_DIR))
 
 from lineage_split_utils import build_and_save_drug_splits, DEFAULT_MIN_CLASS_COUNT
-from significance_testing import (
+from esm_cv_training import (
     DRUG2GENES,
     load_dataset_for_cv,
     train_token_split,
