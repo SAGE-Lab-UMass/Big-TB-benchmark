@@ -1,0 +1,11 @@
+Drug,Residues discovered,Total carriers,Total R,Total S,Positions w/ 0 carriers,Min carriers/position,Median carriers/position,Max carriers/position
+Rifampicin,52,5126,4835,291,0,1,5.0,3198
+Isoniazid,66,6346,6103,243,0,1,1.0,4377
+Ethambutol,9,3198,2388,810,0,23,277.0,1084
+Pyrazinamide,221,2096,1748,348,0,1,4.0,117
+Streptomycin,84,2213,1801,412,1,1,2.0,965
+Moxifloxacin,13,377,279,98,0,1,5.0,198
+Levofloxacin,8,90,72,18,1,1,4.5,45
+Ethionamide,126,1182,698,484,2,1,2.0,478
+Capreomycin,24,587,468,119,0,1,1.0,511
+Kanamycin,8,648,588,60,0,1,28.5,484

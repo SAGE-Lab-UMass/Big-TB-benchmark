@@ -81,16 +81,15 @@ BASE_TO_COLUMN = {
 }
     
 DRUG_TO_LOCI = {
-    'ISONIAZID': ['inhA', 'katG'], 
-    'RIFAMPICIN': ['rpoB', 'rpoC'], # incomplete
-    'ETHAMBUTOL': ['embC', 'embA', 'embB'], # ran
-    'PYRAZINAMIDE': ['pncA'], # complete
-    'STREPTOMYCIN': ['rpsL', 'rrs', 'gid'], # ran
-    'KANAMYCIN': ['rrs'], #
-    'AMIKACIN': ['rrs', 'eis'], # complete
-    'CAPREOMYCIN': ['rrs', 'rrl', 'tlyA'], # 
-    'LEVOFLOXACIN': ['gyrB', 'gyrA'], # 
-    'MOXIFLOXACIN': ['gyrB', 'gyrA'], # ran
-    'ETHIONAMIDE': ['inhA', 'ethA', 'ethR'], # complete
-    # Add more drugs and their corresponding loci as needed
+    'ISONIAZID': ['inhA', 'katG'], # complete, mean_d ran, mean_s ran, pca train complete, mean_seq_dim train ran
+    'RIFAMPICIN': ['rpoB', 'rpoC'], # complete, mean_d ran, mean_s ran, pca train complete, mean_seq_dim train ran
+    'ETHAMBUTOL': ['embC', 'embA', 'embB'], # ran, 
+    'PYRAZINAMIDE': ['pncA'], # complete, pca train complete, mean_d ran, mean_s ran, 
+    'STREPTOMYCIN': ['rpsL', 'rrs', 'gid'], # complete, pca train complete, mean_d ran, mean_s ran, mean_seq_dim train ran
+    'KANAMYCIN': ['rrs'], # complete, pca train ran
+    'AMIKACIN': ['rrs', 'eis'], # complete, mean_d ran, mean_s ran, pca train complete
+    'CAPREOMYCIN': ['rrs', 'rrl', 'tlyA'], # ran
+    'LEVOFLOXACIN': ['gyrB', 'gyrA'], # complete, pca train complete, mean_d ran, mean_s ran
+    'MOXIFLOXACIN': ['gyrB', 'gyrA'], # complete, pca train complete
+    'ETHIONAMIDE': ['inhA', 'ethA', 'ethR'], # complete, pca train complete, mean_d ran, mean_s ran
 } 
