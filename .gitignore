@@ -22,6 +22,9 @@ dna-tasks/Evo2/
 dna-tasks/SD-CNN/model_training/lineage_aware_data_split/logs/
 dna-tasks/SD-CNN/model_training/lineage_aware_data_split/run_sdcnn_lineage_holdout_sai.sh
 dna-tasks/SD-CNN/model_training/lineage_aware_data_split/submit_sdcnn_lineage_holdout_sai.sh
+dna-tasks/SD-CNN/interpretability/lineage_aware_split/outputs
+dna-tasks/SD-CNN/interpretability/lineage_aware_split/logs
+
 
 # SD-CNN lineage-aware runtime outputs
 dna-tasks/SD-CNN/model_training/training_output/lineage_aware_split/**
@@ -43,3 +46,10 @@ dna-tasks/Regression/interpretability/lineage_aware_split/outputs
 # Interpretability runtime artifacts
 dna-tasks/**/interpretability/**/outputs/
 dna-tasks/**/interpretability/**/logs/
+dna-tasks/Evo2/interpretability/finetuned/outputs
+dna-tasks/Evo2/interpretability/lineage_aware_split/outputs
+dna-tasks/Evo2/interpretability/lineage_aware_split/logs
+dna-tasks/Evo2/interpretability/finetuned/__pycache__
+dna-tasks/Evo2/interpretability/random_split/logs
+dna-tasks/Evo2/interpretability/random_split/outputs
+
