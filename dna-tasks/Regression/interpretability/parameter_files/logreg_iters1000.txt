@@ -12,8 +12,8 @@ shap_values_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curatio
 
 # File containing phenotypes of each strain, tab-separated values
 
-genotype_sites_file: input_data/reduced_prepared_data/site_indices.csv
-input_data_file: input_data/reduced_prepared_data/combined_geno_pheno_df.csv
+genotype_sites_file: ../data/regression_data/input_data/reduced_prepared_data/site_indices.csv
+input_data_file: ../data/regression_data/input_data/reduced_prepared_data/combined_geno_pheno_df.csv
 
 # input_data_file: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/phenotype_data/master_resistance_table.csv
 
@@ -22,4 +22,3 @@ has_neg_strand: True
 
 # Type of model
 model_type: log-reg
-
