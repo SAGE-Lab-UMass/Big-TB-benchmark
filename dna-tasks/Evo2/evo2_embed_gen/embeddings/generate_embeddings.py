@@ -34,6 +34,20 @@ def main(args: argparse.Namespace) -> None:
     print(f"{n_gpu} GPUs available")
     torch.cuda.empty_cache()
 
+    # Set random seeds for deterministic dataloader behavior
+    # This ensures consistent batch ordering across multiple runs with the same data
+    import random
+    random.seed(42)
+    np.random.seed(42)
+    torch.manual_seed(42)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(42)
+    
+    # Force deterministic algorithm for CUDA operations
+    torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
     data_config = DataConfig(
         datapath=args.datapath,
         full_dataname=args.full_dataname,
@@ -164,6 +178,7 @@ def generate_embeddings_for_loader(
                     batch,
                     args.max_length,
                     args.save_dtype,
+                    embed_type,
                 )
                 print(f"Validated existing batch {batch_index}")
             continue
@@ -228,6 +243,7 @@ def validate_saved_batch(
     batch: dict,
     max_length: int,
     save_dtype: str,
+    embed_type: str,
 ) -> None:
     embedding_path = os.path.join(
         save_path, f"zs_{data_partition}_embeddings_batch_{batch_index}.npy"
@@ -244,12 +260,31 @@ def validate_saved_batch(
     isolate_ids = np.load(isolate_path, allow_pickle=True).astype(str).tolist()
     expected_phenotypes = collect_phenotypes(batch)
     expected_isolate_ids = [str(identifier) for identifier in batch["isolate_id"]]
-    expected_prefix = (len(expected_isolate_ids), 1, max_length)
+    batch_size = len(expected_isolate_ids)
+    if embed_type == "token":
+        shape_valid = (
+            embeddings.ndim == 4
+            and embeddings.shape[:3] == (batch_size, 1, max_length)
+            and embeddings.shape[3] > 0
+        )
+        expected_shape = f"({batch_size}, 1, {max_length}, hidden_size)"
+    elif embed_type == "mean_dim":
+        shape_valid = embeddings.shape == (batch_size, 1, max_length)
+        expected_shape = f"({batch_size}, 1, {max_length})"
+    elif embed_type == "mean_seq":
+        shape_valid = (
+            embeddings.ndim == 3
+            and embeddings.shape[:2] == (batch_size, 1)
+            and embeddings.shape[2] > 0
+        )
+        expected_shape = f"({batch_size}, 1, hidden_size)"
+    else:
+        raise ValueError(f"Unsupported embed_type: {embed_type}")
 
-    if embeddings.shape[:3] != expected_prefix or embeddings.ndim != 4:
+    if not shape_valid:
         raise ValueError(
             f"Invalid embedding shape for batch {batch_index}: {embeddings.shape}; "
-            f"expected ({expected_prefix[0]}, 1, {max_length}, hidden_size)"
+            f"expected {expected_shape} for {embed_type}"
         )
     if embeddings.dtype != np.dtype(save_dtype):
         raise ValueError(

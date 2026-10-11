@@ -183,4 +183,25 @@ The following drugs are supported (defined in `finetuning/modules/dataloader/loc
 - ETHIONAMIDE
 
 Each drug is mapped to its associated resistance genes automatically.
+# Selecting one downstream model across folds
 
+After all five folds finish, record the checkpoint with the highest validation AUC:
+
+```bash
+python -m evo2_downstream.select_best_fold \
+  --model-root training_output/zero_shot/saved_models/evo2/pca \
+  --results-root training_output/zero_shot/classification_results/evo2/pca \
+  --drug KANAMYCIN --seed 1 --embed-type pca --pca-components 10
+```
+
+This requires all five fold histories and best-model checkpoints. It writes
+`<model-root>/<drug>/seed_<seed>/best_fold.json` with the fold AUCs, selected
+checkpoint and hashes, plus a `best_model.pt` symlink to the selected fold.
+For a different drug or PCA dimension, pass its corresponding values and roots.
+
+To evaluate that single selected model, submit
+`evaluate_random_split_classifier.sh` without `--array`, with
+`USE_BEST_FOLD=1` and the same `DRUG`, `RANDOM_SEED`, `EMBED_TYPE`,
+`PCA_COMPONENTS`, `MEMMAP_ROOT`, and `SAVED_MODEL_PATH` used for training.
+Set `OUTPUT_PATH` and `THRESHOLD_DIR` as usual. The launcher reads the record,
+checks the configuration, and loads the winning fold's best-model checkpoint.

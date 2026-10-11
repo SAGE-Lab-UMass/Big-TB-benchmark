@@ -10,10 +10,10 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-EVO2_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+EVO2_DIR="${EVO2_DIR:-$(cd "${SCRIPT_DIR}/../.." && pwd)}"
 # shellcheck source=../../evo2_env.sh
 source "${EVO2_DIR}/evo2_env.sh"
-LINEAGE_SPLIT_DIR="${SCRIPT_DIR}"
+LINEAGE_SPLIT_DIR="${EVO2_DIR}/zero_shot/lineage_aware"
 
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
@@ -65,6 +65,7 @@ fi
 
 LEARNING_RATE="${LEARNING_RATE:-5e-5}"
 WEIGHT_DECAY="${WEIGHT_DECAY:-1e-5}"
+PCA_COMPONENTS="${PCA_COMPONENTS:-10}"
 
 # Early stopping parameters (training-loss based, matching SD-CNN defaults)
 EARLY_STOPPING_MIN_EPOCHS="${EARLY_STOPPING_MIN_EPOCHS:-5}"
@@ -139,6 +140,7 @@ evo2_run "${EVO2_TRAIN_PYTHON}" "${LINEAGE_SPLIT_DIR}/train_lineage_holdout.py" 
     --val_batch_size "${VAL_BATCH_SIZE}" \
     --learning_rate "${LEARNING_RATE}" \
     --weight_decay "${WEIGHT_DECAY}" \
+    --pca_components "${PCA_COMPONENTS}" \
     --data_loader_workers "${DATA_LOADER_WORKERS}" \
     --early_stopping_min_epochs "${EARLY_STOPPING_MIN_EPOCHS}" \
     --early_stopping_patience "${EARLY_STOPPING_PATIENCE}" \

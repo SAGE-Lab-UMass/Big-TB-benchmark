@@ -58,8 +58,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fold", type=int, choices=range(1, 6), default=None)
     parser.add_argument("--data_loader_workers", type=int, default=0)
     parser.add_argument("--skip_completed", action="store_true")
-    parser.add_argument("--pca_components", type=int, default=10)
-    parser.add_argument("--use_pca", action="store_true")
+    parser.add_argument(
+        "--pca_components", type=int, default=10,
+        help="Component count in precomputed PCA embedding files",
+    )
     
     # Early stopping parameters (matching SD-CNN defaults)
     parser.add_argument("--early_stopping_min_epochs", type=int, default=5,
@@ -70,8 +72,12 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Minimum relative improvement threshold (default: 0.001 = 0.1%%)")
     parser.add_argument("--early_stopping_smoothing_window", type=int, default=3,
                         help="Window size for smoothing training loss")
-    parser.add_argument("--use_validation_early_stopping", action="store_true",
-                        help="Use validation-AUC early stopping instead of training-loss (default: False, uses training-loss)")
+    stopping_group = parser.add_mutually_exclusive_group()
+    stopping_group.add_argument("--use_validation_early_stopping", dest="use_validation_early_stopping",
+                                action="store_true", help="Use validation-AUC early stopping (default)")
+    stopping_group.add_argument("--use_training_loss_early_stopping", dest="use_validation_early_stopping",
+                                action="store_false", help="Use smoothed training-loss early stopping")
+    parser.set_defaults(use_validation_early_stopping=True)
     
     return parser
 

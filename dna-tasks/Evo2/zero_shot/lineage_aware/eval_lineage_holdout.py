@@ -88,15 +88,19 @@ def _load_dataset(args):
 
     loci = evo2_data.DRUG_TO_LOCI[args.drug]
     if len(loci) == 1:
-        meta_paths = sorted(
-            glob.glob(
-                f"{args.saved_embed_memmap_dir}/{loci[0]}/*_{args.embed_type}_meta.npz"
-            )
-        )
+        # Construct the correct glob pattern based on embed_type
+        if args.embed_type == "pca":
+            # PCA-compressed token embeddings are named with *_token_pc{k}_meta.npz
+            glob_pattern = f"{args.saved_embed_memmap_dir}/{loci[0]}/*_token_pc{args.pca_components}_meta.npz"
+        else:
+            glob_pattern = f"{args.saved_embed_memmap_dir}/{loci[0]}/*_{args.embed_type}_meta.npz"
+        
+        meta_paths = sorted(glob.glob(glob_pattern))
         if not meta_paths:
             raise FileNotFoundError(
                 f"No {args.embed_type} metadata found for {loci[0]} under "
-                f"{args.saved_embed_memmap_dir}"
+                f"{args.saved_embed_memmap_dir}\n"
+                f"  (searched for pattern: {glob_pattern})"
             )
         if args.embed_type == "token":
             full_dataset = evo2_data.TokenMemmapMap(meta_paths, full_label_map)
