@@ -1,0 +1,44 @@
+## Random-split interpretability parameters for Evo2 DNABERTCNN models
+
+drug: ISONIAZID
+embed_type: token
+model_name: DNABERTCNN
+# "auto" prefers the final saved checkpoint (<model_name>.pt) and falls back
+# to the early-stopping checkpoint (<model_name>_best_model.pt) per fold --
+# matches the checkpoint convention used for the zero-shot random-split
+# evaluation jobs.
+model_filename: auto
+model_seed: 42
+# null => auto-select the fold with the best validation AUC (fallback: the
+# first available fold when no fold has a usable training history). Set to
+# a specific fold number (e.g. 1) to override the automatic selection.
+fold: null
+
+model_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/training_output/zero_shot/random_split
+memmap_dir: /scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/downstream_inputs/layer20/token/memmaps
+phenotype_label_path: /scratch/workspace/saishradhamo_umass_edu-big-tb/evo2/embeddings/zero-shot/token/layer20/full/zs_full_stacked_phenotypes.npz
+geno_pheno_csv: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/data/multidrug_classification/training/geno_pheno_full_combined.csv
+WHO_VCF_mapped_dir: /project/pi_annagreen_umass_edu/saishradha/project_data_curation/vcf_who_mapped_data
+output_dir: /project/pi_annagreen_umass_edu/saishradha/Data-Curation-for-MTB/dna-tasks/Evo2/interpretability/random_split/outputs
+
+has_neg_strand: true
+k_values: [1, 5, 10]
+
+# Number of top SHAP-ranked "<gene>_<position>" features fed into MAP/MAR.
+top_n_positions: 100
+
+# Background and explainer are selected together from the drug's full
+# deduplicated dataset, matching SD-CNN/interpretability's
+# compute_shap_values_strat (20% stratified background capped at 160). The
+# explainer pool is additionally capped at 360 (matching lineage_aware_split).
+background_frac: 0.2
+max_background: 160
+max_explain: 360
+shap_batch_size: 4
+# Process the selected background in weighted chunks to bound A100 memory.
+shap_background_batch_size: 16
+random_seed: 42
+
+# Set to true to also persist the full per-sample SHAP matrix (can be large -
+# disabled by default, same rationale as lineage_aware_split).
+save_shap_values: false
