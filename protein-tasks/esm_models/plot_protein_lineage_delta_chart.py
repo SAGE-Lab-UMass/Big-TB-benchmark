@@ -2,6 +2,7 @@
 Regenerates Figure 8 (fig:protein_lineage_delta_chart), matching the original per-architecture
 stacked-subplot style (red=decline, green=improve, per-bar labels, -0.05 threshold line).
 Rebuilt 2026-09-21 after correcting the LogReg (Ref-Alt) random-split baseline in Table 3.
+ESM-PCA10 added 2026-09-22 after filling the lineage-holdout coverage gap for this variant.
 """
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,12 +10,14 @@ import matplotlib.pyplot as plt
 DRUGS = ["rifampicin", "isoniazid", "ethambutol", "pyrazinamide", "streptomycin",
          "moxifloxacin", "ethionamide", "amikacin", "capreomycin"]
 ARCHS = {"LogReg": "logreg_test_auc", "CNN": "cnn_test_auc",
-         "Transformer": "transformer_test_auc", "ESM-320": "esm_full320_test_auc"}
+         "Transformer": "transformer_test_auc", "ESM-320": "esm_full320_test_auc",
+         "ESM-PCA10": "esm_pca10_test_auc"}
 LINEAGE_SOURCES = {
     "LogReg":      ("data/latest/lineage_ood_all_train/regression/{d}/all_lineage_summary.csv", "logreg"),
     "CNN":         ("data/latest/lineage_ood_all_train/cnn/{d}/all_lineage_summary.csv", None),
     "Transformer": ("data/latest/lineage_ood_all_train/transformer/{d}/all_lineage_summary.csv", None),
     "ESM-320":     ("data/latest/lineage_ood_all_train/esm/{d}/full_320/all_lineage_summary.csv", None),
+    "ESM-PCA10":   ("data/latest/lineage_ood_all_train/esm/{d}/pca_10/all_lineage_summary.csv", None),
 }
 THRESHOLD = -0.05
 
@@ -27,7 +30,7 @@ def lineage_mean(path, model_filter=None):
 
 table3 = pd.read_csv("data/latest/results/prediction/combined/Combined2_test_aucs_Table.csv").set_index("drug")
 
-arch_order = ["LogReg", "CNN", "Transformer", "ESM-320"]
+arch_order = ["LogReg", "CNN", "Transformer", "ESM-320", "ESM-PCA10"]
 deltas = {}
 for arch in arch_order:
     path_tpl, mf = LINEAGE_SOURCES[arch]
@@ -35,7 +38,7 @@ for arch in arch_order:
 
 pd.DataFrame(deltas).to_csv("data/latest/lineage_ood_all_train/protein_lineage_delta_chart_data.csv")
 
-fig, axes = plt.subplots(len(arch_order), 1, figsize=(11, 12), sharex=True)
+fig, axes = plt.subplots(len(arch_order), 1, figsize=(11, 15), sharex=True)
 fig.suptitle("Lineage-holdout AUC change relative to random split (Protein models)", fontsize=14)
 
 for ax, arch in zip(axes, arch_order):

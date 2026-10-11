@@ -3,6 +3,8 @@ Regenerates Figure 10 (fig:task2_lineage_delta_protein), matching the house styl
 Figure 8: per-architecture stacked subplots, red=decline/green=improve, per-bar value labels.
 Per the caption: solid bar = Precision@10 change, hatched bar = Recall@10 change.
 Built 2026-09-21. Underlying data (FINAL_controlled_shap_comparison.csv) unaffected by the LogReg fix.
+ESM-PCA10 added 2026-09-22 after filling the Task 2 lineage-holdout coverage gap for this variant
+(controlled_shap_task2_esm.py --mode pca).
 """
 import pandas as pd
 import numpy as np
@@ -10,12 +12,13 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
 df = pd.read_csv("data/latest/lineage_ood_all_train/FINAL_controlled_shap_comparison.csv")
-ARCH_MAP = {"regression": "LogReg", "cnn": "CNN", "transformer": "Transformer", "esm_full320": "ESM-320"}
+ARCH_MAP = {"regression": "LogReg", "cnn": "CNN", "transformer": "Transformer", "esm_full320": "ESM-320",
+            "esm_pca10": "ESM-PCA10"}
 df["architecture"] = df["architecture"].map(ARCH_MAP)
-arch_order = ["LogReg", "CNN", "Transformer", "ESM-320"]
+arch_order = ["LogReg", "CNN", "Transformer", "ESM-320", "ESM-PCA10"]
 drugs = sorted(df["drug"].unique())  # 8 drugs, excludes amikacin/kanamycin per Table 6 scope
 
-fig, axes = plt.subplots(len(arch_order), 1, figsize=(11, 13), sharex=True)
+fig, axes = plt.subplots(len(arch_order), 1, figsize=(11, 16), sharex=True)
 fig.suptitle("Task 2 Precision@10/Recall@10 change under lineage holdout relative to random split (Protein)",
              fontsize=13)
 
