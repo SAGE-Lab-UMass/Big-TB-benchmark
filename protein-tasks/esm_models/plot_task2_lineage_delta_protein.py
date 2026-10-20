@@ -16,7 +16,11 @@ ARCH_MAP = {"regression": "LogReg", "cnn": "CNN", "transformer": "Transformer", 
             "esm_pca10": "ESM-PCA10"}
 df["architecture"] = df["architecture"].map(ARCH_MAP)
 arch_order = ["LogReg", "CNN", "Transformer", "ESM-320", "ESM-PCA10"]
-drugs = sorted(df["drug"].unique())  # 8 drugs, excludes amikacin/kanamycin per Table 6 scope
+# Drug order matches the DNA figures; amikacin/kanamycin excluded per Table 6 scope, levofloxacin has no lineage split.
+DRUG_ORDER = ["isoniazid", "rifampicin", "ethambutol", "pyrazinamide", "streptomycin",
+              "amikacin", "capreomycin", "moxifloxacin", "levofloxacin", "ethionamide"]
+drugs = [d for d in DRUG_ORDER if d in set(df["drug"])]
+assert set(drugs) == set(df["drug"]), set(df["drug"]) - set(drugs)
 
 fig, axes = plt.subplots(len(arch_order), 1, figsize=(11, 16), sharex=True)
 fig.suptitle("Task 2 Precision@10/Recall@10 change under lineage holdout relative to random split (Protein)",

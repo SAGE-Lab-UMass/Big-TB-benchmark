@@ -7,8 +7,9 @@ ESM-PCA10 added 2026-09-22 after filling the lineage-holdout coverage gap for th
 import pandas as pd
 import matplotlib.pyplot as plt
 
-DRUGS = ["rifampicin", "isoniazid", "ethambutol", "pyrazinamide", "streptomycin",
-         "moxifloxacin", "ethionamide", "amikacin", "capreomycin"]
+# Drug order matches the DNA figures; levofloxacin has no feasible lineage split.
+DRUGS = ["isoniazid", "rifampicin", "ethambutol", "pyrazinamide", "streptomycin",
+         "amikacin", "capreomycin", "moxifloxacin", "ethionamide"]
 ARCHS = {"LogReg": "logreg_test_auc", "CNN": "cnn_test_auc",
          "Transformer": "transformer_test_auc", "ESM-320": "esm_full320_test_auc",
          "ESM-PCA10": "esm_pca10_test_auc"}
