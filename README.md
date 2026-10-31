@@ -325,6 +325,19 @@ The repository contains model-ready data handling, training, and evaluation code
 
 Task-specific implementation details and additional artifact trees live in the corresponding subdirectories under `dna-tasks/` and `protein-tasks/`.
 
+
+## Reproducing the results and figures
+
+All result files reported in the manuscript are included in the repository. Protein results are in
+`protein-tasks/data/latest/results_final/` (one folder per table/figure). Running
+`protein-tasks/esm_models/significance_testing_evaluation_cleaned.ipynb` (Task 1 and its figure) and
+`protein-tasks/esm_models/esm_model_evaluations.ipynb` (Task 2 and embedding-variant figures) regenerates
+the protein tables and figures; the lineage-holdout figures are produced by
+`plot_protein_lineage_delta_chart.py` and `plot_task2_lineage_delta_protein.py`. DNA results are in
+`dna-tasks/results/`; `dna-tasks/notebooks/plots.ipynb` generates the DNA figures and the notebooks in
+`dna-tasks/significance_testing/` reproduce the significance tests. Input data are available from the
+figshare release listed in the paper.
+
 ## Citation
 
 If you use BIG-TB in your work, please cite:
