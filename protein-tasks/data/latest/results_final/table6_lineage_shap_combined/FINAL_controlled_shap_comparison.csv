@@ -31,3 +31,11 @@ transformer,moxifloxacin,0.4,0.4,0.55,0.55,0.15,0.15,2
 transformer,pyrazinamide,0.7,0.07,0.85,0.089,0.15,0.019,4
 transformer,rifampicin,0.5,0.19,0.65,0.25,0.15,0.06,4
 transformer,streptomycin,0.2,0.2,0.425,0.425,0.225,0.225,4
+esm_pca10,rifampicin,0.8,0.31,0.9,0.346,0.1,0.038,4
+esm_pca10,isoniazid,0.1,0.33,0.2,0.667,0.1,0.333,4
+esm_pca10,ethambutol,0.5,0.83,0.575,0.958,0.075,0.125,4
+esm_pca10,pyrazinamide,1.0,0.11,0.95,0.1,-0.05,-0.005,4
+esm_pca10,streptomycin,0.3,0.3,0.475,0.475,0.175,0.175,4
+esm_pca10,capreomycin,0.1,0.5,0.05,0.25,-0.05,-0.25,2
+esm_pca10,moxifloxacin,0.5,0.5,0.6,0.6,0.1,0.1,2
+esm_pca10,ethionamide,0.2,0.2,0.2,0.2,0.0,0.0,2
