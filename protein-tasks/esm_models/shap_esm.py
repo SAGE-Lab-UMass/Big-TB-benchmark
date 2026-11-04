@@ -257,7 +257,7 @@ def compute_shap_for_drug(drug, mode="full", in_dim=320,
     model, per_gene_len, gene_names, L_PAD = load_model(drug, gene, mode, in_dim, run_dir)
 
     # datasets (build + dedup)
-    (train_files, y_train), (test_files, y_test) = build_train_test_split(drug)
+    (train_files, y_train), (test_files, y_test) = build_train_test_split(drug, unique_isolates=False)  
     train_label_map = dict(zip(train_files, y_train))
     test_label_map  = dict(zip(test_files,  y_test))
     full_label_map  = {**train_label_map, **test_label_map}

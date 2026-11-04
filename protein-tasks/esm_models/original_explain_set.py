@@ -1,10 +1,4 @@
-"""Recovers the exact isolate identities of the SHAP explain set used in the original ESM lineage run, for any of the five drugs, using the SAME live code
-as compute_shap_for_drug() in shap_esm.py: build_train_test_split -> build the
-embedding dataset -> dedup_and_save_indices -> stratified_bg_explain_indices_from_ds.
-for rifampicin this reproduces the identical 712-isolate
-pool (472R/240S) that CNN's dedup produces - confirming the intended unified
-background/explain methodology really is shared across architectures. 
-"""
+
 from __future__ import annotations
 
 import glob
@@ -72,7 +66,8 @@ def _filename_for_index(ds, idx: int) -> str:
 
 
 def recover_original_explain_filenames(drug: str, mode: str = 'full', in_dim: int = 320) -> list[str]:
-    (train_files, y_train), (test_files, y_test) = build_train_test_split(drug)
+
+    (train_files, y_train), (test_files, y_test) = build_train_test_split(drug, unique_isolates=False)
     full_label_map = {**dict(zip(train_files, y_train)), **dict(zip(test_files, y_test))}
     full_ds = _make_dataset(drug, mode, in_dim, list(full_label_map.keys()), list(full_label_map.values()))
 

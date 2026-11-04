@@ -136,8 +136,12 @@ def pad_collate(batch, L_PAD):
 
 
 
-def build_train_test_split(drug, test_size=0.2, seed=42):
-    """Load sequence CSV(s) for a drug, split into train/test, return filenames + labels."""
+def build_train_test_split(drug, test_size=0.2, seed=42, unique_isolates=True):
+    """Load sequence CSV(s) for a drug, split into train/test, return filenames + labels.
+
+    unique_isolates=True splits on one row per isolate.  Keep False only to
+    reproduce the published random-split SHAP explain sets.
+    """
 
     if drug in single_drugs:
         gene = single_drugs[drug][0]
@@ -157,6 +161,9 @@ def build_train_test_split(drug, test_size=0.2, seed=42):
         dfs.append(df)
 
     ph = pd.concat(dfs, ignore_index=True)
+    if unique_isolates:
+        assert ph.groupby("Filename")["Phenotype"].nunique().max() == 1, "phenotype differs across gene CSVs"
+        ph = ph.drop_duplicates("Filename").reset_index(drop=True)
 
     files  = ph["Filename"].astype(str).values
     labels = (ph["Phenotype"] == "R").astype(int).tolist()   # ← cast to list of ints
